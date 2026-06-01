@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Inter, Poppins } from "next/font/google"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
+import { FloatingActions } from "@/components/floating-actions"
 import { site } from "@/lib/site"
 import "./globals.css"
 
@@ -51,6 +52,7 @@ export default function RootLayout({
         <Navbar />
         <main>{children}</main>
         <Footer />
+        <FloatingActions />
       </body>
     </html>
   )
