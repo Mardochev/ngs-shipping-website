@@ -144,7 +144,7 @@ export function TrackingForm() {
 
           <p className="mt-6 rounded-lg bg-navy-deep p-4 text-sm leading-relaxed text-muted-foreground">
             This is a sample tracking view. For real-time updates on your shipment, call us at{" "}
-            <span className="font-semibold text-primary">954-939-8617</span>.
+            <span className="font-semibold text-primary">754-326-3413</span>.
           </p>
         </div>
       )}

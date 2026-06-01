@@ -29,7 +29,7 @@ export function ContactForm() {
         <h3 className="mt-5 font-display text-2xl font-bold text-foreground">Message sent!</h3>
         <p className="mt-2 max-w-md text-pretty leading-relaxed text-muted-foreground">
           Thank you for reaching out to NEXTLANE GLOBAL SHIPPING. Our team will get back to you
-          shortly. For urgent requests, call us at 954-939-8617.
+          shortly. For urgent requests, call us at 754-326-3413.
         </p>
         <button
           type="button"

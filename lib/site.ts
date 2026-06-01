@@ -1,9 +1,9 @@
 export const site = {
   name: "NEXTLANE GLOBAL SHIPPING",
   shortName: "NGS",
-  phone: "954-939-8617",
-  phoneHref: "tel:9549398617",
-  whatsapp: "https://wa.me/19549398617",
+  phone: "754-326-3413",
+  phoneHref: "tel:7543263413",
+  whatsapp: "https://wa.me/17543263413",
   email: "info@ngsshipping.com",
   emailHref: "mailto:info@ngsshipping.com",
   address: "83 NW 15th PL, Pompano Beach, FL 33060",

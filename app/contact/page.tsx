@@ -7,7 +7,7 @@ import { site } from "@/lib/site"
 export const metadata: Metadata = {
   title: "Contact Us",
   description:
-    "Contact NEXTLANE GLOBAL SHIPPING (NGS) for shipping quotes and support. Call 954-939-8617 or visit us in Pompano Beach, FL.",
+    "Contact NEXTLANE GLOBAL SHIPPING (NGS) for shipping quotes and support. Call 754-326-3413 or visit us in Pompano Beach, FL.",
 }
 
 export default function ContactPage() {
