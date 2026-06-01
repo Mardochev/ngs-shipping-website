@@ -9,13 +9,13 @@ export function Hero() {
       <div className="absolute inset-0">
         <Image
           src="/hero-plane.png"
-          alt="Glowing wireframe cargo airplane flying above a cargo ship on neon light trails"
+          alt="Cargo freighter airplane flying above a cargo ship on neon light trails"
           fill
           priority
-          className="object-cover object-center opacity-60"
+          className="object-cover object-center opacity-90"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-navy-deep via-navy-deep/85 to-navy-deep/30" />
-        <div className="absolute inset-0 bg-gradient-to-t from-navy-deep via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-navy-deep via-navy-deep/75 to-navy-deep/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-navy-deep via-navy-deep/20 to-transparent" />
       </div>
 
       <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 sm:py-28 lg:grid-cols-2 lg:px-8 lg:py-32">
