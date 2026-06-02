@@ -62,6 +62,45 @@ export const steps = [
   },
 ] as const
 
+export type PackageStatus = "In Transit" | "Delivered" | "Processing" | "Out for Delivery"
+
+export const samplePackages: {
+  trackingNumber: string
+  status: PackageStatus
+  weight: string
+  dateReceived: string
+  eta: string
+}[] = [
+  {
+    trackingNumber: "NGS-2026-0042",
+    status: "In Transit",
+    weight: "48 lb",
+    dateReceived: "May 24, 2026",
+    eta: "Jun 5, 2026",
+  },
+  {
+    trackingNumber: "NGS-2026-0039",
+    status: "Out for Delivery",
+    weight: "12 lb",
+    dateReceived: "May 21, 2026",
+    eta: "Jun 1, 2026",
+  },
+  {
+    trackingNumber: "NGS-2026-0031",
+    status: "Processing",
+    weight: "1 barrel (55 gal)",
+    dateReceived: "May 28, 2026",
+    eta: "Jun 14, 2026",
+  },
+  {
+    trackingNumber: "NGS-2026-0018",
+    status: "Delivered",
+    weight: "23 lb",
+    dateReceived: "May 6, 2026",
+    eta: "May 19, 2026",
+  },
+] as const
+
 export const pricingPlans = [
   {
     name: "Barrel",

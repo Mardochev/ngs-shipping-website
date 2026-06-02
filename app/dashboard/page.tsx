@@ -9,10 +9,13 @@ import {
   BadgeCheck,
   Package,
   LogOut,
-  PackageOpen,
+  Weight,
+  CalendarDays,
+  Clock,
 } from "lucide-react"
 import { useAuth } from "@/components/auth-provider"
 import { TrackingForm } from "@/components/tracking-form"
+import { samplePackages, type PackageStatus } from "@/lib/data"
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -83,16 +86,75 @@ export default function DashboardPage() {
 
         {/* Packages */}
         <div className="mt-8 rounded-2xl border border-border bg-card p-6 sm:p-8">
-          <div className="flex items-center gap-2">
-            <Package className="h-5 w-5 text-primary" aria-hidden="true" />
-            <h2 className="font-display text-xl font-semibold text-foreground">Your Packages</h2>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <Package className="h-5 w-5 text-primary" aria-hidden="true" />
+              <h2 className="font-display text-xl font-semibold text-foreground">Your Packages</h2>
+            </div>
+            <span className="rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold text-primary">
+              {samplePackages.length} shipments
+            </span>
           </div>
-          <div className="mt-6 flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-navy-deep px-6 py-12 text-center">
-            <PackageOpen className="h-10 w-10 text-muted-foreground" aria-hidden="true" />
-            <p className="mt-4 font-display font-semibold text-foreground">No packages yet</p>
-            <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-              Once you ship with NGS, your packages and their delivery status will appear here.
-            </p>
+
+          {/* Desktop table */}
+          <div className="mt-6 hidden overflow-hidden rounded-xl border border-border md:block">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-navy-deep text-xs uppercase tracking-wider text-muted-foreground">
+                <tr>
+                  <th className="px-4 py-3 font-semibold">Tracking #</th>
+                  <th className="px-4 py-3 font-semibold">Status</th>
+                  <th className="px-4 py-3 font-semibold">Weight</th>
+                  <th className="px-4 py-3 font-semibold">Date Received</th>
+                  <th className="px-4 py-3 font-semibold">ETA</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {samplePackages.map((pkg) => (
+                  <tr key={pkg.trackingNumber} className="transition-colors hover:bg-navy-deep/50">
+                    <td className="px-4 py-4 font-mono font-semibold text-primary">
+                      {pkg.trackingNumber}
+                    </td>
+                    <td className="px-4 py-4">
+                      <StatusBadge status={pkg.status} />
+                    </td>
+                    <td className="px-4 py-4 text-foreground">{pkg.weight}</td>
+                    <td className="px-4 py-4 text-muted-foreground">{pkg.dateReceived}</td>
+                    <td className="px-4 py-4 text-foreground">{pkg.eta}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile cards */}
+          <div className="mt-6 flex flex-col gap-4 md:hidden">
+            {samplePackages.map((pkg) => (
+              <div key={pkg.trackingNumber} className="rounded-xl border border-border bg-navy-deep p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="font-mono text-sm font-semibold text-primary">
+                    {pkg.trackingNumber}
+                  </span>
+                  <StatusBadge status={pkg.status} />
+                </div>
+                <dl className="mt-4 grid grid-cols-1 gap-3">
+                  <div className="flex items-center gap-2">
+                    <Weight className="h-4 w-4 flex-shrink-0 text-primary" aria-hidden="true" />
+                    <dt className="text-muted-foreground">Weight:</dt>
+                    <dd className="font-medium text-foreground">{pkg.weight}</dd>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CalendarDays className="h-4 w-4 flex-shrink-0 text-primary" aria-hidden="true" />
+                    <dt className="text-muted-foreground">Received:</dt>
+                    <dd className="font-medium text-foreground">{pkg.dateReceived}</dd>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 flex-shrink-0 text-primary" aria-hidden="true" />
+                    <dt className="text-muted-foreground">ETA:</dt>
+                    <dd className="font-medium text-foreground">{pkg.eta}</dd>
+                  </div>
+                </dl>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -108,6 +170,22 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+function StatusBadge({ status }: { status: PackageStatus }) {
+  const styles: Record<PackageStatus, string> = {
+    Delivered: "bg-green-500/15 text-green-400",
+    "In Transit": "bg-primary/15 text-primary",
+    "Out for Delivery": "bg-sky-500/15 text-sky-400",
+    Processing: "bg-muted text-muted-foreground",
+  }
+  return (
+    <span
+      className={`inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold ${styles[status]}`}
+    >
+      {status}
+    </span>
   )
 }
 
