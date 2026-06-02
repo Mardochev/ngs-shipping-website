@@ -3,12 +3,14 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu, X, Phone, Plane } from "lucide-react"
+import { Menu, X, Phone, Plane, LayoutDashboard, LogIn, UserPlus } from "lucide-react"
 import { navLinks, site } from "@/lib/site"
+import { useAuth } from "@/components/auth-provider"
 
 export function Navbar() {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
+  const { customer, ready } = useAuth()
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-navy-deep/85 backdrop-blur-md">
@@ -54,12 +56,30 @@ export function Navbar() {
             <Phone className="h-4 w-4 text-primary" aria-hidden="true" />
             {site.phone}
           </a>
-          <Link
-            href="/tracking"
-            className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-apricot-light"
-          >
-            Track Shipment
-          </Link>
+          {ready && customer ? (
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-apricot-light"
+            >
+              <LayoutDashboard className="h-4 w-4" aria-hidden="true" />
+              My Dashboard
+            </Link>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="rounded-lg border border-border px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:border-primary hover:text-primary"
+              >
+                Login
+              </Link>
+              <Link
+                href="/register"
+                className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-apricot-light"
+              >
+                Create Account
+              </Link>
+            </>
+          )}
         </div>
 
         <button
@@ -101,13 +121,35 @@ export function Navbar() {
                 <Phone className="h-4 w-4 text-primary" aria-hidden="true" />
                 {site.phone}
               </a>
-              <Link
-                href="/tracking"
-                onClick={() => setOpen(false)}
-                className="rounded-lg bg-primary px-4 py-2.5 text-center text-base font-semibold text-primary-foreground"
-              >
-                Track Shipment
-              </Link>
+              {ready && customer ? (
+                <Link
+                  href="/dashboard"
+                  onClick={() => setOpen(false)}
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-center text-base font-semibold text-primary-foreground"
+                >
+                  <LayoutDashboard className="h-5 w-5" aria-hidden="true" />
+                  My Dashboard
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    onClick={() => setOpen(false)}
+                    className="inline-flex items-center justify-center gap-2 rounded-lg border border-border px-4 py-2.5 text-center text-base font-semibold text-foreground"
+                  >
+                    <LogIn className="h-5 w-5 text-primary" aria-hidden="true" />
+                    Login
+                  </Link>
+                  <Link
+                    href="/register"
+                    onClick={() => setOpen(false)}
+                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-center text-base font-semibold text-primary-foreground"
+                  >
+                    <UserPlus className="h-5 w-5" aria-hidden="true" />
+                    Create Account
+                  </Link>
+                </>
+              )}
             </div>
           </nav>
         </div>
