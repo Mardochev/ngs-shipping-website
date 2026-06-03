@@ -63,6 +63,69 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Routes we serve */}
+      <section className="border-y border-border/60 bg-navy-deep px-4 py-20 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">
+              Routes We Serve
+            </p>
+            <h2 className="mt-3 font-display text-3xl font-bold text-balance text-foreground sm:text-4xl">
+              Direct air cargo lanes to Haiti
+            </h2>
+            <p className="mt-4 text-pretty leading-relaxed text-muted-foreground">
+              Fast, Secure and Reliable Air Cargo Service from Florida to Haiti.
+            </p>
+          </div>
+
+          <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              { from: "Florida, USA", fromFlag: "\u{1F1FA}\u{1F1F8}", to: "Port-au-Prince, Haiti", toFlag: "\u{1F1ED}\u{1F1F9}" },
+              { from: "Florida, USA", fromFlag: "\u{1F1FA}\u{1F1F8}", to: "Cap-Ha\u00EFtien, Haiti", toFlag: "\u{1F1ED}\u{1F1F9}" },
+              { from: "Florida, USA", fromFlag: "\u{1F1FA}\u{1F1F8}", to: "Les Cayes, Haiti", toFlag: "\u{1F1ED}\u{1F1F9}" },
+            ].map((route) => (
+              <div
+                key={route.to}
+                className="group relative overflow-hidden rounded-2xl border border-border bg-card p-6 transition-colors hover:border-primary/60"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/15 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                    <Plane className="h-5 w-5" aria-hidden="true" />
+                  </span>
+                  <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
+                    Air Cargo
+                  </span>
+                </div>
+
+                <div className="mt-6 flex items-center gap-3">
+                  <div className="min-w-0">
+                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">From</p>
+                    <p className="mt-1 font-display text-base font-semibold text-foreground">
+                      <span aria-hidden="true">{route.fromFlag}</span> {route.from}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="my-4 flex items-center gap-3" aria-hidden="true">
+                  <span className="h-px flex-1 bg-border" />
+                  <ArrowRight className="h-4 w-4 text-primary" />
+                  <span className="h-px flex-1 bg-border" />
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="min-w-0">
+                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">To</p>
+                    <p className="mt-1 font-display text-base font-semibold text-foreground">
+                      <span aria-hidden="true">{route.toFlag}</span> {route.to}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Services preview */}
       <section className="px-4 py-20 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
