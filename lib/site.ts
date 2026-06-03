@@ -7,7 +7,8 @@ export const site = {
   email: "info@ngsshipping.com",
   emailHref: "mailto:info@ngsshipping.com",
   address: "83 NW 15th PL, Pompano Beach, FL 33060",
-  tagline: "Fast & Reliable Shipping from the USA to Haiti",
+  tagline: "Fast, Secure & Reliable Air Cargo from the USA to Haiti",
+  slogan: "Your Cargo, Our Priority",
 } as const
 
 export const navLinks = [

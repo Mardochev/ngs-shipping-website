@@ -4,11 +4,10 @@ import { useState, type FormEvent } from "react"
 import { CheckCircle2, Send } from "lucide-react"
 
 const services = [
-  "Ocean Freight",
-  "Air Freight",
-  "Barrel Shipping",
-  "Vehicle Shipping",
+  "Air Cargo",
   "Package Delivery",
+  "Tracking Services",
+  "Commercial Shipments",
   "Other",
 ]
 

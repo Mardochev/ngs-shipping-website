@@ -49,11 +49,10 @@ export function Footer() {
               Services
             </h3>
             <ul className="mt-4 space-y-2.5 text-sm text-muted-foreground">
-              <li>Ocean Freight</li>
-              <li>Air Freight</li>
-              <li>Barrel Shipping</li>
-              <li>Vehicle Shipping</li>
+              <li>Air Cargo</li>
               <li>Package Delivery</li>
+              <li>Tracking Services</li>
+              <li>Commercial Shipments</li>
             </ul>
           </div>
 

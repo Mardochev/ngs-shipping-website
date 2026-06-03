@@ -7,7 +7,7 @@ import { services, steps } from "@/lib/data"
 export const metadata: Metadata = {
   title: "Services",
   description:
-    "Explore NGS shipping services: ocean freight, air freight, barrel shipping, vehicle shipping, package delivery, and door-to-door logistics from the USA to Haiti.",
+    "Explore NGS air cargo services: air cargo, package delivery, tracking services, and commercial shipments from the USA to Haiti.",
 }
 
 export default function ServicesPage() {
@@ -15,8 +15,8 @@ export default function ServicesPage() {
     <>
       <PageHeader
         eyebrow="Our Services"
-        title="Complete shipping services to Haiti"
-        description="From a single barrel to full container loads, NGS offers flexible options to move anything you need from the USA to Haiti."
+        title="Air cargo services to Haiti"
+        description="From a single package to full commercial shipments, NGS moves everything you need from the USA to Haiti by air cargo."
       />
 
       <section className="px-4 py-20 sm:px-6 lg:px-8">

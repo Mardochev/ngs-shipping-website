@@ -1,6 +1,6 @@
 import Image from "next/image"
 import Link from "next/link"
-import { Phone, ArrowRight, ShieldCheck, Plane, Ship } from "lucide-react"
+import { Phone, ArrowRight, Plane } from "lucide-react"
 import { site } from "@/lib/site"
 
 export function Hero() {
@@ -9,7 +9,7 @@ export function Hero() {
       <div className="absolute inset-0">
         <Image
           src="/hero-plane.png"
-          alt="Cargo freighter airplane flying above a cargo ship on neon light trails"
+          alt="Cargo freighter airplane flying through neon light trails"
           fill
           priority
           className="object-cover object-center opacity-90"
@@ -21,27 +21,25 @@ export function Hero() {
       <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 sm:py-28 lg:grid-cols-2 lg:px-8 lg:py-32">
         <div className="max-w-2xl">
           <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
-            <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
-            USA {"\u2192"} Haiti {"\u{1F1ED}\u{1F1F9}"}
+            USA {"\u{1F1FA}\u{1F1F8}"} {"\u279C"} Haiti {"\u{1F1ED}\u{1F1F9}"}
           </span>
           <h1 className="mt-5 font-display text-4xl font-extrabold leading-[1.05] text-balance text-foreground sm:text-6xl">
-            Air & ocean shipping to{" "}
+            Air Cargo Shipping to{" "}
             <span className="text-primary">Haiti</span>
           </h1>
+          <p className="mt-4 font-display text-lg font-semibold tracking-wide text-foreground sm:text-xl">
+            Fast {"\u2022"} Secure {"\u2022"} Reliable Air Cargo Service
+          </p>
           <p className="mt-5 max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground">
-            NEXTLANE GLOBAL SHIPPING moves your barrels, packages, and vehicles from the United
-            States to Haiti by air and sea {"\u2014"} with care, speed, and full tracking every step
-            of the way.
+            NEXTLANE GLOBAL SHIPPING (NGS) moves your packages and commercial cargo from the United
+            States to Haiti by air cargo {"\u2014"} with care, speed, and full tracking every step of
+            the way.
           </p>
 
-          <div className="mt-6 flex flex-wrap gap-3">
-            <span className="inline-flex items-center gap-2 rounded-lg border border-border bg-secondary/40 px-4 py-2 text-sm font-semibold text-foreground backdrop-blur">
-              <Plane className="h-4 w-4 text-primary" aria-hidden="true" />
-              Air Freight
-            </span>
-            <span className="inline-flex items-center gap-2 rounded-lg border border-border bg-secondary/40 px-4 py-2 text-sm font-semibold text-foreground backdrop-blur">
-              <Ship className="h-4 w-4 text-primary" aria-hidden="true" />
-              Ocean Freight
+          <div className="mt-6 inline-flex items-center gap-2 rounded-lg border border-primary/40 bg-primary/10 px-4 py-2">
+            <Plane className="h-4 w-4 text-primary" aria-hidden="true" />
+            <span className="font-display text-sm font-bold uppercase tracking-wider text-primary">
+              {site.slogan}
             </span>
           </div>
 
@@ -65,7 +63,7 @@ export function Hero() {
           <dl className="mt-12 grid max-w-lg grid-cols-3 gap-6">
             {[
               { value: "10K+", label: "Shipments delivered" },
-              { value: "48hr", label: "Air freight to Haiti" },
+              { value: "48hr", label: "Air cargo to Haiti" },
               { value: "100%", label: "Tracked & insured" },
             ].map((stat) => (
               <div key={stat.label}>

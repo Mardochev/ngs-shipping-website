@@ -1,41 +1,29 @@
-import { Ship, Plane, Package, Car, Boxes, Truck } from "lucide-react"
+import { Plane, Package, Radar, Building2 } from "lucide-react"
 
 export const services = [
   {
-    icon: Ship,
-    title: "Ocean Freight",
-    description:
-      "Affordable container and LCL ocean shipping for large loads, furniture, and bulk cargo bound for Haiti.",
-  },
-  {
     icon: Plane,
-    title: "Air Freight",
+    title: "Air Cargo",
     description:
-      "Express air cargo delivering urgent shipments from the USA to Port-au-Prince in as little as 48 hours.",
-  },
-  {
-    icon: Boxes,
-    title: "Barrel Shipping",
-    description:
-      "The classic way to send food, clothing, and household goods to family. We supply, pack, and ship your barrels.",
-  },
-  {
-    icon: Car,
-    title: "Vehicle Shipping",
-    description:
-      "Cars, trucks, and motorcycles shipped safely with roll-on/roll-off and container options to Haitian ports.",
+      "Fast, secure air cargo delivering your shipments from the USA to Port-au-Prince in as little as 48 hours.",
   },
   {
     icon: Package,
     title: "Package Delivery",
     description:
-      "Send small parcels and documents with reliable door-to-door and pickup-point delivery across Haiti.",
+      "Send parcels, documents, and care packages with reliable door-to-door and pickup-point delivery across Haiti.",
   },
   {
-    icon: Truck,
-    title: "Door-to-Door",
+    icon: Radar,
+    title: "Tracking Services",
     description:
-      "Full-service logistics from your address in the USA all the way to the recipient's door in Haiti.",
+      "Follow every shipment in real time with a tracking number, from drop-off in the USA to delivery in Haiti.",
+  },
+  {
+    icon: Building2,
+    title: "Commercial Shipments",
+    description:
+      "Dependable air cargo solutions for businesses, with customs documentation and dedicated account support.",
   },
 ] as const
 
@@ -88,7 +76,7 @@ export const samplePackages: {
   {
     trackingNumber: "NGS-2026-0031",
     status: "Processing",
-    weight: "1 barrel (55 gal)",
+    weight: "34 lb",
     dateReceived: "May 28, 2026",
     eta: "Jun 14, 2026",
   },
@@ -103,16 +91,16 @@ export const samplePackages: {
 
 export const pricingPlans = [
   {
-    name: "Barrel",
-    price: "$95",
-    unit: "per barrel",
-    description: "Best for sending food, clothing, and everyday household goods to loved ones.",
+    name: "Standard Air",
+    price: "$3.50",
+    unit: "per lb",
+    description: "Reliable air cargo for everyday packages and personal shipments to Haiti.",
     features: [
-      "Standard 55-gallon barrel",
-      "Ocean freight to Haiti",
-      "Up to 2-3 weeks transit",
+      "3-5 day air cargo",
+      "Package & parcel shipping",
       "Tracking included",
       "Pickup point delivery",
+      "Affordable flat handling",
     ],
     highlighted: false,
   },
@@ -122,7 +110,7 @@ export const pricingPlans = [
     unit: "per lb",
     description: "Our fastest option for urgent packages and time-sensitive cargo.",
     features: [
-      "48-hour air freight",
+      "48-hour air cargo",
       "Priority handling",
       "Full insurance coverage",
       "Real-time tracking",
@@ -131,16 +119,16 @@ export const pricingPlans = [
     highlighted: true,
   },
   {
-    name: "Ocean Cargo",
+    name: "Commercial",
     price: "Custom",
-    unit: "by volume",
-    description: "For vehicles, furniture, and large-volume commercial shipments.",
+    unit: "by weight",
+    description: "For businesses and large-volume commercial air cargo shipments.",
     features: [
-      "Container & LCL options",
-      "Vehicle shipping",
+      "Volume air cargo rates",
       "Commercial freight",
       "Customs documentation",
       "Dedicated account manager",
+      "Scheduled recurring shipments",
     ],
     highlighted: false,
   },

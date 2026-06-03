@@ -9,13 +9,13 @@ import { site } from "@/lib/site"
 export const metadata: Metadata = {
   title: "Pricing",
   description:
-    "Transparent, competitive pricing for shipping to Haiti with NGS. Barrel shipping, express air freight, and ocean cargo rates.",
+    "Transparent, competitive air cargo pricing for shipping to Haiti with NGS. Standard air, express air, and commercial cargo rates.",
 }
 
 const faqs = [
   {
     q: "How are shipping rates calculated?",
-    a: "Rates depend on the service type, weight, dimensions, and destination in Haiti. Barrels are flat-rate, air freight is by the pound, and ocean cargo is priced by volume.",
+    a: "Rates depend on the service level, weight, dimensions, and destination in Haiti. Standard and express air cargo are priced by the pound, and commercial shipments are quoted by total weight.",
   },
   {
     q: "Do you offer pickup in the USA?",
@@ -23,11 +23,11 @@ const faqs = [
   },
   {
     q: "Is my shipment insured?",
-    a: "Insurance is available on all shipments and included on express air freight. Ask our team about coverage options for your cargo.",
+    a: "Insurance is available on all shipments and included on express air cargo. Ask our team about coverage options for your cargo.",
   },
   {
     q: "How long does delivery take?",
-    a: "Express air freight arrives in about 48 hours, while ocean freight and barrels typically take 2 to 3 weeks depending on customs.",
+    a: "Express air cargo arrives in about 48 hours, while standard air cargo typically takes 3 to 5 days depending on customs clearance.",
   },
 ]
 
@@ -89,7 +89,7 @@ export default function PricingPage() {
         </div>
 
         <p className="mx-auto mt-10 max-w-2xl text-center text-sm leading-relaxed text-muted-foreground">
-          Need a custom quote for vehicles, commercial freight, or large volumes? Call us at{" "}
+          Need a custom quote for commercial cargo or large-volume shipments? Call us at{" "}
           <a href={site.phoneHref} className="font-semibold text-primary hover:underline">
             {site.phone}
           </a>{" "}

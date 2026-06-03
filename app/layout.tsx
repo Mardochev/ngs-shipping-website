@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     template: `%s | ${site.shortName}`,
   },
   description:
-    "NEXTLANE GLOBAL SHIPPING (NGS) provides fast, reliable, and affordable shipping services from the USA to Haiti. Air and ocean freight, barrels, cars, and package delivery.",
+    "NEXTLANE GLOBAL SHIPPING (NGS) provides fast, secure, and reliable air cargo from the USA to Haiti. Air cargo, package delivery, tracking, and commercial shipments. Your Cargo, Our Priority.",
   keywords: [
     "shipping to Haiti",
     "USA to Haiti shipping",
