@@ -23,8 +23,11 @@ export function Navbar() {
             <span className="font-display text-xl font-extrabold tracking-tight text-foreground">
               NGS
             </span>
-            <span className="mt-1 text-[9px] font-semibold uppercase tracking-[0.16em] text-primary sm:text-[11px] sm:tracking-[0.2em]">
+            <span className="mt-1 text-center text-[9px] font-semibold uppercase tracking-[0.16em] text-primary sm:text-[11px] sm:tracking-[0.2em]">
               NEXTLANE GLOBAL SHIPPING
+            </span>
+            <span className="mt-0.5 text-center text-[10px] font-bold tracking-wide text-primary sm:text-xs">
+              Ha{"\u00EF"}ti {"\u{1F1ED}\u{1F1F9}"} Dir{"\u00E8"}k
             </span>
           </span>
         </Link>
