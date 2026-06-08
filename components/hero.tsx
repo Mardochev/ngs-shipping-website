@@ -20,9 +20,14 @@ export function Hero() {
 
       <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 sm:py-28 lg:grid-cols-2 lg:px-8 lg:py-32">
         <div className="max-w-2xl">
-          <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
-            USA {"\u{1F1FA}\u{1F1F8}"} {"\u279C"} Haiti {"\u{1F1ED}\u{1F1F9}"}
-          </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
+              USA {"\u{1F1FA}\u{1F1F8}"} {"\u279C"} Haiti {"\u{1F1ED}\u{1F1F9}"}
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary-foreground">
+              Haiti {"\u{1F1ED}\u{1F1F9}"} Dir{"\u00E8"}k
+            </span>
+          </div>
           <h1 className="mt-5 font-display text-4xl font-extrabold leading-[1.05] text-balance text-foreground sm:text-6xl">
             Air Cargo Shipping to{" "}
             <span className="text-primary">Haiti</span>
