@@ -303,6 +303,21 @@ export async function updateShipmentStatus(formData: FormData): Promise<void> {
   revalidatePath("/admin")
 }
 
+export async function setPaymentStatus(formData: FormData): Promise<void> {
+  await requireAdmin()
+  const supabase = getServiceClient()
+  const id = String(formData.get("id") ?? "")
+  const paymentStatus = String(formData.get("payment_status") ?? "")
+  if (!id || !["PAID", "UNPAID"].includes(paymentStatus)) return
+
+  await supabase
+    .from("packages")
+    .update({ payment_status: paymentStatus, updated_at: new Date().toISOString() })
+    .eq("id", id)
+  revalidatePath(`/admin/shipments/${id}/invoice`)
+  revalidatePath("/admin")
+}
+
 export async function deleteShipment(formData: FormData): Promise<void> {
   await requireAdmin()
   const supabase = getServiceClient()

@@ -30,6 +30,8 @@ export type Shipment = {
   recipient_phone: string | null
   recipient_address: string | null
   estimated_delivery: string | null
+  payment_status: "PAID" | "UNPAID"
+  due_date: string | null
   created_at: string
   updated_at: string
 }
