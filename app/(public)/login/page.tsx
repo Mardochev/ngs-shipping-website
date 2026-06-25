@@ -1,29 +1,14 @@
 "use client"
 
-import { useState, type FormEvent } from "react"
+import { useActionState, useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { Plane, LogIn, Eye, EyeOff } from "lucide-react"
-import { useAuth } from "@/components/auth-provider"
+import { loginCustomer } from "@/lib/actions/customer"
+import { SubmitButton } from "@/components/admin/submit-button"
 
 export default function LoginPage() {
-  const router = useRouter()
-  const { login } = useAuth()
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const [state, formAction] = useActionState(loginCustomer, {})
   const [showPassword, setShowPassword] = useState(false)
-  const [error, setError] = useState("")
-
-  function handleSubmit(e: FormEvent) {
-    e.preventDefault()
-    setError("")
-    try {
-      login(email, password)
-      router.push("/dashboard")
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.")
-    }
-  }
 
   return (
     <section className="relative flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-16 sm:px-6">
@@ -46,23 +31,22 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {error && (
+        {state?.error && (
           <p className="mt-6 rounded-lg border border-apricot-light/40 bg-apricot-light/10 px-4 py-3 text-sm text-apricot-light" role="alert">
-            {error}
+            {state.error}
           </p>
         )}
 
-        <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
+        <form action={formAction} className="mt-6 flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
             <label htmlFor="email" className="text-sm font-medium text-foreground">
               Email
             </label>
             <input
               id="email"
+              name="email"
               type="email"
               required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
               autoComplete="email"
               className="rounded-lg border border-input bg-navy-deep px-4 py-3 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
             />
@@ -75,10 +59,9 @@ export default function LoginPage() {
             <div className="flex items-center rounded-lg border border-input bg-navy-deep">
               <input
                 id="password"
+                name="password"
                 type={showPassword ? "text" : "password"}
                 required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
                 autoComplete="current-password"
                 className="w-full bg-transparent px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none"
               />
@@ -93,13 +76,10 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <button
-            type="submit"
-            className="mt-2 inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-base font-semibold text-primary-foreground transition-colors hover:bg-apricot-light"
-          >
+          <SubmitButton className="mt-2 w-full py-3 text-base" pendingText="Logging in...">
             <LogIn className="h-5 w-5" aria-hidden="true" />
             Log In
-          </button>
+          </SubmitButton>
         </form>
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
