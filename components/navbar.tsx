@@ -5,12 +5,11 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Menu, X, Phone, Plane, LayoutDashboard, LogIn, UserPlus } from "lucide-react"
 import { navLinks, site } from "@/lib/site"
-import { useAuth } from "@/components/auth-provider"
+import type { CustomerSession } from "@/lib/session"
 
-export function Navbar() {
+export function Navbar({ customer }: { customer: CustomerSession | null }) {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
-  const { customer, ready } = useAuth()
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-navy-deep/85 backdrop-blur-md">
@@ -59,7 +58,7 @@ export function Navbar() {
             <Phone className="h-4 w-4 text-primary" aria-hidden="true" />
             {site.phone}
           </a>
-          {ready && customer ? (
+          {customer ? (
             <Link
               href="/dashboard"
               className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-apricot-light"
@@ -124,7 +123,7 @@ export function Navbar() {
                 <Phone className="h-4 w-4 text-primary" aria-hidden="true" />
                 {site.phone}
               </a>
-              {ready && customer ? (
+              {customer ? (
                 <Link
                   href="/dashboard"
                   onClick={() => setOpen(false)}

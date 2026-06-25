@@ -1,9 +1,5 @@
 import type { Metadata } from "next"
 import { Inter, Poppins } from "next/font/google"
-import { Navbar } from "@/components/navbar"
-import { Footer } from "@/components/footer"
-import { FloatingActions } from "@/components/floating-actions"
-import { AuthProvider } from "@/components/auth-provider"
 import { site } from "@/lib/site"
 import "./globals.css"
 
@@ -49,14 +45,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`bg-background ${inter.variable} ${poppins.variable}`}>
-      <body className="font-sans antialiased">
-        <AuthProvider>
-          <Navbar />
-          <main>{children}</main>
-          <Footer />
-          <FloatingActions />
-        </AuthProvider>
-      </body>
+      <body className="font-sans antialiased">{children}</body>
     </html>
   )
 }
