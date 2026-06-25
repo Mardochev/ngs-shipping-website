@@ -25,7 +25,7 @@ function pad(num: number, len = 4) {
 
 async function nextCode(name: "customer" | "tracking") {
   const supabase = getServiceClient()
-  const { data, error } = await supabase.rpc("next_counter", { counter_name: name })
+  const { data, error } = await supabase.rpc("next_counter", { counter_name: name } as never)
   if (error) throw error
   return Number(data)
 }

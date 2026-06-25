@@ -1,11 +1,12 @@
-import { createClient } from "@supabase/supabase-js"
+import { createClient, type SupabaseClient } from "@supabase/supabase-js"
 
 // Server-only Supabase client using the service role key.
 // This bypasses RLS, so it must ONLY be imported in server-side code
 // (server actions / route handlers) that has already verified the caller's session.
-let cached: ReturnType<typeof createClient> | null = null
+// Typed as `any` schema because we don't generate DB types; queries are validated at runtime.
+let cached: SupabaseClient | null = null
 
-export function getServiceClient() {
+export function getServiceClient(): SupabaseClient {
   if (cached) return cached
 
   const url = process.env.SUPABASE_URL
