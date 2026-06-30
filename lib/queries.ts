@@ -68,8 +68,9 @@ export async function getShipmentById(id: string): Promise<{
   }
 }
 
-// Lightweight: single query, no tracking events. Used by the label/print page.
-export async function getShipmentForLabel(id: string): Promise<ShipmentWithCustomer | null> {
+// Lightweight: single query, no tracking events. Used by the print pages
+// (invoice + label), neither of which renders the tracking timeline.
+export async function getShipmentForPrint(id: string): Promise<ShipmentWithCustomer | null> {
   const supabase = getServiceClient()
   const { data } = await supabase
     .from("packages")

@@ -1,11 +1,9 @@
 import { notFound, redirect } from "next/navigation"
-import QRCode from "qrcode"
 import { Plane } from "lucide-react"
 import { getAdminSession } from "@/lib/session"
-import { getShipmentById } from "@/lib/queries"
+import { getShipmentForPrint } from "@/lib/queries"
+import { getCachedQrDataUrl } from "@/lib/qr-cache"
 import { InvoiceActions } from "@/components/admin/invoice-actions"
-
-export const dynamic = "force-dynamic"
 
 // Invoice-specific company details (provided by NGS)
 const company = {
@@ -37,7 +35,7 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
   if (!session) redirect("/admin/login")
 
   const { id } = await params
-  const { shipment } = await getShipmentById(id)
+  const shipment = await getShipmentForPrint(id)
   if (!shipment) notFound()
 
   const customer = shipment.customers
@@ -47,10 +45,11 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
   const isPaid = paymentStatus === "PAID"
   const dueDate = shipment.due_date ?? addDays(shipment.created_at, 7)
 
-  const qrDataUrl = await QRCode.toDataURL(TRACKING_URL, {
+  const qrDataUrl = await getCachedQrDataUrl(TRACKING_URL, {
     width: 200,
     margin: 1,
-    color: { dark: NAVY, light: "#ffffff" },
+    dark: NAVY,
+    light: "#ffffff",
   })
 
   return (

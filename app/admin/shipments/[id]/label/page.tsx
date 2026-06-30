@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation"
 import { getAdminSession } from "@/lib/session"
-import { getShipmentForLabel } from "@/lib/queries"
+import { getShipmentForPrint } from "@/lib/queries"
 import { getCachedQrDataUrl } from "@/lib/qr-cache"
 import { getBarcodeSvg } from "@/lib/barcode"
 import { LabelActions } from "@/components/admin/label-actions"
@@ -53,7 +53,7 @@ export default async function LabelPage({ params }: { params: Promise<{ id: stri
   if (!session) redirect("/admin/login")
 
   const { id } = await params
-  const shipment = await getShipmentForLabel(id)
+  const shipment = await getShipmentForPrint(id)
   if (!shipment) notFound()
 
   const customer = shipment.customers
