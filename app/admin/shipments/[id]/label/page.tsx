@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation"
 import { getAdminSession } from "@/lib/session"
 import { getShipmentForLabel } from "@/lib/queries"
 import { getCachedQrDataUrl } from "@/lib/qr-cache"
+import { getBarcodeSvg } from "@/lib/barcode"
 import { LabelActions } from "@/components/admin/label-actions"
 
 const company = {
@@ -18,35 +19,31 @@ function formatDate(value: string | null) {
   return new Date(value).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
 }
 
+// Print strategy mirrors the working invoice page: hide page chrome with
+// display:none (cheap) instead of toggling visibility on every DOM node, and
+// avoid CSS gradients so Edge's print pipeline does not freeze.
 const labelPrintCss = `
 @media print {
   @page {
     size: 4in 6in;
     margin: 0;
   }
-  body * {
-    visibility: hidden;
-  }
-  .shipping-label,
-  .shipping-label * {
-    visibility: visible;
-  }
-  .shipping-label {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 4in;
-    height: 6in;
-    padding: 0.2in;
-    background: white;
-    color: black;
-    font-family: Arial, sans-serif;
-    box-shadow: none !important;
-    border: none !important;
-    border-radius: 0 !important;
+  .label-page {
+    background: white !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    min-height: 0 !important;
   }
   .no-print {
     display: none !important;
+  }
+  .shipping-label {
+    width: 4in !important;
+    height: 6in !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
   }
 }
 `
@@ -64,9 +61,10 @@ export default async function LabelPage({ params }: { params: Promise<{ id: stri
     `${TRACKING_URL}?number=${encodeURIComponent(shipment.tracking_number)}`,
     { width: 220, margin: 1 },
   )
+  const barcodeSvg = getBarcodeSvg(shipment.tracking_number, { height: 40 })
 
   return (
-    <div className="min-h-screen bg-navy-deep px-4 py-8 print:bg-white print:p-0">
+    <div className="label-page min-h-screen bg-navy-deep px-4 py-8 print:bg-white print:p-0">
       {/* eslint-disable-next-line react/no-danger */}
       <style dangerouslySetInnerHTML={{ __html: labelPrintCss }} />
 
@@ -165,16 +163,13 @@ export default async function LabelPage({ params }: { params: Promise<{ id: stri
               <p className="font-mono font-extrabold" style={{ fontSize: "16px", letterSpacing: "0.5px" }}>
                 {shipment.tracking_number}
               </p>
-              {/* Faux barcode strip */}
+              {/* Barcode (cached inline SVG — cheap to print, never regenerated) */}
               <div
                 aria-hidden="true"
                 className="mt-1"
-                style={{
-                  height: "34px",
-                  width: "2in",
-                  backgroundImage:
-                    "repeating-linear-gradient(90deg, #000 0 2px, #fff 2px 4px, #000 4px 5px, #fff 5px 9px, #000 9px 12px, #fff 12px 14px)",
-                }}
+                style={{ height: "34px", width: "2in" }}
+                // eslint-disable-next-line react/no-danger
+                dangerouslySetInnerHTML={{ __html: barcodeSvg }}
               />
             </div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
