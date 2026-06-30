@@ -68,6 +68,17 @@ export async function getShipmentById(id: string): Promise<{
   }
 }
 
+// Lightweight: single query, no tracking events. Used by the label/print page.
+export async function getShipmentForLabel(id: string): Promise<ShipmentWithCustomer | null> {
+  const supabase = getServiceClient()
+  const { data } = await supabase
+    .from("packages")
+    .select("*, customers ( id, full_name, customer_code, email, phone )")
+    .eq("id", id)
+    .maybeSingle()
+  return (data as unknown as ShipmentWithCustomer) ?? null
+}
+
 export async function getShipmentByTracking(tracking: string): Promise<{
   shipment: Shipment | null
   events: TrackingEvent[]

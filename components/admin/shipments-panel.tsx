@@ -108,6 +108,7 @@ export function ShipmentsPanel({
                       </Link>
                       <Link
                         href={`/admin/shipments/${s.id}/label`}
+                        prefetch
                         className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-primary"
                         aria-label="Print shipping label"
                         title="Shipping label"

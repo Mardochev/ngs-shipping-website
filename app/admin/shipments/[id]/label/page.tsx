@@ -1,10 +1,8 @@
 import { notFound, redirect } from "next/navigation"
-import QRCode from "qrcode"
 import { getAdminSession } from "@/lib/session"
-import { getShipmentById } from "@/lib/queries"
+import { getShipmentForLabel } from "@/lib/queries"
+import { getCachedQrDataUrl } from "@/lib/qr-cache"
 import { LabelActions } from "@/components/admin/label-actions"
-
-export const dynamic = "force-dynamic"
 
 const company = {
   name: "NEXTLANE GLOBAL SHIPPING",
@@ -58,14 +56,14 @@ export default async function LabelPage({ params }: { params: Promise<{ id: stri
   if (!session) redirect("/admin/login")
 
   const { id } = await params
-  const { shipment } = await getShipmentById(id)
+  const shipment = await getShipmentForLabel(id)
   if (!shipment) notFound()
 
   const customer = shipment.customers
-  const qrDataUrl = await QRCode.toDataURL(`${TRACKING_URL}?number=${encodeURIComponent(shipment.tracking_number)}`, {
-    width: 220,
-    margin: 1,
-  })
+  const qrDataUrl = await getCachedQrDataUrl(
+    `${TRACKING_URL}?number=${encodeURIComponent(shipment.tracking_number)}`,
+    { width: 220, margin: 1 },
+  )
 
   return (
     <div className="min-h-screen bg-navy-deep px-4 py-8 print:bg-white print:p-0">
