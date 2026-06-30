@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Plus, Pencil, Trash2, FileText, Search } from "lucide-react"
+import { Plus, Pencil, Trash2, FileText, Search, Tag } from "lucide-react"
 import { deleteShipment, updateShipmentStatus } from "@/lib/actions/admin"
 import { SHIPMENT_STATUSES, type Customer, type Shipment, type ShipmentWithCustomer } from "@/lib/types"
 import { Modal } from "./modal"
@@ -105,6 +105,14 @@ export function ShipmentsPanel({
                         title="Invoice"
                       >
                         <FileText className="h-4 w-4" />
+                      </Link>
+                      <Link
+                        href={`/admin/shipments/${s.id}/label`}
+                        className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-primary"
+                        aria-label="Print shipping label"
+                        title="Shipping label"
+                      >
+                        <Tag className="h-4 w-4" />
                       </Link>
                       <button
                         type="button"
