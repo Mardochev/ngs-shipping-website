@@ -19,6 +19,37 @@ const NAVY = "#0a2a4a"
 const GOLD = "#b8791a"
 const TRACKING_URL = "https://www.ngsshipping.com/tracking"
 
+// Keep the invoice on a single Letter page: neutralize the screen-only
+// min-height/margins and prevent any page breaks inside the invoice.
+const invoicePrintCss = `
+@media print {
+  @page {
+    size: letter;
+    margin: 0.4in;
+  }
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+  .invoice-page {
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #fff !important;
+  }
+  .invoice-article {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
+`
+
 function formatDate(value: string | null) {
   if (!value) return "—"
   return new Date(value).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
@@ -53,13 +84,14 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
   })
 
   return (
-    <div className="min-h-screen bg-navy-deep px-4 py-8 print:bg-white print:p-0">
+    <div className="invoice-page min-h-screen bg-navy-deep px-4 py-8 print:bg-white print:p-0">
+      <style dangerouslySetInnerHTML={{ __html: invoicePrintCss }} />
       <div className="mx-auto max-w-3xl">
-        <div className="mb-6">
+        <div className="no-print mb-6">
           <InvoiceActions shipmentId={shipment.id} paymentStatus={paymentStatus} />
         </div>
 
-        <article className="mx-auto overflow-hidden rounded-2xl bg-white text-slate-900 shadow-2xl print:rounded-none print:shadow-none">
+        <article className="invoice-article mx-auto overflow-hidden rounded-2xl bg-white text-slate-900 shadow-2xl print:rounded-none print:shadow-none">
           {/* Top accent bar */}
           <div className="h-2 w-full" style={{ backgroundColor: NAVY }}>
             <div className="h-full w-1/3" style={{ backgroundColor: GOLD }} />
