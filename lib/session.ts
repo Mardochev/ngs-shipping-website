@@ -7,7 +7,7 @@ const secret = new TextEncoder().encode(
 )
 
 const ADMIN_COOKIE = "ngs_admin_session"
-const CUSTOMER_COOKIE = "ngs_customer_session"
+export const CUSTOMER_COOKIE = "ngs_customer_session"
 const MAX_AGE = 60 * 60 * 24 * 7 // 7 days
 
 export type AdminSession = { id: string; email: string; name: string | null }

@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation"
 import { User, Mail, BadgeCheck, Package, LogOut, Weight, CalendarDays, Clock } from "lucide-react"
 import { getCustomerSession } from "@/lib/session"
-import { logoutCustomer } from "@/lib/actions/customer"
 import { listCustomerShipments } from "@/lib/queries"
 import { TrackingForm } from "@/components/tracking-form"
 import { StatusBadge } from "@/components/status-badge"
@@ -28,15 +27,13 @@ export default async function DashboardPage() {
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">Customer Dashboard</p>
             <h1 className="mt-2 font-display text-3xl font-bold text-foreground">Welcome, {firstName}</h1>
           </div>
-          <form action={logoutCustomer}>
-            <button
-              type="submit"
-              className="inline-flex w-fit items-center gap-2 rounded-lg border border-border bg-card px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-primary"
-            >
-              <LogOut className="h-4 w-4 text-primary" aria-hidden="true" />
-              Log Out
-            </button>
-          </form>
+          <a
+            href="/logout"
+            className="inline-flex w-fit items-center gap-2 rounded-lg border border-border bg-card px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-primary"
+          >
+            <LogOut className="h-4 w-4 text-primary" aria-hidden="true" />
+            Log Out
+          </a>
         </div>
 
         {/* Account details */}
