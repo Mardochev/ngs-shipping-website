@@ -5,7 +5,7 @@ export const services = [
     icon: Plane,
     title: "Air Cargo",
     description:
-      "Reliable air cargo delivering your shipments from Florida to Haiti, with estimated delivery in 5\u201310 business days.",
+      "Reliable air cargo delivering your shipments from USA to Haiti, with estimated delivery in 5\u201310 business days.",
   },
   {
     icon: Package,

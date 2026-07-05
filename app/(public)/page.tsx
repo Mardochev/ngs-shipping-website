@@ -80,9 +80,9 @@ export default function HomePage() {
 
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {[
-              { from: "Florida, USA", fromFlag: "\u{1F1FA}\u{1F1F8}", to: "Les Cayes / Okay, Haiti", toFlag: "\u{1F1ED}\u{1F1F9}", available: true },
-              { from: "Florida, USA", fromFlag: "\u{1F1FA}\u{1F1F8}", to: "Port-au-Prince, Haiti", toFlag: "\u{1F1ED}\u{1F1F9}", available: false },
-              { from: "Florida, USA", fromFlag: "\u{1F1FA}\u{1F1F8}", to: "Cap-Ha\u00EFtien, Haiti", toFlag: "\u{1F1ED}\u{1F1F9}", available: false },
+              { from: "USA", fromFlag: "\u{1F1FA}\u{1F1F8}", to: "Les Cayes / Okay, Haiti", toFlag: "\u{1F1ED}\u{1F1F9}", available: true },
+              { from: "USA", fromFlag: "\u{1F1FA}\u{1F1F8}", to: "Port-au-Prince, Haiti", toFlag: "\u{1F1ED}\u{1F1F9}", available: false },
+              { from: "USA", fromFlag: "\u{1F1FA}\u{1F1F8}", to: "Cap-Ha\u00EFtien, Haiti", toFlag: "\u{1F1ED}\u{1F1F9}", available: false },
             ].map((route) => (
               <div
                 key={route.to}
@@ -194,7 +194,7 @@ export default function HomePage() {
               The trusted bridge between the USA and Haiti
             </h2>
             <p className="mt-4 text-pretty leading-relaxed text-muted-foreground">
-              NEXTLANE GLOBAL SHIPPING is now serving Florida to Haiti, helping families and
+              NEXTLANE GLOBAL SHIPPING is now serving USA to Haiti, helping families and
               businesses send what matters most. We combine competitive rates with the personal care
               of a team that understands the Haitian community.
             </p>

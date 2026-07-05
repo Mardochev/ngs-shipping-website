@@ -24,11 +24,11 @@ export function Hero() {
             USA {"\u{1F1FA}\u{1F1F8}"} {"\u279C"} Haiti {"\u{1F1ED}\u{1F1F9}"}
           </span>
           <h1 className="mt-5 font-display text-4xl font-extrabold leading-[1.05] text-balance text-foreground sm:text-6xl">
-            Air Cargo from Florida to{" "}
+            Air Cargo from USA to{" "}
             <span className="text-primary">Haiti</span>
           </h1>
           <p className="mt-5 max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground">
-            Reliable air cargo service from Florida to Haiti. Currently serving Les Cayes / Okay.
+            Reliable air cargo service from USA to Haiti. Currently serving Les Cayes / Okay.
             Port-au-Prince and Cap-Ha{"\u00EF"}tien coming soon.
           </p>
 
@@ -58,7 +58,7 @@ export function Hero() {
 
           <ul className="mt-10 flex flex-wrap gap-3">
             {[
-              "Now serving Florida to Haiti",
+              "Now serving USA to Haiti",
               "Estimated delivery: 5\u201310 business days",
               "Tracked & insured",
             ].map((item) => (

@@ -21,7 +21,7 @@ const values = [
     icon: Globe2,
     title: "Global Reach",
     description:
-      "From Florida to every corner of Haiti, our network ensures your cargo gets where it needs to go.",
+      "From the USA to every corner of Haiti, our network ensures your cargo gets where it needs to go.",
   },
   {
     icon: Award,
@@ -60,7 +60,7 @@ export default function AboutPage() {
                 packages, and we knew there was a better way.
               </p>
               <p>
-                We are now serving Florida to Haiti, moving packages and commercial air cargo for
+                We are now serving USA to Haiti, moving packages and commercial air cargo for
                 our community. Whether you are sending a care package to family or managing
                 commercial cargo, our team handles every detail with precision and care.
               </p>
