@@ -1,6 +1,6 @@
 import Image from "next/image"
 import Link from "next/link"
-import { Phone, ArrowRight, Plane } from "lucide-react"
+import { Phone, ArrowRight, Plane, CheckCircle2 } from "lucide-react"
 import { site } from "@/lib/site"
 
 export function Hero() {
@@ -24,16 +24,12 @@ export function Hero() {
             USA {"\u{1F1FA}\u{1F1F8}"} {"\u279C"} Haiti {"\u{1F1ED}\u{1F1F9}"}
           </span>
           <h1 className="mt-5 font-display text-4xl font-extrabold leading-[1.05] text-balance text-foreground sm:text-6xl">
-            Air Cargo Shipping to{" "}
+            Air Cargo from Florida to{" "}
             <span className="text-primary">Haiti</span>
           </h1>
-          <p className="mt-4 font-display text-lg font-semibold tracking-wide text-foreground sm:text-xl">
-            Fast {"\u2022"} Secure {"\u2022"} Reliable Air Cargo Service
-          </p>
           <p className="mt-5 max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground">
-            NEXTLANE GLOBAL SHIPPING (NGS) moves your packages and commercial cargo from the United
-            States to Haiti by air cargo {"\u2014"} with care, speed, and full tracking every step of
-            the way.
+            Reliable air cargo service from Florida to Haiti. Currently serving Les Cayes / Okay.
+            Port-au-Prince and Cap-Ha{"\u00EF"}tien coming soon.
           </p>
 
           <div className="mt-6 inline-flex items-center gap-2 rounded-lg border border-primary/40 bg-primary/10 px-4 py-2">
@@ -60,18 +56,21 @@ export function Hero() {
             </a>
           </div>
 
-          <dl className="mt-12 grid max-w-lg grid-cols-3 gap-6">
+          <ul className="mt-10 flex flex-wrap gap-3">
             {[
-              { value: "10K+", label: "Shipments delivered" },
-              { value: "48hr", label: "Air cargo to Haiti" },
-              { value: "100%", label: "Tracked & insured" },
-            ].map((stat) => (
-              <div key={stat.label}>
-                <dt className="font-display text-3xl font-bold text-primary">{stat.value}</dt>
-                <dd className="mt-1 text-sm text-muted-foreground">{stat.label}</dd>
-              </div>
+              "Now serving Florida to Haiti",
+              "Estimated delivery: 5\u201310 business days",
+              "Tracked & insured",
+            ].map((item) => (
+              <li
+                key={item}
+                className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-4 py-2 text-sm font-semibold text-foreground"
+              >
+                <CheckCircle2 className="h-4 w-4 text-primary" aria-hidden="true" />
+                {item}
+              </li>
             ))}
-          </dl>
+          </ul>
         </div>
 
         <div className="relative hidden lg:block">
@@ -90,8 +89,8 @@ export function Hero() {
               <Plane className="h-5 w-5" aria-hidden="true" />
             </span>
             <div>
-              <p className="font-display text-sm font-bold text-foreground">Express Air Cargo</p>
-              <p className="text-xs text-muted-foreground">Delivered in as little as 48 hours</p>
+              <p className="font-display text-sm font-bold text-foreground">Air Cargo to Haiti</p>
+              <p className="text-xs text-muted-foreground">Estimated delivery: 5{"\u2013"}10 business days</p>
             </div>
           </div>
         </div>

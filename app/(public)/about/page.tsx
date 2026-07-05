@@ -60,8 +60,8 @@ export default function AboutPage() {
                 packages, and we knew there was a better way.
               </p>
               <p>
-                Today, we move thousands of packages and commercial air cargo shipments from the USA
-                to Haiti every year. Whether you are sending a care package to family or managing
+                We are now serving Florida to Haiti, moving packages and commercial air cargo for
+                our community. Whether you are sending a care package to family or managing
                 commercial cargo, our team handles every detail with precision and care.
               </p>
               <p>

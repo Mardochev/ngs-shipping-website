@@ -27,7 +27,7 @@ const faqs = [
   },
   {
     q: "How long does delivery take?",
-    a: "Express air cargo arrives in about 48 hours, while standard air cargo typically takes 3 to 5 days depending on customs clearance.",
+    a: "Estimated delivery is 5 to 10 business days depending on customs clearance. Priority air cargo is handled first for faster processing.",
   },
 ]
 

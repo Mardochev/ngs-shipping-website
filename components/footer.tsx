@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Plane, Phone, Mail, MapPin } from "lucide-react"
+import { Plane, Phone, MessageCircle, Mail, MapPin } from "lucide-react"
 import { navLinks, site } from "@/lib/site"
 
 export function Footer() {
@@ -65,6 +65,17 @@ export function Footer() {
                 <a href={site.phoneHref} className="flex items-start gap-2.5 transition-colors hover:text-primary">
                   <Phone className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" aria-hidden="true" />
                   {site.phone}
+                </a>
+              </li>
+              <li>
+                <a
+                  href={site.whatsapp}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start gap-2.5 transition-colors hover:text-primary"
+                >
+                  <MessageCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" aria-hidden="true" />
+                  WhatsApp: {site.whatsappNumber}
                 </a>
               </li>
               <li>

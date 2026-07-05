@@ -5,7 +5,7 @@ export const services = [
     icon: Plane,
     title: "Air Cargo",
     description:
-      "Fast, secure air cargo delivering your shipments from the USA to Port-au-Prince in as little as 48 hours.",
+      "Reliable air cargo delivering your shipments from Florida to Haiti, with estimated delivery in 5\u201310 business days.",
   },
   {
     icon: Package,
@@ -57,7 +57,7 @@ export const pricingPlans = [
     unit: "per lb",
     description: "Reliable air cargo for everyday packages and personal shipments to Haiti.",
     features: [
-      "3-5 day air cargo",
+      "Standard air cargo",
       "Package & parcel shipping",
       "Tracking included",
       "Pickup point delivery",
@@ -71,7 +71,7 @@ export const pricingPlans = [
     unit: "per lb",
     description: "Our fastest option for urgent packages and time-sensitive cargo.",
     features: [
-      "48-hour air cargo",
+      "Priority air cargo",
       "Priority handling",
       "Full insurance coverage",
       "Real-time tracking",

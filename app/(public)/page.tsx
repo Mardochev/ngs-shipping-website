@@ -27,8 +27,8 @@ export default function HomePage() {
                   <Plane className="h-5 w-5" aria-hidden="true" />
                 </span>
                 <div>
-                  <p className="font-display text-sm font-bold text-foreground">Express Air Cargo</p>
-                  <p className="text-xs text-muted-foreground">Delivered in as little as 48 hours</p>
+                  <p className="font-display text-sm font-bold text-foreground">Air Cargo to Haiti</p>
+                  <p className="text-xs text-muted-foreground">Estimated delivery: 5{"\u2013"}10 business days</p>
                 </div>
               </div>
             </div>
@@ -47,7 +47,7 @@ export default function HomePage() {
               </p>
               <ul className="mt-8 space-y-4">
                 {[
-                  { icon: Clock, text: "Delivered to Port-au-Prince in as little as 48 hours" },
+                  { icon: Clock, text: "Estimated delivery: 5\u201310 business days" },
                   { icon: CheckCircle2, text: "Priority handling and full cargo insurance" },
                   { icon: Radar, text: "Real-time tracking from drop-off to delivery" },
                   { icon: Plane, text: "Door-to-door air cargo across Haiti" },
@@ -74,15 +74,15 @@ export default function HomePage() {
               Direct air cargo lanes to Haiti
             </h2>
             <p className="mt-4 text-pretty leading-relaxed text-muted-foreground">
-              Fast, Secure and Reliable Air Cargo Service from Florida to Haiti.
+              Currently serving Les Cayes / Okay. Port-au-Prince and Cap-Ha{"\u00EF"}tien coming soon.
             </p>
           </div>
 
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {[
-              { from: "Florida, USA", fromFlag: "\u{1F1FA}\u{1F1F8}", to: "Port-au-Prince, Haiti", toFlag: "\u{1F1ED}\u{1F1F9}" },
-              { from: "Florida, USA", fromFlag: "\u{1F1FA}\u{1F1F8}", to: "Cap-Ha\u00EFtien, Haiti", toFlag: "\u{1F1ED}\u{1F1F9}" },
-              { from: "Florida, USA", fromFlag: "\u{1F1FA}\u{1F1F8}", to: "Les Cayes, Haiti", toFlag: "\u{1F1ED}\u{1F1F9}" },
+              { from: "Florida, USA", fromFlag: "\u{1F1FA}\u{1F1F8}", to: "Les Cayes / Okay, Haiti", toFlag: "\u{1F1ED}\u{1F1F9}", available: true },
+              { from: "Florida, USA", fromFlag: "\u{1F1FA}\u{1F1F8}", to: "Port-au-Prince, Haiti", toFlag: "\u{1F1ED}\u{1F1F9}", available: false },
+              { from: "Florida, USA", fromFlag: "\u{1F1FA}\u{1F1F8}", to: "Cap-Ha\u00EFtien, Haiti", toFlag: "\u{1F1ED}\u{1F1F9}", available: false },
             ].map((route) => (
               <div
                 key={route.to}
@@ -92,8 +92,14 @@ export default function HomePage() {
                   <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/15 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
                     <Plane className="h-5 w-5" aria-hidden="true" />
                   </span>
-                  <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
-                    Air Cargo
+                  <span
+                    className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider ${
+                      route.available
+                        ? "bg-primary/10 text-primary"
+                        : "bg-secondary text-muted-foreground"
+                    }`}
+                  >
+                    {route.available ? "Available now" : "Coming soon"}
                   </span>
                 </div>
 
@@ -188,9 +194,9 @@ export default function HomePage() {
               The trusted bridge between the USA and Haiti
             </h2>
             <p className="mt-4 text-pretty leading-relaxed text-muted-foreground">
-              For years, families and businesses have counted on NEXTLANE GLOBAL SHIPPING to deliver
-              what matters most. We combine competitive rates with the personal care of a team that
-              understands the Haitian community.
+              NEXTLANE GLOBAL SHIPPING is now serving Florida to Haiti, helping families and
+              businesses send what matters most. We combine competitive rates with the personal care
+              of a team that understands the Haitian community.
             </p>
             <ul className="mt-8 grid gap-4 sm:grid-cols-2">
               {[

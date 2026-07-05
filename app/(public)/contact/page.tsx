@@ -58,7 +58,7 @@ export default function ContactPage() {
                   <span>
                     <span className="block text-sm text-muted-foreground">WhatsApp</span>
                     <span className="font-display text-lg font-semibold text-foreground">
-                      Chat with us
+                      {site.whatsappNumber}
                     </span>
                   </span>
                 </a>

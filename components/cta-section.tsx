@@ -10,8 +10,8 @@ export function CtaSection() {
           Ready to ship to Haiti {"\u{1F1ED}\u{1F1F9}"}?
         </h2>
         <p className="mx-auto mt-4 max-w-2xl text-pretty leading-relaxed text-muted-foreground">
-          Get a free quote today and discover why thousands trust NEXTLANE GLOBAL SHIPPING for fast,
-          safe, and affordable delivery from the USA to Haiti.
+          Get a free quote today for reliable air cargo from Florida to Haiti. Now serving Les Cayes
+          / Okay, with Port-au-Prince and Cap-Ha{"\u00EF"}tien coming soon.
         </p>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <a
