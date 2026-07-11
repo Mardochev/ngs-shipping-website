@@ -56,7 +56,7 @@ export default function ServicesPage() {
             </p>
             <ul className="mt-8 space-y-4">
               {[
-                "Direct routes to Port-au-Prince and Cap-Haïtien",
+                "Direct routes to Okap and Okay (Port-au-Prince coming soon)",
                 "Customs documentation and clearance support",
                 "Consolidation services to lower your costs",
                 "Flexible pickup and drop-off scheduling",

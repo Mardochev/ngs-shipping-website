@@ -50,7 +50,7 @@ export default function HomePage() {
                   { icon: Clock, text: "Estimated delivery: 5\u201310 business days" },
                   { icon: CheckCircle2, text: "Priority handling and full cargo insurance" },
                   { icon: Radar, text: "Real-time tracking from drop-off to delivery" },
-                  { icon: Plane, text: "Door-to-door air cargo across Haiti" },
+                  { icon: Plane, text: "Air cargo to our Okap and Okay pickup locations" },
                 ].map((item) => (
                   <li key={item.text} className="flex items-start gap-3">
                     <item.icon className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" aria-hidden="true" />
@@ -74,15 +74,18 @@ export default function HomePage() {
               Direct air cargo lanes to Haiti
             </h2>
             <p className="mt-4 text-pretty leading-relaxed text-muted-foreground">
-              Currently serving Les Cayes / Okay. Port-au-Prince and Cap-Ha{"\u00EF"}tien coming soon.
+              We receive packages for Okap and Okay. Port-au-Prince coming soon.
+            </p>
+            <p className="mt-2 text-pretty leading-relaxed text-primary">
+              Nou pran koli pou Okap ak Okay. Port-au-Prince ap vini.
             </p>
           </div>
 
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {[
-              { from: "USA", fromFlag: "\u{1F1FA}\u{1F1F8}", to: "Les Cayes / Okay, Haiti", toFlag: "\u{1F1ED}\u{1F1F9}", available: true },
+              { from: "USA", fromFlag: "\u{1F1FA}\u{1F1F8}", to: "Cap-Ha\u00EFtien (Okap), Haiti", toFlag: "\u{1F1ED}\u{1F1F9}", available: true },
+              { from: "USA", fromFlag: "\u{1F1FA}\u{1F1F8}", to: "Les Cayes (Okay), Haiti", toFlag: "\u{1F1ED}\u{1F1F9}", available: true },
               { from: "USA", fromFlag: "\u{1F1FA}\u{1F1F8}", to: "Port-au-Prince, Haiti", toFlag: "\u{1F1ED}\u{1F1F9}", available: false },
-              { from: "USA", fromFlag: "\u{1F1FA}\u{1F1F8}", to: "Cap-Ha\u00EFtien, Haiti", toFlag: "\u{1F1ED}\u{1F1F9}", available: false },
             ].map((route) => (
               <div
                 key={route.to}
@@ -205,7 +208,7 @@ export default function HomePage() {
                 "Cargo insurance available",
                 "Bilingual customer support",
                 "Fast, secure air cargo",
-                "Door-to-door delivery",
+                "Convenient pickup locations",
               ].map((item) => (
                 <li key={item} className="flex items-start gap-3">
                   <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" aria-hidden="true" />

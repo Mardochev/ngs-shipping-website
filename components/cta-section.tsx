@@ -10,8 +10,8 @@ export function CtaSection() {
           Ready to ship to Haiti {"\u{1F1ED}\u{1F1F9}"}?
         </h2>
         <p className="mx-auto mt-4 max-w-2xl text-pretty leading-relaxed text-muted-foreground">
-          Get a free quote today for reliable air cargo from USA to Haiti. Now serving Les Cayes
-          / Okay, with Port-au-Prince and Cap-Ha{"\u00EF"}tien coming soon.
+          Get a free quote today for reliable air cargo from USA to Haiti. We receive packages for
+          Okap and Okay. Port-au-Prince coming soon.
         </p>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <a
@@ -19,7 +19,7 @@ export function CtaSection() {
             className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-base font-semibold text-primary-foreground transition-colors hover:bg-apricot-light sm:w-auto"
           >
             <Phone className="h-5 w-5" aria-hidden="true" />
-            Call {site.phone}
+            Call / WhatsApp: {site.phone}
           </a>
           <Link
             href="/contact"

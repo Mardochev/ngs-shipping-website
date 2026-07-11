@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Plane, Phone, MessageCircle, Mail, MapPin } from "lucide-react"
+import { Plane, Phone, MessageCircle, Mail, MapPin, Globe } from "lucide-react"
 import { navLinks, site } from "@/lib/site"
 
 export function Footer() {
@@ -64,7 +64,7 @@ export function Footer() {
               <li>
                 <a href={site.phoneHref} className="flex items-start gap-2.5 transition-colors hover:text-primary">
                   <Phone className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" aria-hidden="true" />
-                  {site.phone}
+                  Call / WhatsApp: {site.phone}
                 </a>
               </li>
               <li>
@@ -75,13 +75,24 @@ export function Footer() {
                   className="flex items-start gap-2.5 transition-colors hover:text-primary"
                 >
                   <MessageCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" aria-hidden="true" />
-                  WhatsApp: {site.whatsappNumber}
+                  Chat on WhatsApp
                 </a>
               </li>
               <li>
                 <a href={site.emailHref} className="flex items-start gap-2.5 transition-colors hover:text-primary">
                   <Mail className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" aria-hidden="true" />
                   {site.email}
+                </a>
+              </li>
+              <li>
+                <a
+                  href={site.websiteHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start gap-2.5 transition-colors hover:text-primary"
+                >
+                  <Globe className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" aria-hidden="true" />
+                  {site.website}
                 </a>
               </li>
               <li className="flex items-start gap-2.5">

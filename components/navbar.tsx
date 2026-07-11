@@ -53,7 +53,7 @@ export function Navbar({ customer }: { customer: CustomerSession | null }) {
             className="flex items-center gap-2 text-sm font-semibold text-foreground transition-colors hover:text-primary"
           >
             <Phone className="h-4 w-4 text-primary" aria-hidden="true" />
-            {site.phone}
+            Call / WhatsApp: {site.phone}
           </a>
           {customer ? (
             <Link
@@ -118,7 +118,7 @@ export function Navbar({ customer }: { customer: CustomerSession | null }) {
                 className="flex items-center gap-2 px-3 text-base font-semibold text-foreground"
               >
                 <Phone className="h-4 w-4 text-primary" aria-hidden="true" />
-                {site.phone}
+                Call / WhatsApp: {site.phone}
               </a>
               {customer ? (
                 <Link

@@ -28,8 +28,11 @@ export function Hero() {
             <span className="text-primary">Haiti</span>
           </h1>
           <p className="mt-5 max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground">
-            Reliable air cargo service from USA to Haiti. Currently serving Les Cayes / Okay.
-            Port-au-Prince and Cap-Ha{"\u00EF"}tien coming soon.
+            Reliable air cargo service from USA to Haiti. We receive packages for Okap and Okay.
+            Port-au-Prince coming soon.
+          </p>
+          <p className="mt-3 max-w-xl text-pretty text-base font-medium leading-relaxed text-primary">
+            Nou pran koli pou Okap ak Okay. Port-au-Prince ap vini.
           </p>
 
           <div className="mt-6 inline-flex items-center gap-2 rounded-lg border border-primary/40 bg-primary/10 px-4 py-2">
@@ -52,7 +55,7 @@ export function Hero() {
               className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-secondary/60 px-6 py-3 text-base font-semibold text-foreground backdrop-blur transition-colors hover:border-primary"
             >
               <Phone className="h-5 w-5 text-primary" aria-hidden="true" />
-              {site.phone}
+              Call / WhatsApp: {site.phone}
             </a>
           </div>
 

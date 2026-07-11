@@ -11,7 +11,7 @@ export const services = [
     icon: Package,
     title: "Package Delivery",
     description:
-      "Send parcels, documents, and care packages with reliable door-to-door and pickup-point delivery across Haiti.",
+      "Send parcels, documents, and care packages with reliable air cargo to our Okap and Okay pickup locations.",
   },
   {
     icon: Radar,
@@ -45,8 +45,8 @@ export const steps = [
   },
   {
     step: "04",
-    title: "Delivered in Haiti",
-    description: "Your shipment arrives safely and is ready for pickup or door-to-door delivery in Haiti.",
+    title: "Arrives in Haiti",
+    description: "Your shipment arrives safely and is ready for pickup at our Okap or Okay location.",
   },
 ] as const
 
@@ -75,7 +75,7 @@ export const pricingPlans = [
       "Priority handling",
       "Full insurance coverage",
       "Real-time tracking",
-      "Door-to-door available",
+      "Priority pickup available",
     ],
     highlighted: true,
   },
