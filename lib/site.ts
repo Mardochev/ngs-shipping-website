@@ -4,7 +4,7 @@ export const site = {
   phone: "754-326-3413",
   phoneHref: "tel:+17543263413",
   whatsappNumber: "754-326-3413",
-  whatsapp: "https://wa.me/17543263413",
+  whatsapp: "https://api.whatsapp.com/send?phone=17543263413",
   email: "info@ngsshipping.com",
   emailHref: "mailto:info@ngsshipping.com",
   website: "www.ngsshipping.com",
