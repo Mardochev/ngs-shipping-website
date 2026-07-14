@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu, X, Phone, Plane, LayoutDashboard, LogIn, UserPlus } from "lucide-react"
+import { Menu, X, Mail, Plane, LayoutDashboard, LogIn, UserPlus } from "lucide-react"
 import { navLinks, site } from "@/lib/site"
 import type { CustomerSession } from "@/lib/session"
 
@@ -49,11 +49,11 @@ export function Navbar({ customer }: { customer: CustomerSession | null }) {
 
         <div className="hidden items-center gap-3 lg:flex">
           <a
-            href={site.phoneHref}
+            href={site.emailHref}
             className="flex items-center gap-2 text-sm font-semibold text-foreground transition-colors hover:text-primary"
           >
-            <Phone className="h-4 w-4 text-primary" aria-hidden="true" />
-            Call / WhatsApp: {site.phone}
+            <Mail className="h-4 w-4 text-primary" aria-hidden="true" />
+            {site.email}
           </a>
           {customer ? (
             <Link
@@ -114,11 +114,11 @@ export function Navbar({ customer }: { customer: CustomerSession | null }) {
             })}
             <div className="mt-2 flex flex-col gap-2 border-t border-border/60 pt-4">
               <a
-                href={site.phoneHref}
+                href={site.emailHref}
                 className="flex items-center gap-2 px-3 text-base font-semibold text-foreground"
               >
-                <Phone className="h-4 w-4 text-primary" aria-hidden="true" />
-                Call / WhatsApp: {site.phone}
+                <Mail className="h-4 w-4 text-primary" aria-hidden="true" />
+                {site.email}
               </a>
               {customer ? (
                 <Link
