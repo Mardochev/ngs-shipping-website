@@ -82,13 +82,13 @@ export default async function LabelPage({ params }: { params: Promise<{ id: stri
           <div className="flex items-center justify-between border-b-2 border-black pb-2">
             <div className="flex items-center gap-2">
               <span
-                className="flex h-9 w-9 items-center justify-center rounded font-extrabold text-white"
-                style={{ backgroundColor: "#0a2a4a", fontSize: "13px" }}
+                className="flex h-12 w-12 items-center justify-center rounded font-extrabold text-white"
+                style={{ backgroundColor: "#0a2a4a", fontSize: "17px" }}
               >
                 NGS
               </span>
               <div className="leading-tight">
-                <p className="font-extrabold" style={{ fontSize: "10px" }}>
+                <p className="font-extrabold" style={{ fontSize: "13px", color: "#0a2a4a" }}>
                   {company.name}
                 </p>
                 <p style={{ fontSize: "8px" }}>Air Cargo · USA → Haiti</p>
