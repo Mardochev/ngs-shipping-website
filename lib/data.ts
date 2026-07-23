@@ -35,8 +35,9 @@ export const steps = [
   },
   {
     step: "02",
-    title: "Drop Off or Pickup",
-    description: "Bring your items to our Pompano Beach facility or schedule a convenient pickup.",
+    title: "Drop Off or Schedule a Pickup",
+    description:
+      "Bring your packages to our Pompano Beach location, or contact us to schedule a convenient pickup. Pickup availability may vary by location.",
   },
   {
     step: "03",
@@ -73,7 +74,7 @@ export const pricingPlans = [
     features: [
       "Priority air cargo",
       "Priority handling",
-      "Full insurance coverage",
+      "Cargo insurance options available",
       "Real-time tracking",
       "Priority pickup available",
     ],

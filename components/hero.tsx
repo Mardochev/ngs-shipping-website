@@ -63,7 +63,7 @@ export function Hero() {
             {[
               "Now serving USA to Haiti",
               "Estimated delivery: 5\u201310 business days",
-              "Tracked & insured",
+              "Secure & tracked shipping",
             ].map((item) => (
               <li
                 key={item}

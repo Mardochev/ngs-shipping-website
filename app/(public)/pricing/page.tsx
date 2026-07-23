@@ -23,7 +23,7 @@ const faqs = [
   },
   {
     q: "Is my shipment insured?",
-    a: "Insurance is available on all shipments and included on express air cargo. Ask our team about coverage options for your cargo.",
+    a: "Every shipment receives a tracking number for added visibility and peace of mind. Cargo insurance options may be available \u2014 contact NGS for details.",
   },
   {
     q: "How long does delivery take?",

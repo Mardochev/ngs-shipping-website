@@ -48,7 +48,7 @@ export default function HomePage() {
               <ul className="mt-8 space-y-4">
                 {[
                   { icon: Clock, text: "Estimated delivery: 5\u201310 business days" },
-                  { icon: CheckCircle2, text: "Priority handling and full cargo insurance" },
+                  { icon: CheckCircle2, text: "Secure & tracked shipping with a tracking number" },
                   { icon: Radar, text: "Real-time tracking from drop-off to delivery" },
                   { icon: Plane, text: "Air cargo to our Okap and Okay pickup locations" },
                 ].map((item) => (
@@ -205,7 +205,7 @@ export default function HomePage() {
               {[
                 "Competitive, transparent pricing",
                 "Full shipment tracking",
-                "Cargo insurance available",
+                "Cargo insurance options available",
                 "Bilingual customer support",
                 "Fast, secure air cargo",
                 "Convenient pickup locations",
