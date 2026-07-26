@@ -1,11 +1,14 @@
 import "server-only"
 import { getServiceClient } from "@/lib/supabase/admin"
-import type {
-  AppSettings,
-  Customer,
-  Shipment,
-  ShipmentWithCustomer,
-  TrackingEvent,
+import {
+  MANIFEST_ELIGIBLE_STATUSES,
+  type AppSettings,
+  type Customer,
+  type Manifest,
+  type ManifestWithPackages,
+  type Shipment,
+  type ShipmentWithCustomer,
+  type TrackingEvent,
 } from "@/lib/types"
 
 export async function getAdminCount(): Promise<number> {
@@ -110,4 +113,46 @@ export async function listCustomerShipments(customerId: string): Promise<Shipmen
     .eq("customer_id", customerId)
     .order("created_at", { ascending: false })
   return (data ?? []) as unknown as Shipment[]
+}
+
+// ---------------- Manifests ----------------
+export async function listManifests(): Promise<Manifest[]> {
+  const supabase = getServiceClient()
+  const { data } = await supabase
+    .from("manifests")
+    .select("*")
+    .order("created_at", { ascending: false })
+  return (data ?? []) as unknown as Manifest[]
+}
+
+export async function getManifestById(id: string): Promise<ManifestWithPackages | null> {
+  const supabase = getServiceClient()
+  const { data: manifest } = await supabase
+    .from("manifests")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle()
+  if (!manifest) return null
+  const { data: packages } = await supabase
+    .from("packages")
+    .select("*, customers ( id, full_name, customer_code, email, phone )")
+    .eq("manifest_id", id)
+    .order("tracking_number", { ascending: true })
+  return {
+    ...(manifest as unknown as Manifest),
+    packages: (packages ?? []) as unknown as ShipmentWithCustomer[],
+  }
+}
+
+// Packages that can be added to a new manifest: eligible status and not
+// already attached to another manifest.
+export async function listManifestEligiblePackages(): Promise<ShipmentWithCustomer[]> {
+  const supabase = getServiceClient()
+  const { data } = await supabase
+    .from("packages")
+    .select("*, customers ( id, full_name, customer_code, email, phone )")
+    .in("status", MANIFEST_ELIGIBLE_STATUSES as unknown as string[])
+    .is("manifest_id", null)
+    .order("created_at", { ascending: false })
+  return (data ?? []) as unknown as ShipmentWithCustomer[]
 }

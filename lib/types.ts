@@ -1,6 +1,47 @@
-export type ShipmentStatus = "Processing" | "In Transit" | "Delivered"
+export type ShipmentStatus =
+  | "Processing"
+  | "In Transit"
+  | "Delivered"
+  | "Ready for Shipment"
+  | "Manifested"
+  | "Departed USA"
+  | "Arrived Haiti"
+  | "Ready for Pickup"
 
-export const SHIPMENT_STATUSES: ShipmentStatus[] = ["Processing", "In Transit", "Delivered"]
+export const SHIPMENT_STATUSES: ShipmentStatus[] = [
+  "Processing",
+  "In Transit",
+  "Delivered",
+  "Ready for Shipment",
+  "Manifested",
+  "Departed USA",
+  "Arrived Haiti",
+  "Ready for Pickup",
+]
+
+// Statuses that make a package eligible to be added to a new manifest.
+export const MANIFEST_ELIGIBLE_STATUSES: ShipmentStatus[] = ["Processing", "Ready for Shipment"]
+
+export type ManifestStatus = "Draft" | "Manifested" | "Departed USA" | "Arrived Haiti" | "Closed"
+
+export const MANIFEST_STATUSES: ManifestStatus[] = [
+  "Draft",
+  "Manifested",
+  "Departed USA",
+  "Arrived Haiti",
+  "Closed",
+]
+
+// Maps a manifest status to the package status its members should cascade to.
+export const MANIFEST_TO_PACKAGE_STATUS: Record<ManifestStatus, ShipmentStatus> = {
+  Draft: "Ready for Shipment",
+  Manifested: "Manifested",
+  "Departed USA": "Departed USA",
+  "Arrived Haiti": "Arrived Haiti",
+  Closed: "Ready for Pickup",
+}
+
+export const MANIFEST_DESTINATIONS = ["Cap-Ha\u00EFtien", "Les Cayes", "Port-au-Prince"] as const
 
 export type Customer = {
   id: string
@@ -32,12 +73,34 @@ export type Shipment = {
   estimated_delivery: string | null
   payment_status: "PAID" | "UNPAID"
   due_date: string | null
+  quantity: number
+  declared_value: number
+  manifest_id: string | null
   created_at: string
   updated_at: string
 }
 
 export type ShipmentWithCustomer = Shipment & {
   customers: Pick<Customer, "id" | "full_name" | "customer_code" | "email" | "phone"> | null
+}
+
+export type Manifest = {
+  id: string
+  manifest_number: string
+  destination: string
+  shipment_date: string | null
+  carrier: string | null
+  flight_number: string | null
+  status: ManifestStatus
+  total_packages: number
+  total_weight: number
+  total_declared_value: number
+  created_at: string
+  updated_at: string
+}
+
+export type ManifestWithPackages = Manifest & {
+  packages: ShipmentWithCustomer[]
 }
 
 export type TrackingEvent = {

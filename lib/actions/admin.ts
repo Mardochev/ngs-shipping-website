@@ -183,6 +183,8 @@ export async function createShipment(_prev: ActionResult, formData: FormData): P
   const eta = String(formData.get("estimated_delivery") ?? "").trim()
   let tracking = String(formData.get("tracking_number") ?? "").trim().toUpperCase()
   const costInput = String(formData.get("cost") ?? "").trim()
+  const quantity = Math.max(1, Math.round(Number.parseFloat(String(formData.get("quantity") ?? "1")) || 1))
+  const declaredValue = Math.max(0, Number.parseFloat(String(formData.get("declared_value") ?? "0")) || 0)
 
   if (!SHIPMENT_STATUSES.includes(status)) return { error: "Invalid status." }
   if (weight <= 0) return { error: "Weight must be greater than zero." }
@@ -221,6 +223,8 @@ export async function createShipment(_prev: ActionResult, formData: FormData): P
       recipient_phone: recipientPhone || null,
       recipient_address: recipientAddress || null,
       estimated_delivery: eta || null,
+      quantity,
+      declared_value: declaredValue,
     })
     .select("id")
     .single()
@@ -255,6 +259,8 @@ export async function updateShipment(_prev: ActionResult, formData: FormData): P
   const recipientAddress = String(formData.get("recipient_address") ?? "").trim()
   const eta = String(formData.get("estimated_delivery") ?? "").trim()
   const customerId = String(formData.get("customer_id") ?? "")
+  const quantity = Math.max(1, Math.round(Number.parseFloat(String(formData.get("quantity") ?? "1")) || 1))
+  const declaredValue = Math.max(0, Number.parseFloat(String(formData.get("declared_value") ?? "0")) || 0)
 
   if (!SHIPMENT_STATUSES.includes(status)) return { error: "Invalid status." }
 
@@ -273,6 +279,8 @@ export async function updateShipment(_prev: ActionResult, formData: FormData): P
       recipient_phone: recipientPhone || null,
       recipient_address: recipientAddress || null,
       estimated_delivery: eta || null,
+      quantity,
+      declared_value: declaredValue,
       updated_at: new Date().toISOString(),
     })
     .eq("id", id)

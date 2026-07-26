@@ -1,18 +1,20 @@
 "use client"
 
 import { useState } from "react"
-import { Package, Users, Settings, LogOut, Plane, LayoutDashboard, Truck, PackageCheck } from "lucide-react"
+import { Package, Users, Settings, LogOut, Plane, LayoutDashboard, Truck, PackageCheck, ClipboardList } from "lucide-react"
 import { adminLogout } from "@/lib/actions/admin"
-import type { AppSettings, Customer, ShipmentWithCustomer } from "@/lib/types"
+import type { AppSettings, Customer, Manifest, ShipmentWithCustomer } from "@/lib/types"
 import { ShipmentsPanel } from "./shipments-panel"
 import { CustomersPanel } from "./customers-panel"
 import { SettingsPanel } from "./settings-panel"
+import { ManifestsPanel } from "./manifests-panel"
 
-type Tab = "overview" | "shipments" | "customers" | "settings"
+type Tab = "overview" | "shipments" | "manifests" | "customers" | "settings"
 
 const tabs: { id: Tab; label: string; icon: typeof Package }[] = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "shipments", label: "Shipments", icon: Package },
+  { id: "manifests", label: "Manifests", icon: ClipboardList },
   { id: "customers", label: "Customers", icon: Users },
   { id: "settings", label: "Settings", icon: Settings },
 ]
@@ -22,11 +24,15 @@ export function AdminDashboard({
   shipments,
   customers,
   settings,
+  manifests,
+  eligiblePackages,
 }: {
   adminName: string
   shipments: ShipmentWithCustomer[]
   customers: Customer[]
   settings: AppSettings
+  manifests: Manifest[]
+  eligiblePackages: ShipmentWithCustomer[]
 }) {
   const [tab, setTab] = useState<Tab>("overview")
 
@@ -147,6 +153,9 @@ export function AdminDashboard({
           )}
 
           {tab === "shipments" && <ShipmentsPanel shipments={shipments} customers={customers} />}
+          {tab === "manifests" && (
+            <ManifestsPanel manifests={manifests} eligiblePackages={eligiblePackages} />
+          )}
           {tab === "customers" && <CustomersPanel customers={customers} />}
           {tab === "settings" && <SettingsPanel settings={settings} />}
         </div>
