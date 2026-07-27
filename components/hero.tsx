@@ -28,11 +28,11 @@ export function Hero() {
             <span className="text-primary">Haiti</span>
           </h1>
           <p className="mt-5 max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground">
-            Reliable air cargo service from USA to Haiti. We receive packages for Okap and Okay.
-            Port-au-Prince coming soon.
+            Reliable air cargo service from USA to Haiti. Now shipping to Port-au-Prince,
+            Cap-Ha&iuml;tien &amp; Les Cayes.
           </p>
           <p className="mt-3 max-w-xl text-pretty text-base font-medium leading-relaxed text-primary">
-            Nou pran koli pou Okap ak Okay. Port-au-Prince ap vini.
+            Nou pran koli pou Pòtoprens, Okap ak Okay.
           </p>
 
           <div className="mt-6 inline-flex items-center gap-2 rounded-lg border border-primary/40 bg-primary/10 px-4 py-2">

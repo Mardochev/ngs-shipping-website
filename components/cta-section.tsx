@@ -10,8 +10,8 @@ export function CtaSection() {
           Ready to ship to Haiti {"\u{1F1ED}\u{1F1F9}"}?
         </h2>
         <p className="mx-auto mt-4 max-w-2xl text-pretty leading-relaxed text-muted-foreground">
-          Get a free quote today for reliable air cargo from USA to Haiti. We receive packages for
-          Okap and Okay. Port-au-Prince coming soon.
+          Get a free quote today for reliable air cargo from USA to Haiti. Now shipping to
+          Port-au-Prince, Cap-Ha&iuml;tien &amp; Les Cayes.
         </p>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <a

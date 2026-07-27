@@ -11,7 +11,7 @@ export const services = [
     icon: Package,
     title: "Package Delivery",
     description:
-      "Send parcels, documents, and care packages with reliable air cargo to our Okap and Okay pickup locations.",
+      "Send parcels, documents, and care packages with reliable air cargo to Port-au-Prince, Cap-Ha\u00EFtien (Okap) and Les Cayes (Okay).",
   },
   {
     icon: Radar,
