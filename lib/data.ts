@@ -35,9 +35,9 @@ export const steps = [
   },
   {
     step: "02",
-    title: "Drop Off or Schedule a Pickup",
+    title: "Drop Off Your Package",
     description:
-      "Bring your packages to our Pompano Beach location, or contact us to schedule a convenient pickup. Pickup availability may vary by location.",
+      "Bring your packages to our Pompano Beach, Florida location. Our team will receive, weigh, prepare, and process your shipment for Haiti.",
   },
   {
     step: "03",
@@ -47,51 +47,7 @@ export const steps = [
   {
     step: "04",
     title: "Arrives in Haiti",
-    description: "Your shipment arrives safely and is ready for pickup at our Okap or Okay location.",
-  },
-] as const
-
-export const pricingPlans = [
-  {
-    name: "Standard Air",
-    price: "$3.50",
-    unit: "per lb",
-    description: "Reliable air cargo for everyday packages and personal shipments to Haiti.",
-    features: [
-      "Standard air cargo",
-      "Package & parcel shipping",
-      "Tracking included",
-      "Pickup point delivery",
-      "Affordable flat handling",
-    ],
-    highlighted: false,
-  },
-  {
-    name: "Express Air",
-    price: "$4.50",
-    unit: "per lb",
-    description: "Our fastest option for urgent packages and time-sensitive cargo.",
-    features: [
-      "Priority air cargo",
-      "Priority handling",
-      "Cargo insurance options available",
-      "Real-time tracking",
-      "Priority pickup available",
-    ],
-    highlighted: true,
-  },
-  {
-    name: "Commercial",
-    price: "Custom",
-    unit: "by weight",
-    description: "For businesses and large-volume commercial air cargo shipments.",
-    features: [
-      "Volume air cargo rates",
-      "Commercial freight",
-      "Customs documentation",
-      "Dedicated account manager",
-      "Scheduled recurring shipments",
-    ],
-    highlighted: false,
+    description:
+      "Your shipment arrives safely at our Port-au-Prince, Cap-Ha\u00EFtien (Okap), or Les Cayes (Okay) location.",
   },
 ] as const

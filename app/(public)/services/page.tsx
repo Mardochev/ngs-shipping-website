@@ -58,8 +58,8 @@ export default function ServicesPage() {
               {[
                 "Direct routes to Port-au-Prince, Cap-Ha\u00EFtien (Okap) and Les Cayes (Okay)",
                 "Customs documentation and clearance support",
-                "Consolidation services to lower your costs",
-                "Flexible pickup and drop-off scheduling",
+                "Consolidation services for your shipments",
+                "Convenient drop-off at our Pompano Beach facility",
                 "Commercial and personal shipment handling",
               ].map((item) => (
                 <li key={item} className="flex items-start gap-3">

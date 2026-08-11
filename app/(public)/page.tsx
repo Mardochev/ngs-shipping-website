@@ -203,12 +203,12 @@ export default function HomePage() {
             </p>
             <ul className="mt-8 grid gap-4 sm:grid-cols-2">
               {[
-                "Competitive, transparent pricing",
                 "Full shipment tracking",
                 "Cargo insurance options available",
                 "Bilingual customer support",
                 "Fast, secure air cargo",
-                "Convenient pickup locations",
+                "Easy drop-off at our Pompano Beach facility",
+                "Tracking number provided on every shipment",
               ].map((item) => (
                 <li key={item} className="flex items-start gap-3">
                   <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" aria-hidden="true" />
