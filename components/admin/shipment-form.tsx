@@ -129,6 +129,27 @@ export function ShipmentForm({
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
+          <label className={labelClass} htmlFor="declared_value">
+            Declared Value / Vale Machandiz
+          </label>
+          <div className="relative">
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+              $
+            </span>
+            <input
+              id="declared_value"
+              name="declared_value"
+              type="number"
+              step="0.01"
+              min="0"
+              inputMode="decimal"
+              defaultValue={shipment?.declared_value ?? 0}
+              placeholder="250.00"
+              className={`${inputClass} pl-7`}
+            />
+          </div>
+        </div>
+        <div className="flex flex-col gap-1.5">
           <label className={labelClass} htmlFor="quantity">
             Quantity (pieces)
           </label>
@@ -139,21 +160,6 @@ export function ShipmentForm({
             step="1"
             min="1"
             defaultValue={shipment?.quantity ?? 1}
-            className={inputClass}
-          />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <label className={labelClass} htmlFor="declared_value">
-            Declared value (USD)
-          </label>
-          <input
-            id="declared_value"
-            name="declared_value"
-            type="number"
-            step="0.01"
-            min="0"
-            defaultValue={shipment?.declared_value ?? 0}
-            placeholder="For customs / manifest"
             className={inputClass}
           />
         </div>

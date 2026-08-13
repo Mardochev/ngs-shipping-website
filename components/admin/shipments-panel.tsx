@@ -57,6 +57,7 @@ export function ShipmentsPanel({
                 <th className="px-4 py-3 font-semibold">Tracking #</th>
                 <th className="px-4 py-3 font-semibold">Customer</th>
                 <th className="px-4 py-3 font-semibold">Weight</th>
+                <th className="px-4 py-3 font-semibold">Declared $</th>
                 <th className="px-4 py-3 font-semibold">Cost</th>
                 <th className="px-4 py-3 font-semibold">Status</th>
                 <th className="px-4 py-3 text-right font-semibold">Actions</th>
@@ -65,7 +66,7 @@ export function ShipmentsPanel({
             <tbody className="divide-y divide-border">
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
+                  <td colSpan={7} className="px-4 py-10 text-center text-muted-foreground">
                     No shipments yet. Click &quot;New shipment&quot; to create one.
                   </td>
                 </tr>
@@ -77,6 +78,7 @@ export function ShipmentsPanel({
                     {s.customers?.full_name ?? <span className="text-muted-foreground">Unassigned</span>}
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">{s.weight_lb} lb</td>
+                  <td className="px-4 py-3 text-muted-foreground">${(Number(s.declared_value) || 0).toFixed(2)}</td>
                   <td className="px-4 py-3 text-muted-foreground">${Number(s.cost).toFixed(2)}</td>
                   <td className="px-4 py-3">
                     <form action={updateShipmentStatus} className="flex items-center gap-2">
