@@ -154,8 +154,18 @@ export default async function LabelPage({ params }: { params: Promise<{ id: stri
             </div>
           </div>
 
+          {/* NGS watermark — fills the empty middle space, does not move any element */}
+          <div aria-hidden="true" className="flex flex-1 items-center justify-center">
+            <span
+              className="font-extrabold uppercase leading-none"
+              style={{ fontSize: "72px", letterSpacing: "4px", color: "#0a2a4a" }}
+            >
+              NGS
+            </span>
+          </div>
+
           {/* Tracking + QR */}
-          <div className="mt-auto flex items-end justify-between pt-2">
+          <div className="flex items-end justify-between pt-2">
             <div>
               <p className="font-bold uppercase" style={{ fontSize: "8px" }}>
                 Tracking Number
