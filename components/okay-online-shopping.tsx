@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowRight, Check, Copy, MapPin, MessageCircle, UserPlus } from "lucide-react"
+import { ArrowRight, Check, Copy, MapPin, MessageCircle, Phone, UserPlus } from "lucide-react"
 import { site } from "@/lib/site"
 
 const steps = [
@@ -137,6 +137,28 @@ export function OkayOnlineShopping() {
             >
               <MessageCircle className="h-5 w-5 text-primary" aria-hidden="true" />
               Pale ak NGS sou WhatsApp
+            </a>
+          </div>
+
+          {/* Mobile-only contact row (replaces the floating buttons on small screens) */}
+          <div className="mt-4 flex items-center gap-3 md:hidden">
+            <a
+              href={site.whatsapp}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Chat sou WhatsApp"
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-[#25D366] px-4 py-3 text-sm font-semibold text-white transition-transform hover:scale-[1.02]"
+            >
+              <MessageCircle className="h-5 w-5" aria-hidden="true" />
+              WhatsApp
+            </a>
+            <a
+              href={site.phoneHref}
+              aria-label={`Rele NGS nan ${site.phone}`}
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.02]"
+            >
+              <Phone className="h-5 w-5" aria-hidden="true" />
+              Rele NGS
             </a>
           </div>
         </div>
