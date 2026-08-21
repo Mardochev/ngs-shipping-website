@@ -34,6 +34,11 @@ export default function RegisterPage() {
           </p>
         </div>
 
+        <p className="mt-6 rounded-lg border border-primary/40 bg-primary/5 px-4 py-3 text-sm leading-relaxed text-foreground">
+          Ou se yon kliyan Okay? Kreye kont ou, apre sa kontakte NGS pou resevwa enstriksyon adrès ou
+          anvan premye acha ou.
+        </p>
+
         {state?.error && (
           <p className="mt-6 rounded-lg border border-apricot-light/40 bg-apricot-light/10 px-4 py-3 text-sm text-apricot-light" role="alert">
             {state.error}

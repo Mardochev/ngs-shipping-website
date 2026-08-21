@@ -2,6 +2,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { ArrowRight, CheckCircle2, Plane, Clock, Radar } from "lucide-react"
 import { Hero } from "@/components/hero"
+import { OkayOnlineShopping } from "@/components/okay-online-shopping"
 import { CtaSection } from "@/components/cta-section"
 import { services, steps } from "@/lib/data"
 
@@ -9,6 +10,8 @@ export default function HomePage() {
   return (
     <>
       <Hero />
+
+      <OkayOnlineShopping />
 
       {/* Air Cargo focus */}
       <section className="px-4 py-20 sm:px-6 lg:px-8">
