@@ -129,19 +129,10 @@ export function OkayOnlineShopping() {
               Kreye kont mwen
               <ArrowRight className="h-5 w-5" aria-hidden="true" />
             </Link>
-            <a
-              href={site.whatsapp}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-secondary/60 px-6 py-3 text-base font-semibold text-foreground transition-colors hover:border-primary"
-            >
-              <MessageCircle className="h-5 w-5 text-primary" aria-hidden="true" />
-              Pale ak NGS sou WhatsApp
-            </a>
           </div>
 
-          {/* Mobile-only contact row (replaces the floating buttons on small screens) */}
-          <div className="mt-4 flex items-center gap-3 md:hidden">
+          {/* Horizontal contact row: WhatsApp + Rele NGS */}
+          <div className="mt-4 flex items-center gap-3">
             <a
               href={site.whatsapp}
               target="_blank"
