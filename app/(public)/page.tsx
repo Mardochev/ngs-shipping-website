@@ -53,7 +53,7 @@ export default function HomePage() {
                   { icon: Clock, text: "Estimated delivery: 5\u201310 business days" },
                   { icon: CheckCircle2, text: "Secure & tracked shipping with a tracking number" },
                   { icon: Radar, text: "Real-time tracking from drop-off to delivery" },
-                  { icon: Plane, text: "Air cargo to Port-au-Prince, Cap-Ha\u00EFtien & Les Cayes" },
+                  { icon: Plane, text: "Air cargo to Les Cayes (Okay), Haiti" },
                 ].map((item) => (
                   <li key={item.text} className="flex items-start gap-3">
                     <item.icon className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" aria-hidden="true" />
@@ -74,20 +74,18 @@ export default function HomePage() {
               Routes We Serve
             </p>
             <h2 className="mt-3 font-display text-3xl font-bold text-balance text-foreground sm:text-4xl">
-              Direct air cargo lanes to Haiti
+              Direct air cargo lane to Haiti
             </h2>
             <p className="mt-4 text-pretty leading-relaxed text-muted-foreground">
-              Now shipping to Port-au-Prince, Cap-Ha&iuml;tien &amp; Les Cayes.
+              Now shipping to Les Cayes (Okay), Haiti.
             </p>
             <p className="mt-2 text-pretty leading-relaxed text-primary">
-              Nou pran koli pou P&ograve;toprens, Okap ak Okay.
+              Nou pran koli pou Okay.
             </p>
           </div>
 
-          <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mx-auto mt-14 grid max-w-md gap-6">
             {[
-              { from: "USA", fromFlag: "\u{1F1FA}\u{1F1F8}", to: "Port-au-Prince, Haiti", toFlag: "\u{1F1ED}\u{1F1F9}", available: true },
-              { from: "USA", fromFlag: "\u{1F1FA}\u{1F1F8}", to: "Cap-Ha\u00EFtien (Okap), Haiti", toFlag: "\u{1F1ED}\u{1F1F9}", available: true },
               { from: "USA", fromFlag: "\u{1F1FA}\u{1F1F8}", to: "Les Cayes (Okay), Haiti", toFlag: "\u{1F1ED}\u{1F1F9}", available: true },
             ].map((route) => (
               <div

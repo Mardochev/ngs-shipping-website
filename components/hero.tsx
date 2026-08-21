@@ -21,18 +21,17 @@ export function Hero() {
       <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 sm:py-28 lg:grid-cols-2 lg:px-8 lg:py-32">
         <div className="max-w-2xl">
           <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
-            USA {"\u{1F1FA}\u{1F1F8}"} {"\u279C"} Haiti {"\u{1F1ED}\u{1F1F9}"}
+            USA {"\u{1F1FA}\u{1F1F8}"} {"\u279C"} Okay, Haiti {"\u{1F1ED}\u{1F1F9}"}
           </span>
           <h1 className="mt-5 font-display text-4xl font-extrabold leading-[1.05] text-balance text-foreground sm:text-6xl">
             Air Cargo from USA to{" "}
-            <span className="text-primary">Haiti</span>
+            <span className="text-primary">Les Cayes, Haiti</span>
           </h1>
           <p className="mt-5 max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground">
-            Reliable air cargo service from USA to Haiti. Now shipping to Port-au-Prince,
-            Cap-Ha&iuml;tien &amp; Les Cayes.
+            Reliable air cargo service from the USA to Les Cayes (Okay), Haiti.
           </p>
           <p className="mt-3 max-w-xl text-pretty text-base font-medium leading-relaxed text-primary">
-            Nou pran koli pou Pòtoprens, Okap ak Okay.
+            Nou pran koli pou Okay.
           </p>
 
           <div className="mt-6 inline-flex items-center gap-2 rounded-lg border border-primary/40 bg-primary/10 px-4 py-2">
@@ -61,7 +60,7 @@ export function Hero() {
 
           <ul className="mt-10 flex flex-wrap gap-3">
             {[
-              "Now serving USA to Haiti",
+              "Now serving USA to Les Cayes (Okay)",
               "Estimated delivery: 5\u201310 business days",
               "Secure & tracked shipping",
             ].map((item) => (

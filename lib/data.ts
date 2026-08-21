@@ -11,7 +11,7 @@ export const services = [
     icon: Package,
     title: "Package Delivery",
     description:
-      "Send parcels, documents, and care packages with reliable air cargo to Port-au-Prince, Cap-Ha\u00EFtien (Okap) and Les Cayes (Okay).",
+      "Send parcels, documents, and care packages with reliable air cargo to Les Cayes (Okay), Haiti.",
   },
   {
     icon: Radar,
@@ -48,6 +48,6 @@ export const steps = [
     step: "04",
     title: "Arrives in Haiti",
     description:
-      "Your shipment arrives safely at our Port-au-Prince, Cap-Ha\u00EFtien (Okap), or Les Cayes (Okay) location.",
+      "Your shipment arrives safely at our Les Cayes (Okay), Haiti location.",
   },
 ] as const
