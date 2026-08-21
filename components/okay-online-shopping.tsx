@@ -31,18 +31,19 @@ export function OkayOnlineShopping() {
   return (
     <section
       aria-labelledby="okay-online-heading"
-      className="border-b border-border/60 bg-navy px-4 py-20 sm:px-6 lg:px-8"
+      className="border-b border-border/60 bg-navy px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20"
     >
-      <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-2">
+      <div className="mx-auto grid max-w-7xl items-center gap-8 lg:grid-cols-2 lg:gap-12">
         {/* Image: first on mobile, right on desktop */}
         <div className="order-first lg:order-last">
-          <div className="relative overflow-hidden rounded-3xl border border-border shadow-2xl shadow-navy-deep/50">
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-border shadow-2xl shadow-navy-deep/50">
             <Image
               src="/okay-online-shopping.png"
               alt="Yon fanm ayisyen nan Okay k ap achte sou entènèt sou telefòn li pandan NGS ap resevwa koli yo nan Florid epi yon avyon cargo ap pote yo ale pou Okay"
-              width={1200}
-              height={1000}
-              className="h-full w-full object-cover"
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover object-center"
+              priority
             />
           </div>
         </div>
@@ -54,7 +55,7 @@ export function OkayOnlineShopping() {
           </p>
           <h2
             id="okay-online-heading"
-            className="mt-3 font-display text-3xl font-bold text-balance text-foreground sm:text-4xl"
+            className="mt-3 font-display text-2xl font-bold text-balance text-foreground sm:text-4xl"
           >
             Moun Okay, achte sou entènèt avèk NGS
           </h2>
