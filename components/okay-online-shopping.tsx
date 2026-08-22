@@ -57,7 +57,7 @@ export function OkayOnlineShopping() {
             id="okay-online-heading"
             className="mt-3 font-display text-2xl font-bold text-balance text-foreground sm:text-4xl"
           >
-            Moun Okay, achte sou entènèt avèk NGS
+            Moun Okay, achte sou entènèt avèk adrès NGS
           </h2>
           <p className="mt-4 text-pretty leading-relaxed text-muted-foreground">
             Ou rete Okay? Achte pwodwi ou sou entènèt epi voye yo nan adrès NGS nan Florid. NGS ap
