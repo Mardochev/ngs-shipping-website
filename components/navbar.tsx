@@ -61,7 +61,7 @@ export function Navbar({ customer }: { customer: CustomerSession | null }) {
               className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-apricot-light"
             >
               <LayoutDashboard className="h-4 w-4" aria-hidden="true" />
-              My Dashboard
+              Customer Dashboard
             </Link>
           ) : (
             <>
@@ -127,7 +127,7 @@ export function Navbar({ customer }: { customer: CustomerSession | null }) {
                   className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-center text-base font-semibold text-primary-foreground"
                 >
                   <LayoutDashboard className="h-5 w-5" aria-hidden="true" />
-                  My Dashboard
+                  Customer Dashboard
                 </Link>
               ) : (
                 <>
