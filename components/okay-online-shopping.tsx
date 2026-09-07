@@ -10,13 +10,21 @@ const steps = [
   "Kreye kont NGS ou",
   "Achte pwodwi ou sou entènèt",
   "Voye koli a nan adrès NGS nan Florid",
-  "NGS voye koli ou pou Okay",
+  "NGS voye koli ou pou Okay oswa Okap",
 ] as const
 
 const addressLines = ["83 NW 15th Pl", "Pompano Beach, FL 33060"] as const
 
+const pickupLocations = [
+  { city: "Okay (Les Cayes)", detail: "Route de Simon, anvan Kolèj Evanjelik la." },
+  { city: "Okap (Cap-Ha\u00EFtien)", detail: "Kontakte NGS pou enf\u00F2masyon sou kote pou pran koli a." },
+] as const
+
+const destinationOptions = ["Okay (Les Cayes)", "Okap (Cap-Ha\u00EFtien)"] as const
+
 export function OkayOnlineShopping() {
   const [copied, setCopied] = useState(false)
+  const [destination, setDestination] = useState<(typeof destinationOptions)[number]>(destinationOptions[0])
 
   async function copyAddress() {
     try {
@@ -39,7 +47,7 @@ export function OkayOnlineShopping() {
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-border shadow-2xl shadow-navy-deep/50">
             <Image
               src="/okay-online-shopping.png"
-              alt="Yon fanm ayisyen nan Okay k ap achte sou entènèt sou telefòn li pandan NGS ap resevwa koli yo nan Florid epi yon avyon cargo ap pote yo ale pou Okay"
+              alt="Yon kliyan ayisyen k ap achte sou entènèt sou telefòn li pandan NGS ap resevwa koli yo nan Florid epi yon avyon cargo ap pote yo ale pou Okay oswa Okap"
               fill
               sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover object-center"
@@ -51,18 +59,19 @@ export function OkayOnlineShopping() {
         {/* Text */}
         <div className="order-last lg:order-first">
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">
-            Sèvis pou moun Okay
+            Sèvis pou moun Okay ak Okap
           </p>
           <h2
             id="okay-online-heading"
             className="mt-3 font-display text-2xl font-bold text-balance text-foreground sm:text-4xl"
           >
-            Moun Okay, achte sou entènèt epi voye l nan adrès NGS.
+            Moun Okay ak Okap, achte sou entènèt epi voye yo nan adrès NGS.
           </h2>
           <p className="mt-4 text-pretty leading-relaxed text-muted-foreground">
-            Ou rete Okay? Achte pwodwi ou sou entènèt epi voye yo nan adrès NGS nan Florid. NGS ap
-            resevwa koli ou, prepare li epi voye li pa Air Cargo pou Okay. Lè koli a rive epi li pare,
-            n ap kontakte w pou vin pran li nan biwo NGS sou Route de Simon, anvan Kolèj Evanjelik la.
+            Ou rete Okay oswa Okap? Achte pwodwi ou sou entènèt epi voye yo nan adrès NGS nan Florid.
+            NGS ap resevwa koli ou, prepare li epi voye li pa Air Cargo pou destinasyon ou chwazi a. Lè
+            koli a rive epi li pare, n ap kontakte w pou vin pran li nan biwo oswa pwen sèvis NGS nan
+            vil ou.
           </p>
 
           {/* Steps */}
@@ -77,8 +86,32 @@ export function OkayOnlineShopping() {
             ))}
           </ol>
 
+          {/* Required destination selector */}
+          <div className="mt-8">
+            <label
+              htmlFor="okay-destination"
+              className="text-sm font-semibold uppercase tracking-wider text-primary"
+            >
+              Chwazi destinasyon ou <span className="text-apricot-light">*</span>
+            </label>
+            <select
+              id="okay-destination"
+              name="destination"
+              required
+              value={destination}
+              onChange={(e) => setDestination(e.target.value as (typeof destinationOptions)[number])}
+              className="mt-2 w-full rounded-lg border border-input bg-navy-deep px-3 py-3 text-sm font-medium text-foreground focus:border-primary focus:outline-none sm:max-w-xs"
+            >
+              {destinationOptions.map((d) => (
+                <option key={d} value={d}>
+                  {d}
+                </option>
+              ))}
+            </select>
+          </div>
+
           {/* Address card */}
-          <div className="mt-8 rounded-2xl border border-primary/40 bg-primary/5 p-5">
+          <div className="mt-6 rounded-2xl border border-primary/40 bg-primary/5 p-5">
             <div className="flex items-center gap-2">
               <MapPin className="h-5 w-5 text-primary" aria-hidden="true" />
               <p className="font-display text-sm font-bold uppercase tracking-wider text-primary">
@@ -112,6 +145,19 @@ export function OkayOnlineShopping() {
             </button>
           </div>
 
+          {/* Pickup locations (shown separately per destination) */}
+          <div className="mt-6 grid gap-3 sm:grid-cols-2">
+            {pickupLocations.map((loc) => (
+              <div key={loc.city} className="rounded-2xl border border-border bg-card p-4">
+                <div className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4 flex-shrink-0 text-primary" aria-hidden="true" />
+                  <p className="font-display text-sm font-bold text-foreground">{loc.city}</p>
+                </div>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{loc.detail}</p>
+              </div>
+            ))}
+          </div>
+
           {/* Important note */}
           <p className="mt-6 rounded-xl border border-border bg-card/60 px-4 py-3 text-sm leading-relaxed text-muted-foreground">
             Anvan premye acha ou, kontakte NGS pou konfime kijan pou mete non ou ak referans kliyan ou
@@ -122,7 +168,7 @@ export function OkayOnlineShopping() {
           {/* Buttons */}
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link
-              href="/register"
+              href={`/register?destination=${encodeURIComponent(destination)}`}
               className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-base font-semibold text-primary-foreground transition-colors hover:bg-apricot-light"
             >
               <UserPlus className="h-5 w-5" aria-hidden="true" />

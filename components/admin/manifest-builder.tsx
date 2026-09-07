@@ -22,6 +22,14 @@ export function ManifestBuilder({
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [qty, setQty] = useState<Record<string, number>>({})
   const [val, setVal] = useState<Record<string, number>>({})
+  const [destination, setDestination] = useState("")
+
+  // Only show packages whose destination matches the manifest destination so
+  // Okay and Okap packages never land on the same manifest by accident.
+  const visiblePackages = useMemo(
+    () => (destination ? eligiblePackages.filter((p) => p.destination === destination) : eligiblePackages),
+    [destination, eligiblePackages],
+  )
 
   useEffect(() => {
     if (state?.manifestId) {
@@ -42,7 +50,7 @@ export function ManifestBuilder({
 
   function toggleAll() {
     setSelected((prev) =>
-      prev.size === eligiblePackages.length ? new Set() : new Set(eligiblePackages.map((p) => p.id)),
+      prev.size === visiblePackages.length ? new Set() : new Set(visiblePackages.map((p) => p.id)),
     )
   }
 
@@ -50,7 +58,7 @@ export function ManifestBuilder({
     let totalPackages = 0
     let totalWeight = 0
     let totalDeclaredValue = 0
-    for (const p of eligiblePackages) {
+    for (const p of visiblePackages) {
       if (!selected.has(p.id)) continue
       const q = qty[p.id] ?? p.quantity ?? 1
       const v = val[p.id] ?? Number(p.declared_value) ?? 0
@@ -63,9 +71,9 @@ export function ManifestBuilder({
       totalWeight: Math.round(totalWeight * 100) / 100,
       totalDeclaredValue: Math.round(totalDeclaredValue * 100) / 100,
     }
-  }, [selected, qty, val, eligiblePackages])
+  }, [selected, qty, val, visiblePackages])
 
-  const allSelected = selected.size === eligiblePackages.length && eligiblePackages.length > 0
+  const allSelected = selected.size === visiblePackages.length && visiblePackages.length > 0
 
   return (
     <form action={formAction} className="flex flex-col gap-5">
@@ -83,7 +91,17 @@ export function ManifestBuilder({
           <label className={labelClass} htmlFor="destination">
             Destination
           </label>
-          <select id="destination" name="destination" defaultValue="" required className={inputClass}>
+          <select
+            id="destination"
+            name="destination"
+            value={destination}
+            onChange={(e) => {
+              setDestination(e.target.value)
+              setSelected(new Set())
+            }}
+            required
+            className={inputClass}
+          >
             <option value="" disabled>
               — Choose destination —
             </option>
@@ -121,8 +139,8 @@ export function ManifestBuilder({
 
       <div>
         <div className="mb-2 flex items-center justify-between">
-          <p className={labelClass}>Ready for shipment ({eligiblePackages.length})</p>
-          {eligiblePackages.length > 0 && (
+          <p className={labelClass}>Ready for shipment ({visiblePackages.length})</p>
+          {visiblePackages.length > 0 && (
             <button
               type="button"
               onClick={toggleAll}
@@ -148,14 +166,16 @@ export function ManifestBuilder({
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {eligiblePackages.length === 0 && (
+              {visiblePackages.length === 0 && (
                 <tr>
                   <td colSpan={8} className="px-3 py-8 text-center text-muted-foreground">
-                    No packages ready for shipment.
+                    {destination
+                      ? `No packages ready for ${destination}.`
+                      : "No packages ready for shipment."}
                   </td>
                 </tr>
               )}
-              {eligiblePackages.map((p) => {
+              {visiblePackages.map((p) => {
                 const checked = selected.has(p.id)
                 return (
                   <tr key={p.id} className={checked ? "bg-primary/5" : "transition-colors hover:bg-secondary/30"}>

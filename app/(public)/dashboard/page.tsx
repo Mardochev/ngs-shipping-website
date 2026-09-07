@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation"
-import { User, Mail, BadgeCheck, Package, LogOut, Weight, CalendarDays, Clock } from "lucide-react"
+import { User, Mail, BadgeCheck, Package, LogOut, Weight, CalendarDays, Clock, MapPin } from "lucide-react"
 import { getCustomerSession } from "@/lib/session"
 import { listCustomerShipments } from "@/lib/queries"
 import { TrackingForm } from "@/components/tracking-form"
@@ -79,6 +79,7 @@ export default async function DashboardPage() {
                     <tr>
                       <th className="px-4 py-3 font-semibold">Tracking #</th>
                       <th className="px-4 py-3 font-semibold">Status</th>
+                      <th className="px-4 py-3 font-semibold">Destination</th>
                       <th className="px-4 py-3 font-semibold">Weight</th>
                       <th className="px-4 py-3 font-semibold">Date Received</th>
                       <th className="px-4 py-3 font-semibold">ETA</th>
@@ -91,6 +92,7 @@ export default async function DashboardPage() {
                         <td className="px-4 py-4">
                           <StatusBadge status={pkg.status} />
                         </td>
+                        <td className="px-4 py-4 text-foreground">{pkg.destination}</td>
                         <td className="px-4 py-4 text-foreground">{pkg.weight_lb} lb</td>
                         <td className="px-4 py-4 text-muted-foreground">{formatDate(pkg.created_at)}</td>
                         <td className="px-4 py-4 text-foreground">{formatDate(pkg.estimated_delivery)}</td>
@@ -109,6 +111,11 @@ export default async function DashboardPage() {
                       <StatusBadge status={pkg.status} />
                     </div>
                     <dl className="mt-4 grid grid-cols-1 gap-3">
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4 flex-shrink-0 text-primary" aria-hidden="true" />
+                        <dt className="text-muted-foreground">Destination:</dt>
+                        <dd className="font-medium text-foreground">{pkg.destination}</dd>
+                      </div>
                       <div className="flex items-center gap-2">
                         <Weight className="h-4 w-4 flex-shrink-0 text-primary" aria-hidden="true" />
                         <dt className="text-muted-foreground">Weight:</dt>

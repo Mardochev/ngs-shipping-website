@@ -176,7 +176,7 @@ export async function createShipment(_prev: ActionResult, formData: FormData): P
   const weight = Number.parseFloat(String(formData.get("weight_lb") ?? "0")) || 0
   const status = (String(formData.get("status") ?? "Processing") as ShipmentStatus)
   const origin = String(formData.get("origin") ?? "Florida, USA").trim()
-  const destination = String(formData.get("destination") ?? "Port-au-Prince, Haiti").trim()
+  const destination = String(formData.get("destination") ?? "Les Cayes (Okay)").trim()
   const recipientName = String(formData.get("recipient_name") ?? "").trim()
   const recipientPhone = String(formData.get("recipient_phone") ?? "").trim()
   const recipientAddress = String(formData.get("recipient_address") ?? "").trim()

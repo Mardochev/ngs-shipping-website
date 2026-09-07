@@ -41,7 +41,11 @@ export const MANIFEST_TO_PACKAGE_STATUS: Record<ManifestStatus, ShipmentStatus> 
   Closed: "Ready for Pickup",
 }
 
-export const MANIFEST_DESTINATIONS = ["Cap-Ha\u00EFtien", "Les Cayes", "Port-au-Prince"] as const
+// The two currently-active shipping destinations. Used by the shipment form,
+// the manifest builder, and manifest validation so everything stays in sync.
+export const ACTIVE_DESTINATIONS = ["Les Cayes (Okay)", "Cap-Ha\u00EFtien (Okap)"] as const
+
+export const MANIFEST_DESTINATIONS = ACTIVE_DESTINATIONS
 
 export type Customer = {
   id: string

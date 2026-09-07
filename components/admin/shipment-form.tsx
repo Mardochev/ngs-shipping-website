@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect } from "react"
 import { createShipment, updateShipment } from "@/lib/actions/admin"
-import { SHIPMENT_STATUSES, type Customer, type Shipment } from "@/lib/types"
+import { ACTIVE_DESTINATIONS, SHIPMENT_STATUSES, type Customer, type Shipment } from "@/lib/types"
 import { SubmitButton } from "./submit-button"
 
 const inputClass =
@@ -20,6 +20,15 @@ export function ShipmentForm({
 }) {
   const action = shipment ? updateShipment : createShipment
   const [state, formAction] = useActionState(action, {})
+
+  // Existing records keep their stored destination (even legacy values) unless
+  // an admin changes it here; new shipments default to Les Cayes (Okay).
+  const isLegacyDestination =
+    !!shipment?.destination &&
+    !ACTIVE_DESTINATIONS.includes(shipment.destination as (typeof ACTIVE_DESTINATIONS)[number])
+  const destinationOptions = isLegacyDestination
+    ? [shipment!.destination, ...ACTIVE_DESTINATIONS]
+    : [...ACTIVE_DESTINATIONS]
 
   useEffect(() => {
     if (state?.success) onDone()
@@ -202,12 +211,19 @@ export function ShipmentForm({
           <label className={labelClass} htmlFor="destination">
             Destination
           </label>
-          <input
+          <select
             id="destination"
             name="destination"
-            defaultValue={shipment?.destination ?? "Port-au-Prince, Haiti"}
+            required
+            defaultValue={shipment?.destination ?? "Les Cayes (Okay)"}
             className={inputClass}
-          />
+          >
+            {destinationOptions.map((d) => (
+              <option key={d} value={d}>
+                {d}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 

@@ -2,16 +2,22 @@
 
 import { useActionState, useState } from "react"
 import Link from "next/link"
-import { Plane, UserPlus, Eye, EyeOff } from "lucide-react"
+import { useSearchParams } from "next/navigation"
+import { MapPin, Plane, UserPlus, Eye, EyeOff } from "lucide-react"
 import { registerCustomer } from "@/lib/actions/customer"
 import { SubmitButton } from "@/components/admin/submit-button"
 
 const inputClass =
   "rounded-lg border border-input bg-navy-deep px-4 py-3 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
 
+const VALID_DESTINATIONS = ["Okay (Les Cayes)", "Okap (Cap-Ha\u00EFtien)"]
+
 export default function RegisterPage() {
   const [state, formAction] = useActionState(registerCustomer, {})
   const [showPassword, setShowPassword] = useState(false)
+  const searchParams = useSearchParams()
+  const destinationParam = searchParams.get("destination") ?? ""
+  const chosenDestination = VALID_DESTINATIONS.includes(destinationParam) ? destinationParam : ""
 
   return (
     <section className="relative flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-16 sm:px-6">
@@ -45,7 +51,15 @@ export default function RegisterPage() {
           </p>
         )}
 
+        {chosenDestination && (
+          <p className="mt-6 flex items-center gap-2 rounded-lg border border-primary/40 bg-primary/5 px-4 py-3 text-sm font-medium text-foreground">
+            <MapPin className="h-4 w-4 flex-shrink-0 text-primary" aria-hidden="true" />
+            Destinasyon ou chwazi: <span className="font-semibold text-primary">{chosenDestination}</span>
+          </p>
+        )}
+
         <form action={formAction} className="mt-6 flex flex-col gap-4">
+          {chosenDestination && <input type="hidden" name="preferred_destination" value={chosenDestination} />}
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="flex flex-col gap-1.5">
               <label htmlFor="first_name" className="text-sm font-medium text-foreground">
