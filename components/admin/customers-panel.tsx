@@ -51,13 +51,14 @@ export function CustomersPanel({ customers }: { customers: Customer[] }) {
                 <th className="px-4 py-3 font-semibold">Name</th>
                 <th className="px-4 py-3 font-semibold">Email</th>
                 <th className="px-4 py-3 font-semibold">Phone</th>
+                <th className="px-4 py-3 font-semibold">Destination</th>
                 <th className="px-4 py-3 text-right font-semibold">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-10 text-center text-muted-foreground">
+                  <td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
                     No customers yet. Click &quot;Add customer&quot; to create one.
                   </td>
                 </tr>
@@ -70,6 +71,7 @@ export function CustomersPanel({ customers }: { customers: Customer[] }) {
                   <td className="px-4 py-3 text-foreground">{c.full_name}</td>
                   <td className="px-4 py-3 text-muted-foreground">{c.email ?? "—"}</td>
                   <td className="px-4 py-3 text-muted-foreground">{c.phone ?? "—"}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{c.destination ?? "—"}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-1">
                       <button

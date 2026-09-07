@@ -22,7 +22,7 @@ export function ShipmentForm({
   const [state, formAction] = useActionState(action, {})
 
   // Existing records keep their stored destination (even legacy values) unless
-  // an admin changes it here; new shipments default to Les Cayes (Okay).
+  // an admin changes it here; new shipments have no default and must be chosen.
   const isLegacyDestination =
     !!shipment?.destination &&
     !ACTIVE_DESTINATIONS.includes(shipment.destination as (typeof ACTIVE_DESTINATIONS)[number])
@@ -215,9 +215,12 @@ export function ShipmentForm({
             id="destination"
             name="destination"
             required
-            defaultValue={shipment?.destination ?? "Les Cayes (Okay)"}
+            defaultValue={shipment?.destination ?? ""}
             className={inputClass}
           >
+            <option value="" disabled>
+              Chwazi destinasyon
+            </option>
             {destinationOptions.map((d) => (
               <option key={d} value={d}>
                 {d}

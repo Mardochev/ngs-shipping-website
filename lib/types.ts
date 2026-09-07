@@ -47,6 +47,11 @@ export const ACTIVE_DESTINATIONS = ["Les Cayes (Okay)", "Cap-Ha\u00EFtien (Okap)
 
 export const MANIFEST_DESTINATIONS = ACTIVE_DESTINATIONS
 
+// Destination options offered to customers at registration and on their admin
+// profile. Kept separate from ACTIVE_DESTINATIONS (which labels packages and
+// manifests) so both stay in sync from one place.
+export const CUSTOMER_DESTINATIONS = ["Okay (Les Cayes)", "Okap (Cap-Ha\u00EFtien)"] as const
+
 export type Customer = {
   id: string
   customer_code: string | null
@@ -57,6 +62,7 @@ export type Customer = {
   phone: string | null
   address: string | null
   notes: string | null
+  destination: string | null
   created_at: string
 }
 

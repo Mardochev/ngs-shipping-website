@@ -9,7 +9,7 @@ import {
   getAdminSession,
   clearAdminSession,
 } from "@/lib/session"
-import { SHIPMENT_STATUSES, type ShipmentStatus } from "@/lib/types"
+import { ACTIVE_DESTINATIONS, SHIPMENT_STATUSES, type ShipmentStatus } from "@/lib/types"
 
 type ActionResult = { error?: string; success?: string }
 
@@ -102,6 +102,7 @@ export async function createCustomer(_prev: ActionResult, formData: FormData): P
   const phone = String(formData.get("phone") ?? "").trim()
   const address = String(formData.get("address") ?? "").trim()
   const notes = String(formData.get("notes") ?? "").trim()
+  const destination = String(formData.get("destination") ?? "").trim()
 
   if (!firstName || !lastName) return { error: "First and last name are required." }
 
@@ -117,6 +118,7 @@ export async function createCustomer(_prev: ActionResult, formData: FormData): P
     phone: phone || null,
     address: address || null,
     notes: notes || null,
+    destination: destination || null,
   })
   if (error) return { error: error.message }
 
@@ -135,6 +137,7 @@ export async function updateCustomer(_prev: ActionResult, formData: FormData): P
   const phone = String(formData.get("phone") ?? "").trim()
   const address = String(formData.get("address") ?? "").trim()
   const notes = String(formData.get("notes") ?? "").trim()
+  const destination = String(formData.get("destination") ?? "").trim()
   if (!id) return { error: "Missing customer id." }
 
   const { error } = await supabase
@@ -147,6 +150,7 @@ export async function updateCustomer(_prev: ActionResult, formData: FormData): P
       phone: phone || null,
       address: address || null,
       notes: notes || null,
+      destination: destination || null,
     })
     .eq("id", id)
   if (error) return { error: error.message }
@@ -176,7 +180,7 @@ export async function createShipment(_prev: ActionResult, formData: FormData): P
   const weight = Number.parseFloat(String(formData.get("weight_lb") ?? "0")) || 0
   const status = (String(formData.get("status") ?? "Processing") as ShipmentStatus)
   const origin = String(formData.get("origin") ?? "Florida, USA").trim()
-  const destination = String(formData.get("destination") ?? "Les Cayes (Okay)").trim()
+  const destination = String(formData.get("destination") ?? "").trim()
   const recipientName = String(formData.get("recipient_name") ?? "").trim()
   const recipientPhone = String(formData.get("recipient_phone") ?? "").trim()
   const recipientAddress = String(formData.get("recipient_address") ?? "").trim()
@@ -188,6 +192,9 @@ export async function createShipment(_prev: ActionResult, formData: FormData): P
 
   if (!SHIPMENT_STATUSES.includes(status)) return { error: "Invalid status." }
   if (weight <= 0) return { error: "Weight must be greater than zero." }
+  if (!ACTIVE_DESTINATIONS.includes(destination as (typeof ACTIVE_DESTINATIONS)[number])) {
+    return { error: "Please choose a destination: Okay (Les Cayes) or Okap (Cap-Ha\u00EFtien)." }
+  }
 
   // Auto-generate tracking number if not provided
   if (!tracking) {
@@ -263,6 +270,7 @@ export async function updateShipment(_prev: ActionResult, formData: FormData): P
   const declaredValue = Math.max(0, Number.parseFloat(String(formData.get("declared_value") ?? "0")) || 0)
 
   if (!SHIPMENT_STATUSES.includes(status)) return { error: "Invalid status." }
+  if (!destination) return { error: "Destination is required." }
 
   const { error } = await supabase
     .from("packages")

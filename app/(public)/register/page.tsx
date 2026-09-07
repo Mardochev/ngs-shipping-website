@@ -51,15 +51,30 @@ export default function RegisterPage() {
           </p>
         )}
 
-        {chosenDestination && (
-          <p className="mt-6 flex items-center gap-2 rounded-lg border border-primary/40 bg-primary/5 px-4 py-3 text-sm font-medium text-foreground">
-            <MapPin className="h-4 w-4 flex-shrink-0 text-primary" aria-hidden="true" />
-            Destinasyon ou chwazi: <span className="font-semibold text-primary">{chosenDestination}</span>
-          </p>
-        )}
-
         <form action={formAction} className="mt-6 flex flex-col gap-4">
-          {chosenDestination && <input type="hidden" name="preferred_destination" value={chosenDestination} />}
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="destination" className="flex items-center gap-2 text-sm font-medium text-foreground">
+              <MapPin className="h-4 w-4 flex-shrink-0 text-primary" aria-hidden="true" />
+              Destinasyon ou <span className="text-apricot-light">*</span>
+            </label>
+            <select
+              id="destination"
+              name="destination"
+              required
+              defaultValue={chosenDestination}
+              className={inputClass}
+            >
+              <option value="" disabled>
+                Chwazi destinasyon
+              </option>
+              {VALID_DESTINATIONS.map((d) => (
+                <option key={d} value={d}>
+                  {d}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="flex flex-col gap-1.5">
               <label htmlFor="first_name" className="text-sm font-medium text-foreground">

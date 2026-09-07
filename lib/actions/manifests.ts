@@ -72,6 +72,19 @@ export async function createManifest(_prev: ActionResult, formData: FormData): P
     return { error: "Select at least one package to add to the manifest." }
   }
 
+  // Safety: every selected package must ship to the manifest's destination, so
+  // Okay and Okap packages can never be mixed on the same manifest.
+  const { data: destRows } = await supabase
+    .from("packages")
+    .select("id, destination")
+    .in("id", packageIds)
+  const mismatched = (destRows ?? []).filter(
+    (p) => (p as { destination: string }).destination !== destination,
+  )
+  if (mismatched.length > 0) {
+    return { error: `All packages must ship to ${destination}. Remove packages for other destinations.` }
+  }
+
   // Optional per-package quantity / declared value overrides captured in the builder.
   for (const pid of packageIds) {
     const qtyRaw = formData.get(`qty_${pid}`)
@@ -253,21 +266,33 @@ export async function addPackagesToManifest(formData: FormData): Promise<void> {
 
   const { data: manifest } = await supabase
     .from("manifests")
-    .select("manifest_number, status")
+    .select("manifest_number, status, destination")
     .eq("id", manifestId)
     .maybeSingle()
   const manifestNumber = (manifest?.manifest_number as string) ?? ""
   const manifestStatus = (manifest?.status as ManifestStatus) ?? "Manifested"
+  const manifestDestination = (manifest?.destination as string) ?? ""
   const packageStatus = MANIFEST_TO_PACKAGE_STATUS[manifestStatus]
+
+  // Only attach packages that ship to this manifest's destination so Okay and
+  // Okap packages can never be mixed together.
+  const { data: destRows } = await supabase
+    .from("packages")
+    .select("id, destination")
+    .in("id", packageIds)
+  const eligibleIds = (destRows ?? [])
+    .filter((p) => (p as { destination: string }).destination === manifestDestination)
+    .map((p) => (p as { id: string }).id)
+  if (eligibleIds.length === 0) return
 
   await supabase
     .from("packages")
     .update({ manifest_id: manifestId, status: packageStatus, updated_at: new Date().toISOString() })
-    .in("id", packageIds)
+    .in("id", eligibleIds)
     .is("manifest_id", null)
 
   await supabase.from("tracking_events").insert(
-    packageIds.map((pid) => ({
+    eligibleIds.map((pid) => ({
       package_id: pid,
       status: packageStatus,
       location: "Pompano Beach, Florida, USA",

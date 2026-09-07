@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect } from "react"
 import { createCustomer, updateCustomer } from "@/lib/actions/admin"
-import type { Customer } from "@/lib/types"
+import { CUSTOMER_DESTINATIONS, type Customer } from "@/lib/types"
 import { SubmitButton } from "./submit-button"
 
 const inputClass =
@@ -12,6 +12,15 @@ const labelClass = "text-xs font-medium uppercase tracking-wide text-muted-foreg
 export function CustomerForm({ customer, onDone }: { customer?: Customer; onDone: () => void }) {
   const action = customer ? updateCustomer : createCustomer
   const [state, formAction] = useActionState(action, {})
+
+  // Preserve any legacy destination value already on the record so editing an
+  // existing customer never silently drops it.
+  const isLegacyDestination =
+    !!customer?.destination &&
+    !CUSTOMER_DESTINATIONS.includes(customer.destination as (typeof CUSTOMER_DESTINATIONS)[number])
+  const destinationOptions = isLegacyDestination
+    ? [customer!.destination as string, ...CUSTOMER_DESTINATIONS]
+    : [...CUSTOMER_DESTINATIONS]
 
   useEffect(() => {
     if (state?.success) onDone()
@@ -67,6 +76,28 @@ export function CustomerForm({ customer, onDone }: { customer?: Customer; onDone
           </label>
           <input id="phone" name="phone" defaultValue={customer?.phone ?? ""} className={inputClass} />
         </div>
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <label className={labelClass} htmlFor="destination">
+          Destination (Haiti)
+        </label>
+        <select
+          id="destination"
+          name="destination"
+          required
+          defaultValue={customer?.destination ?? ""}
+          className={inputClass}
+        >
+          <option value="" disabled>
+            Chwazi destinasyon
+          </option>
+          {destinationOptions.map((d) => (
+            <option key={d} value={d}>
+              {d}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="flex flex-col gap-1.5">

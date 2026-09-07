@@ -22,10 +22,13 @@ export async function registerCustomer(_prev: ActionResult, formData: FormData):
   const phone = String(formData.get("phone") ?? "").trim()
   const password = String(formData.get("password") ?? "")
   const confirm = String(formData.get("confirm_password") ?? "")
-  const preferredDestination = String(formData.get("preferred_destination") ?? "").trim()
+  const destination = String(formData.get("destination") ?? "").trim()
   const allowedDestinations = ["Okay (Les Cayes)", "Okap (Cap-Ha\u00EFtien)"]
 
   if (!firstName || !lastName || !email) return { error: "All fields are required." }
+  if (!allowedDestinations.includes(destination)) {
+    return { error: "Please choose your destination: Okay (Les Cayes) or Okap (Cap-Ha\u00EFtien)." }
+  }
   if (password.length < 6) return { error: "Password must be at least 6 characters." }
   if (password !== confirm) return { error: "Passwords do not match." }
 
@@ -51,9 +54,7 @@ export async function registerCustomer(_prev: ActionResult, formData: FormData):
       email,
       phone: phone || null,
       password_hash: passwordHash,
-      notes: allowedDestinations.includes(preferredDestination)
-        ? `Preferred destination: ${preferredDestination}`
-        : null,
+      destination,
     })
     .select("id, customer_code, full_name, email")
     .single()
