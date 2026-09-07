@@ -56,7 +56,7 @@ export default function ServicesPage() {
             </p>
             <ul className="mt-8 space-y-4">
               {[
-                "Direct route to Les Cayes (Okay), Haiti",
+                "Direct routes to Les Cayes (Okay) and Cap-Ha\u00EFtien (Okap), Haiti",
                 "Customs documentation and clearance support",
                 "Consolidation services for your shipments",
                 "Convenient drop-off at our Pompano Beach facility",

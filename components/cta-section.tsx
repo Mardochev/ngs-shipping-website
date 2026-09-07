@@ -7,10 +7,10 @@ export function CtaSection() {
     <section className="px-4 py-20 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-navy-light to-card px-6 py-14 text-center sm:px-12">
         <h2 className="font-display text-3xl font-bold text-balance text-foreground sm:text-4xl">
-          Ready to ship to Les Cayes, Haiti {"\u{1F1ED}\u{1F1F9}"}?
+          Ready to ship to Les Cayes &amp; Cap-Ha&iuml;tien, Haiti {"\u{1F1ED}\u{1F1F9}"}?
         </h2>
         <p className="mx-auto mt-4 max-w-2xl text-pretty leading-relaxed text-muted-foreground">
-          Get a free quote today for reliable air cargo from the USA to Les Cayes (Okay).
+          Get a free quote today for reliable air cargo from the USA to Les Cayes (Okay) and Cap-Ha&iuml;tien (Okap).
         </p>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <a

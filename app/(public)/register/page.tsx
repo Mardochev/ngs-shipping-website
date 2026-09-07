@@ -41,7 +41,7 @@ export default function RegisterPage() {
         </div>
 
         <p className="mt-6 rounded-lg border border-primary/40 bg-primary/5 px-4 py-3 text-sm leading-relaxed text-foreground">
-          Ou se yon kliyan Okay? Kreye kont ou, apre sa kontakte NGS pou resevwa enstriksyon adrès ou
+          Ou se yon kliyan Okay oswa Okap? Kreye kont ou, apre sa kontakte NGS pou resevwa enstriksyon adrès ou
           anvan premye acha ou.
         </p>
 
