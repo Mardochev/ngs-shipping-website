@@ -55,12 +55,6 @@ function formatDate(value: string | null) {
   return new Date(value).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
 }
 
-function addDays(value: string, days: number) {
-  const d = new Date(value)
-  d.setDate(d.getDate() + days)
-  return d.toISOString()
-}
-
 export default async function InvoicePage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getAdminSession()
   if (!session) redirect("/admin/login")
@@ -74,7 +68,15 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
   const invoiceNo = `INV-${shipment.tracking_number.replace(/[^0-9A-Za-z]/g, "").slice(-8).toUpperCase()}`
   const paymentStatus = shipment.payment_status ?? "UNPAID"
   const isPaid = paymentStatus === "PAID"
-  const dueDate = shipment.due_date ?? addDays(shipment.created_at, 7)
+
+  // Sender is the saved customer account; recipient is who collects in Haiti.
+  // Only show a separate "Sent by" block when they are different people.
+  const senderName = (customer?.full_name ?? "").trim()
+  const recipientName = (shipment.recipient_name ?? "").trim()
+  const showSentBy =
+    senderName.length > 0 &&
+    recipientName.length > 0 &&
+    senderName.toLowerCase() !== recipientName.toLowerCase()
 
   const qrDataUrl = await getCachedQrDataUrl(TRACKING_URL, {
     width: 200,
@@ -135,7 +137,6 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
                 </p>
                 <p className="mt-1 text-sm font-semibold text-slate-700">{invoiceNo}</p>
                 <p className="text-sm text-slate-500">Issued: {formatDate(shipment.created_at)}</p>
-                <p className="text-sm text-slate-500">Due: {formatDate(dueDate)}</p>
                 {/* Payment status stamp */}
                 <span
                   className={`mt-3 inline-flex items-center gap-1.5 rounded-md border-2 px-3 py-1 text-sm font-extrabold uppercase tracking-widest ${
@@ -147,41 +148,47 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
               </div>
             </div>
 
-            {/* Bill to + shipment */}
-            <div className="grid gap-6 py-6 sm:grid-cols-2">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wide" style={{ color: GOLD }}>
-                  Bill to
-                </p>
-                <p className="mt-1 font-semibold text-slate-900">{customer?.full_name ?? "Walk-in customer"}</p>
-                {customer?.customer_code && <p className="text-sm text-slate-500">{customer.customer_code}</p>}
-                {customer?.email && <p className="text-sm text-slate-500">{customer.email}</p>}
-                {customer?.phone && <p className="text-sm text-slate-500">{customer.phone}</p>}
-              </div>
-              <div className="sm:text-right">
-                <p className="text-xs font-bold uppercase tracking-wide" style={{ color: GOLD }}>
-                  Shipment
-                </p>
-                <p className="mt-1 font-mono text-sm font-semibold text-slate-900">{shipment.tracking_number}</p>
-                <p className="text-sm text-slate-500">
-                  {shipment.origin} → {shipment.destination}
-                </p>
-                <p className="text-sm text-slate-500">Status: {shipment.status}</p>
-                <p className="text-sm text-slate-500">ETA: {formatDate(shipment.estimated_delivery)}</p>
-              </div>
+            {/* Shipment */}
+            <div className="py-6">
+              <p className="text-xs font-bold uppercase tracking-wide" style={{ color: GOLD }}>
+                Shipment
+              </p>
+              <p className="mt-1 font-mono text-sm font-semibold text-slate-900">{shipment.tracking_number}</p>
+              <p className="text-sm text-slate-500">
+                {shipment.origin} → {shipment.destination}
+              </p>
+              <p className="text-sm text-slate-500">Status: {shipment.status}</p>
+              <p className="text-sm text-slate-500">ETA: {formatDate(shipment.estimated_delivery)}</p>
             </div>
 
-            {/* Recipient */}
+            {/* Recipient in Haiti */}
             {(shipment.recipient_name || shipment.recipient_address) && (
               <div className="mb-6 rounded-lg bg-slate-50 p-4">
                 <p className="text-xs font-bold uppercase tracking-wide" style={{ color: GOLD }}>
-                  Ship to (Haiti)
+                  Recipient in Haiti
                 </p>
                 <p className="mt-1 text-sm text-slate-700">
                   {shipment.recipient_name}
                   {shipment.recipient_phone ? ` · ${shipment.recipient_phone}` : ""}
                 </p>
                 {shipment.recipient_address && <p className="text-sm text-slate-500">{shipment.recipient_address}</p>}
+                {customer?.customer_code && (
+                  <p className="text-sm text-slate-500">Customer ID: {customer.customer_code}</p>
+                )}
+              </div>
+            )}
+
+            {/* Sent by (only when the sender is a different person than the recipient) */}
+            {showSentBy && (
+              <div className="mb-6 rounded-lg bg-slate-50 p-4">
+                <p className="text-xs font-bold uppercase tracking-wide" style={{ color: GOLD }}>
+                  Sent by
+                </p>
+                <p className="mt-1 text-sm text-slate-700">
+                  {customer?.full_name}
+                  {customer?.phone ? ` · ${customer.phone}` : ""}
+                </p>
+                {customer?.email && <p className="text-sm text-slate-500">{customer.email}</p>}
               </div>
             )}
 
