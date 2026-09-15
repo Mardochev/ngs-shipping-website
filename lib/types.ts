@@ -74,6 +74,7 @@ export type Shipment = {
   shipping_method: string
   weight_lb: number
   cost: number
+  rate_per_lb: number | null
   status: ShipmentStatus
   origin: string
   destination: string
@@ -124,6 +125,16 @@ export type TrackingEvent = {
 
 export type AppSettings = {
   id: number
+  rate_per_lb: number
+  currency: string
+  updated_at: string
+}
+
+// Admin-configured price per pound for a specific destination. The shipment
+// form auto-loads the matching rate; the value is then frozen onto each
+// shipment so historical invoices are unaffected by later price changes.
+export type DestinationRate = {
+  destination: string
   rate_per_lb: number
   currency: string
   updated_at: string

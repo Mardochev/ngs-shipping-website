@@ -1,8 +1,14 @@
 "use client"
 
-import { useActionState, useEffect } from "react"
+import { useActionState, useEffect, useMemo, useState } from "react"
 import { createShipment, updateShipment } from "@/lib/actions/admin"
-import { ACTIVE_DESTINATIONS, SHIPMENT_STATUSES, type Customer, type Shipment } from "@/lib/types"
+import {
+  ACTIVE_DESTINATIONS,
+  SHIPMENT_STATUSES,
+  type Customer,
+  type DestinationRate,
+  type Shipment,
+} from "@/lib/types"
 import { SubmitButton } from "./submit-button"
 
 const inputClass =
@@ -12,10 +18,12 @@ const labelClass = "text-xs font-medium uppercase tracking-wide text-muted-foreg
 export function ShipmentForm({
   customers,
   shipment,
+  destinationRates,
   onDone,
 }: {
   customers: Customer[]
   shipment?: Shipment
+  destinationRates: DestinationRate[]
   onDone: () => void
 }) {
   const action = shipment ? updateShipment : createShipment
@@ -29,6 +37,30 @@ export function ShipmentForm({
   const destinationOptions = isLegacyDestination
     ? [shipment!.destination, ...ACTIVE_DESTINATIONS]
     : [...ACTIVE_DESTINATIONS]
+
+  const rateMap = useMemo(() => {
+    const m = new Map<string, number>()
+    for (const r of destinationRates) m.set(r.destination, Number(r.rate_per_lb))
+    return m
+  }, [destinationRates])
+
+  // Controlled fields so the rate can auto-load from the chosen destination and
+  // the Amount preview (weight × rate) stays live. Editing keeps the shipment's
+  // saved rate; picking a new destination loads that destination's current rate.
+  const [destination, setDestination] = useState(shipment?.destination ?? "")
+  const [weight, setWeight] = useState(shipment?.weight_lb != null ? String(shipment.weight_lb) : "")
+  const [rate, setRate] = useState(shipment?.rate_per_lb != null ? String(shipment.rate_per_lb) : "")
+
+  function handleDestinationChange(value: string) {
+    setDestination(value)
+    const configured = rateMap.get(value)
+    setRate(configured != null ? String(configured) : "")
+  }
+
+  const numericRate = Number.parseFloat(rate) || 0
+  const numericWeight = Number.parseFloat(weight) || 0
+  const amount = Math.round(numericWeight * numericRate * 100) / 100
+  const hasConfiguredRate = destination !== "" && rateMap.get(destination) != null
 
   useEffect(() => {
     if (state?.success) onDone()
@@ -103,22 +135,25 @@ export function ShipmentForm({
             step="0.1"
             min="0"
             required
-            defaultValue={shipment?.weight_lb ?? ""}
+            value={weight}
+            onChange={(e) => setWeight(e.target.value)}
             className={inputClass}
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className={labelClass} htmlFor="cost">
-            Cost (USD)
+          <label className={labelClass} htmlFor="rate_per_lb">
+            Rate / lb (USD)
           </label>
           <input
-            id="cost"
-            name="cost"
+            id="rate_per_lb"
+            name="rate_per_lb"
             type="number"
             step="0.01"
             min="0"
-            defaultValue={shipment?.cost ?? ""}
-            placeholder={shipment ? "" : "Auto from rate"}
+            required
+            value={rate}
+            onChange={(e) => setRate(e.target.value)}
+            placeholder="Set by destination"
             className={inputClass}
           />
         </div>
@@ -215,7 +250,8 @@ export function ShipmentForm({
             id="destination"
             name="destination"
             required
-            defaultValue={shipment?.destination ?? ""}
+            value={destination}
+            onChange={(e) => handleDestinationChange(e.target.value)}
             className={inputClass}
           >
             <option value="" disabled>
@@ -229,6 +265,17 @@ export function ShipmentForm({
           </select>
         </div>
       </div>
+
+      {/* Live amount preview + missing-rate warning */}
+      <div className="flex items-center justify-between rounded-lg border border-border bg-card px-3 py-2.5 text-sm">
+        <span className="text-muted-foreground">Amount (Weight × Rate)</span>
+        <span className="font-semibold text-foreground">${amount.toFixed(2)}</span>
+      </div>
+      {destination !== "" && !hasConfiguredRate && (
+        <p className="text-xs text-apricot-light">
+          No saved rate for {destination}. Enter a rate per pound to create the invoice.
+        </p>
+      )}
 
       <fieldset className="rounded-lg border border-border p-4">
         <legend className="px-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">

@@ -4,6 +4,7 @@ import {
   MANIFEST_ELIGIBLE_STATUSES,
   type AppSettings,
   type Customer,
+  type DestinationRate,
   type Manifest,
   type ManifestWithPackages,
   type Shipment,
@@ -48,6 +49,12 @@ export async function getSettings(): Promise<AppSettings> {
       updated_at: new Date().toISOString(),
     }
   )
+}
+
+export async function listDestinationRates(): Promise<DestinationRate[]> {
+  const supabase = getServiceClient()
+  const { data } = await supabase.from("destination_rates").select("*").order("destination", { ascending: true })
+  return (data ?? []) as unknown as DestinationRate[]
 }
 
 export async function getShipmentById(id: string): Promise<{

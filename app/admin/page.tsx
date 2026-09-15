@@ -6,6 +6,7 @@ import {
   getSettings,
   listManifests,
   listManifestEligiblePackages,
+  listDestinationRates,
 } from "@/lib/queries"
 import { AdminDashboard } from "@/components/admin/admin-dashboard"
 
@@ -15,12 +16,13 @@ export default async function AdminPage() {
   const session = await getAdminSession()
   if (!session) redirect("/admin/login")
 
-  const [shipments, customers, settings, manifests, eligiblePackages] = await Promise.all([
+  const [shipments, customers, settings, manifests, eligiblePackages, destinationRates] = await Promise.all([
     listShipments(),
     listCustomers(),
     getSettings(),
     listManifests(),
     listManifestEligiblePackages(),
+    listDestinationRates(),
   ])
 
   return (
@@ -31,6 +33,7 @@ export default async function AdminPage() {
       settings={settings}
       manifests={manifests}
       eligiblePackages={eligiblePackages}
+      destinationRates={destinationRates}
     />
   )
 }

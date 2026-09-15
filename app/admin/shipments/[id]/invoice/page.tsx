@@ -64,7 +64,12 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
   if (!shipment) notFound()
 
   const customer = shipment.customers
-  const cost = Number(shipment.cost)
+  const weight = Number(shipment.weight_lb) || 0
+  // Prefer the rate frozen onto the shipment; fall back to cost/weight for any
+  // legacy record. Amount is always Weight × Rate.
+  const rate =
+    shipment.rate_per_lb != null ? Number(shipment.rate_per_lb) : weight > 0 ? Number(shipment.cost) / weight : 0
+  const amount = Math.round(weight * rate * 100) / 100
   const invoiceNo = `INV-${shipment.tracking_number.replace(/[^0-9A-Za-z]/g, "").slice(-8).toUpperCase()}`
   const paymentStatus = shipment.payment_status ?? "UNPAID"
   const isPaid = paymentStatus === "PAID"
@@ -197,6 +202,7 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
                   <th className="rounded-l-md px-3 py-2 font-semibold">Description</th>
                   <th className="px-3 py-2 text-center font-semibold">Method</th>
                   <th className="px-3 py-2 text-center font-semibold">Weight</th>
+                  <th className="px-3 py-2 text-center font-semibold">Rate</th>
                   <th className="rounded-r-md px-3 py-2 text-right font-semibold">Amount</th>
                 </tr>
               </thead>
@@ -205,7 +211,8 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
                   <td className="px-3 py-3 text-slate-700">{shipment.description || "Air cargo shipment to Haiti"}</td>
                   <td className="px-3 py-3 text-center text-slate-500">{shipment.shipping_method}</td>
                   <td className="px-3 py-3 text-center text-slate-500">{shipment.weight_lb} lb</td>
-                  <td className="px-3 py-3 text-right font-semibold text-slate-900">${cost.toFixed(2)}</td>
+                  <td className="px-3 py-3 text-center text-slate-500">${rate.toFixed(2)}/lb</td>
+                  <td className="px-3 py-3 text-right font-semibold text-slate-900">${amount.toFixed(2)}</td>
                 </tr>
               </tbody>
             </table>
@@ -215,14 +222,14 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
               <div className="w-full max-w-xs space-y-2">
                 <div className="flex justify-between text-sm text-slate-500">
                   <span>Subtotal</span>
-                  <span>${cost.toFixed(2)}</span>
+                  <span>${amount.toFixed(2)}</span>
                 </div>
                 <div
                   className="flex justify-between rounded-md px-3 py-2 text-base font-bold text-white"
                   style={{ backgroundColor: NAVY }}
                 >
                   <span>Total (USD)</span>
-                  <span>${cost.toFixed(2)}</span>
+                  <span>${amount.toFixed(2)}</span>
                 </div>
               </div>
             </div>

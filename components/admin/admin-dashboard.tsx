@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Package, Users, Settings, LogOut, Plane, LayoutDashboard, Truck, PackageCheck, ClipboardList } from "lucide-react"
 import { adminLogout } from "@/lib/actions/admin"
-import type { AppSettings, Customer, Manifest, ShipmentWithCustomer } from "@/lib/types"
+import type { AppSettings, Customer, DestinationRate, Manifest, ShipmentWithCustomer } from "@/lib/types"
 import { ShipmentsPanel } from "./shipments-panel"
 import { CustomersPanel } from "./customers-panel"
 import { SettingsPanel } from "./settings-panel"
@@ -26,6 +26,7 @@ export function AdminDashboard({
   settings,
   manifests,
   eligiblePackages,
+  destinationRates,
 }: {
   adminName: string
   shipments: ShipmentWithCustomer[]
@@ -33,6 +34,7 @@ export function AdminDashboard({
   settings: AppSettings
   manifests: Manifest[]
   eligiblePackages: ShipmentWithCustomer[]
+  destinationRates: DestinationRate[]
 }) {
   const [tab, setTab] = useState<Tab>("overview")
 
@@ -152,12 +154,14 @@ export function AdminDashboard({
             </div>
           )}
 
-          {tab === "shipments" && <ShipmentsPanel shipments={shipments} customers={customers} />}
+          {tab === "shipments" && (
+            <ShipmentsPanel shipments={shipments} customers={customers} destinationRates={destinationRates} />
+          )}
           {tab === "manifests" && (
             <ManifestsPanel manifests={manifests} eligiblePackages={eligiblePackages} />
           )}
           {tab === "customers" && <CustomersPanel customers={customers} />}
-          {tab === "settings" && <SettingsPanel settings={settings} />}
+          {tab === "settings" && <SettingsPanel settings={settings} destinationRates={destinationRates} />}
         </div>
       </div>
     </div>

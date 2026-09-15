@@ -170,6 +170,29 @@ export async function deleteCustomer(formData: FormData): Promise<void> {
 }
 
 // ---------------- Shipments ----------------
+// Resolves the price per pound to save on a shipment. A non-empty admin
+// override always wins; otherwise falls back to the destination's configured
+// rate. Returns null when no positive rate can be determined so callers can
+// require the admin to enter one before creating the invoice.
+async function resolveShipmentRate(
+  supabase: ReturnType<typeof getServiceClient>,
+  destination: string,
+  rateInput: string,
+): Promise<number | null> {
+  const override = Number.parseFloat(rateInput)
+  if (rateInput !== "" && !Number.isNaN(override) && override > 0) {
+    return Math.round(override * 100) / 100
+  }
+  const { data } = await supabase
+    .from("destination_rates")
+    .select("rate_per_lb")
+    .eq("destination", destination)
+    .maybeSingle()
+  const configured = data ? Number(data.rate_per_lb) : NaN
+  if (!Number.isNaN(configured) && configured > 0) return configured
+  return null
+}
+
 export async function createShipment(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
   await requireAdmin()
   const supabase = getServiceClient()
@@ -186,7 +209,7 @@ export async function createShipment(_prev: ActionResult, formData: FormData): P
   const recipientAddress = String(formData.get("recipient_address") ?? "").trim()
   const eta = String(formData.get("estimated_delivery") ?? "").trim()
   let tracking = String(formData.get("tracking_number") ?? "").trim().toUpperCase()
-  const costInput = String(formData.get("cost") ?? "").trim()
+  const rateInput = String(formData.get("rate_per_lb") ?? "").trim()
   const quantity = Math.max(1, Math.round(Number.parseFloat(String(formData.get("quantity") ?? "1")) || 1))
   const declaredValue = Math.max(0, Number.parseFloat(String(formData.get("declared_value") ?? "0")) || 0)
 
@@ -196,22 +219,20 @@ export async function createShipment(_prev: ActionResult, formData: FormData): P
     return { error: "Please choose a destination: Okay (Les Cayes) or Okap (Cap-Ha\u00EFtien)." }
   }
 
+  // Resolve the rate: an admin override wins; otherwise use the destination's
+  // configured rate. If neither exists, require the admin to enter one.
+  const rate = await resolveShipmentRate(supabase, destination, rateInput)
+  if (rate == null) {
+    return {
+      error: `No rate is configured for ${destination}. Enter a rate per pound to create the invoice.`,
+    }
+  }
+  const cost = Math.round(rate * weight * 100) / 100
+
   // Auto-generate tracking number if not provided
   if (!tracking) {
     const year = new Date().getFullYear()
     tracking = `NGS-${year}-${pad(await nextCode("tracking"))}`
-  }
-
-  // Compute cost from rate if not provided
-  let cost = Number.parseFloat(costInput)
-  if (!costInput || Number.isNaN(cost)) {
-    const { data: settings } = await supabase
-      .from("app_settings")
-      .select("rate_per_lb")
-      .limit(1)
-      .maybeSingle()
-    const rate = Number(settings?.rate_per_lb ?? 3.5)
-    cost = Math.round(rate * weight * 100) / 100
   }
 
   const { data: pkg, error } = await supabase
@@ -223,6 +244,7 @@ export async function createShipment(_prev: ActionResult, formData: FormData): P
       shipping_method: shippingMethod,
       weight_lb: weight,
       cost,
+      rate_per_lb: rate,
       status,
       origin,
       destination,
@@ -257,7 +279,7 @@ export async function updateShipment(_prev: ActionResult, formData: FormData): P
   const description = String(formData.get("description") ?? "").trim()
   const shippingMethod = String(formData.get("shipping_method") ?? "Air Cargo").trim()
   const weight = Number.parseFloat(String(formData.get("weight_lb") ?? "0")) || 0
-  const cost = Number.parseFloat(String(formData.get("cost") ?? "0")) || 0
+  const rateInput = String(formData.get("rate_per_lb") ?? "").trim()
   const status = String(formData.get("status") ?? "Processing") as ShipmentStatus
   const origin = String(formData.get("origin") ?? "").trim()
   const destination = String(formData.get("destination") ?? "").trim()
@@ -272,6 +294,14 @@ export async function updateShipment(_prev: ActionResult, formData: FormData): P
   if (!SHIPMENT_STATUSES.includes(status)) return { error: "Invalid status." }
   if (!destination) return { error: "Destination is required." }
 
+  // The submitted rate is the final saved rate for this shipment (an admin
+  // override, or the destination rate the form auto-loaded). Amount = weight × rate.
+  const rate = await resolveShipmentRate(supabase, destination, rateInput)
+  if (rate == null) {
+    return { error: `No rate is configured for ${destination}. Enter a rate per pound.` }
+  }
+  const cost = Math.round(rate * weight * 100) / 100
+
   const { error } = await supabase
     .from("packages")
     .update({
@@ -280,6 +310,7 @@ export async function updateShipment(_prev: ActionResult, formData: FormData): P
       shipping_method: shippingMethod,
       weight_lb: weight,
       cost,
+      rate_per_lb: rate,
       status,
       origin,
       destination,
@@ -362,4 +393,48 @@ export async function updateSettings(_prev: ActionResult, formData: FormData): P
   }
   revalidatePath("/admin")
   return { success: "Settings saved." }
+}
+
+// Save each destination's configured price per pound. Paired hidden
+// "destination" + "rate" fields are zipped together from the form.
+export async function updateDestinationRates(
+  _prev: ActionResult,
+  formData: FormData,
+): Promise<ActionResult> {
+  await requireAdmin()
+  const supabase = getServiceClient()
+
+  const destinations = formData.getAll("destination").map((d) => String(d).trim())
+  const rates = formData.getAll("rate").map((r) => Number.parseFloat(String(r)))
+  const currency = String(formData.get("currency") ?? "USD").trim() || "USD"
+
+  for (let i = 0; i < destinations.length; i++) {
+    const d = destinations[i]
+    if (!d) continue
+    const value = rates[i]
+    if (Number.isNaN(value) || value < 0) {
+      return { error: `Enter a valid rate for ${d}.` }
+    }
+    await supabase.from("destination_rates").upsert(
+      {
+        destination: d,
+        rate_per_lb: Math.round(value * 100) / 100,
+        currency,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "destination" },
+    )
+  }
+
+  // Keep the currency in app_settings in sync for legacy display.
+  const { data: existing } = await supabase.from("app_settings").select("id").limit(1).maybeSingle()
+  if (existing) {
+    await supabase
+      .from("app_settings")
+      .update({ currency, updated_at: new Date().toISOString() })
+      .eq("id", existing.id)
+  }
+
+  revalidatePath("/admin")
+  return { success: "Destination rates saved." }
 }

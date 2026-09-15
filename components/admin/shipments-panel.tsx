@@ -4,16 +4,24 @@ import { useState } from "react"
 import Link from "next/link"
 import { Plus, Pencil, Trash2, FileText, Search, Tag } from "lucide-react"
 import { deleteShipment, updateShipmentStatus } from "@/lib/actions/admin"
-import { SHIPMENT_STATUSES, type Customer, type Shipment, type ShipmentWithCustomer } from "@/lib/types"
+import {
+  SHIPMENT_STATUSES,
+  type Customer,
+  type DestinationRate,
+  type Shipment,
+  type ShipmentWithCustomer,
+} from "@/lib/types"
 import { Modal } from "./modal"
 import { ShipmentForm } from "./shipment-form"
 
 export function ShipmentsPanel({
   shipments,
   customers,
+  destinationRates,
 }: {
   shipments: ShipmentWithCustomer[]
   customers: Customer[]
+  destinationRates: DestinationRate[]
 }) {
   const [creating, setCreating] = useState(false)
   const [editing, setEditing] = useState<Shipment | null>(null)
@@ -150,10 +158,17 @@ export function ShipmentsPanel({
       </div>
 
       <Modal open={creating} onClose={() => setCreating(false)} title="New shipment">
-        <ShipmentForm customers={customers} onDone={() => setCreating(false)} />
+        <ShipmentForm customers={customers} destinationRates={destinationRates} onDone={() => setCreating(false)} />
       </Modal>
       <Modal open={!!editing} onClose={() => setEditing(null)} title={`Edit ${editing?.tracking_number ?? ""}`}>
-        {editing && <ShipmentForm customers={customers} shipment={editing} onDone={() => setEditing(null)} />}
+        {editing && (
+          <ShipmentForm
+            customers={customers}
+            shipment={editing}
+            destinationRates={destinationRates}
+            onDone={() => setEditing(null)}
+          />
+        )}
       </Modal>
     </div>
   )
