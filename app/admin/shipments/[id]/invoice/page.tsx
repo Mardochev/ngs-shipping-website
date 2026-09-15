@@ -10,7 +10,7 @@ const company = {
   shortName: "NGS",
   name: "NEXTLANE GLOBAL SHIPPING",
   addressLines: ["83 NW 15th Pl", "Pompano Beach, FL 33060", "USA"],
-  phone: "+1 (954) 939-8617",
+  phone: "+1 (754) 800-6115",
   email: "info@ngsshipping.com",
   website: "www.ngsshipping.com",
 } as const
@@ -167,10 +167,10 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
                 <p className="text-xs font-bold uppercase tracking-wide" style={{ color: GOLD }}>
                   Recipient in Haiti
                 </p>
-                <p className="mt-1 text-sm text-slate-700">
-                  {shipment.recipient_name}
-                  {shipment.recipient_phone ? ` · ${shipment.recipient_phone}` : ""}
-                </p>
+                <p className="mt-1 text-sm font-semibold text-slate-900">{shipment.recipient_name}</p>
+                {shipment.recipient_phone && (
+                  <p className="text-sm text-slate-700">Phone: {shipment.recipient_phone}</p>
+                )}
                 {shipment.recipient_address && <p className="text-sm text-slate-500">{shipment.recipient_address}</p>}
                 {customer?.customer_code && (
                   <p className="text-sm text-slate-500">Customer ID: {customer.customer_code}</p>
@@ -184,10 +184,8 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
                 <p className="text-xs font-bold uppercase tracking-wide" style={{ color: GOLD }}>
                   Sent by
                 </p>
-                <p className="mt-1 text-sm text-slate-700">
-                  {customer?.full_name}
-                  {customer?.phone ? ` · ${customer.phone}` : ""}
-                </p>
+                <p className="mt-1 text-sm font-semibold text-slate-900">{customer?.full_name}</p>
+                {customer?.phone && <p className="text-sm text-slate-700">Phone: {customer.phone}</p>}
                 {customer?.email && <p className="text-sm text-slate-500">{customer.email}</p>}
               </div>
             )}
