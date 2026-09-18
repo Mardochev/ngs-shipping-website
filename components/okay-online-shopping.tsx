@@ -7,20 +7,15 @@ import { ArrowRight, Check, Copy, MapPin, MessageCircle, Phone, UserPlus } from 
 import { site } from "@/lib/site"
 
 const steps = [
-  "Kreye kont NGS ou",
-  "Achte pwodwi ou sou entènèt",
-  "Voye koli a nan adrès NGS nan Florid",
-  "NGS voye koli ou pou Okay oswa Okap",
+  "Create your NGS account",
+  "Shop for your products online",
+  "Ship the package to your NGS address in Florida",
+  "NGS ships your package to Haiti",
 ] as const
 
 const addressLines = ["83 NW 15th Pl", "Pompano Beach, FL 33060"] as const
 
-const pickupLocations = [
-  { city: "Okay (Les Cayes)", detail: "Route de Simon, anvan Kolèj Evanjelik la." },
-  { city: "Okap (Cap-Ha\u00EFtien)", detail: "Kontakte NGS pou enf\u00F2masyon sou kote pou pran koli a." },
-] as const
-
-const destinationOptions = ["Okay (Les Cayes)", "Okap (Cap-Ha\u00EFtien)"] as const
+const destinationOptions = ["Les Cayes, Haiti", "Cap-Ha\u00EFtien, Haiti", "Port-au-Prince, Haiti"] as const
 
 export function OkayOnlineShopping() {
   const [copied, setCopied] = useState(false)
@@ -47,7 +42,7 @@ export function OkayOnlineShopping() {
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-border shadow-2xl shadow-navy-deep/50">
             <Image
               src="/okay-online-shopping.png"
-              alt="Yon kliyan ayisyen k ap achte sou entènèt sou telefòn li pandan NGS ap resevwa koli yo nan Florid epi yon avyon cargo ap pote yo ale pou Okay oswa Okap"
+              alt="A customer shopping online on their phone while NGS receives the packages in Florida and a cargo plane carries them to Haiti"
               fill
               sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover object-center"
@@ -59,19 +54,18 @@ export function OkayOnlineShopping() {
         {/* Text */}
         <div className="order-last lg:order-first">
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">
-            Sèvis pou moun Okay ak Okap
+            Online shopping, shipped to Haiti
           </p>
           <h2
             id="okay-online-heading"
             className="mt-3 font-display text-2xl font-bold text-balance text-foreground sm:text-4xl"
           >
-            Moun Okay ak Okap, achte sou entènèt epi voye yo nan adrès NGS.
+            Shop online and ship it to your NGS address.
           </h2>
           <p className="mt-4 text-pretty leading-relaxed text-muted-foreground">
-            Ou rete Okay oswa Okap? Achte pwodwi ou sou entènèt epi voye yo nan adrès NGS nan Florid.
-            NGS ap resevwa koli ou, prepare li epi voye li pa Air Cargo pou destinasyon ou chwazi a. Lè
-            koli a rive epi li pare, n ap kontakte w pou vin pran li nan biwo oswa pwen sèvis NGS nan
-            vil ou.
+            Shop for your products online and send them to your NGS address in Florida. NGS receives
+            your package, prepares it, and ships it by air cargo to the destination you choose. When
+            your package arrives and is ready, we will contact you.
           </p>
 
           {/* Steps */}
@@ -92,7 +86,7 @@ export function OkayOnlineShopping() {
               htmlFor="okay-destination"
               className="text-sm font-semibold uppercase tracking-wider text-primary"
             >
-              Chwazi destinasyon ou <span className="text-apricot-light">*</span>
+              Choose your destination <span className="text-apricot-light">*</span>
             </label>
             <select
               id="okay-destination"
@@ -115,7 +109,7 @@ export function OkayOnlineShopping() {
             <div className="flex items-center gap-2">
               <MapPin className="h-5 w-5 text-primary" aria-hidden="true" />
               <p className="font-display text-sm font-bold uppercase tracking-wider text-primary">
-                Adrès NGS nan Florid
+                NGS address in Florida
               </p>
             </div>
             <address className="mt-3 not-italic">
@@ -134,35 +128,33 @@ export function OkayOnlineShopping() {
               {copied ? (
                 <>
                   <Check className="h-4 w-4 text-primary" aria-hidden="true" />
-                  Adrès la kopye!
+                  Address copied!
                 </>
               ) : (
                 <>
                   <Copy className="h-4 w-4 text-primary" aria-hidden="true" />
-                  Kopye adrès la
+                  Copy address
                 </>
               )}
             </button>
           </div>
 
-          {/* Pickup locations (shown separately per destination) */}
-          <div className="mt-6 grid gap-3 sm:grid-cols-2">
-            {pickupLocations.map((loc) => (
-              <div key={loc.city} className="rounded-2xl border border-border bg-card p-4">
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 flex-shrink-0 text-primary" aria-hidden="true" />
-                  <p className="font-display text-sm font-bold text-foreground">{loc.city}</p>
-                </div>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{loc.detail}</p>
-              </div>
-            ))}
+          {/* Pickup note */}
+          <div className="mt-6 rounded-2xl border border-border bg-card p-4">
+            <div className="flex items-center gap-2">
+              <MapPin className="h-4 w-4 flex-shrink-0 text-primary" aria-hidden="true" />
+              <p className="font-display text-sm font-bold text-foreground">Pickup in Haiti</p>
+            </div>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              Pickup details will be provided directly to the recipient when the shipment is ready.
+            </p>
           </div>
 
           {/* Important note */}
           <p className="mt-6 rounded-xl border border-border bg-card/60 px-4 py-3 text-sm leading-relaxed text-muted-foreground">
-            Anvan premye acha ou, kontakte NGS pou konfime kijan pou mete non ou ak referans kliyan ou
-            sou koli a. Itilize adrès NGS kòm Shipping Address sèlman. Pou Billing Address, itilize
-            adrès ki asosye ak mwayen peman ou.
+            Before your first purchase, contact NGS to confirm how to put your name and customer
+            reference on the package. Use the NGS address as the Shipping Address only. For the Billing
+            Address, use the address associated with your payment method.
           </p>
 
           {/* Buttons */}
@@ -172,18 +164,18 @@ export function OkayOnlineShopping() {
               className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-base font-semibold text-primary-foreground transition-colors hover:bg-apricot-light"
             >
               <UserPlus className="h-5 w-5" aria-hidden="true" />
-              Kreye kont mwen
+              Create my account
               <ArrowRight className="h-5 w-5" aria-hidden="true" />
             </Link>
           </div>
 
-          {/* Horizontal contact row: WhatsApp + Rele NGS */}
+          {/* Horizontal contact row: WhatsApp + Call NGS */}
           <div className="mt-4 flex items-center gap-3">
             <a
               href={site.whatsapp}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="Chat sou WhatsApp"
+              aria-label="Chat on WhatsApp"
               className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-[#25D366] px-4 py-3 text-sm font-semibold text-white transition-transform hover:scale-[1.02]"
             >
               <MessageCircle className="h-5 w-5" aria-hidden="true" />
@@ -191,11 +183,11 @@ export function OkayOnlineShopping() {
             </a>
             <a
               href={site.phoneHref}
-              aria-label={`Rele NGS nan ${site.phone}`}
+              aria-label={`Call NGS at ${site.phone}`}
               className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.02]"
             >
               <Phone className="h-5 w-5" aria-hidden="true" />
-              Rele NGS
+              Call NGS
             </a>
           </div>
         </div>

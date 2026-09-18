@@ -216,7 +216,7 @@ export async function createShipment(_prev: ActionResult, formData: FormData): P
   if (!SHIPMENT_STATUSES.includes(status)) return { error: "Invalid status." }
   if (weight <= 0) return { error: "Weight must be greater than zero." }
   if (!ACTIVE_DESTINATIONS.includes(destination as (typeof ACTIVE_DESTINATIONS)[number])) {
-    return { error: "Please choose a destination: Okay (Les Cayes) or Okap (Cap-Ha\u00EFtien)." }
+    return { error: "Please choose a destination in Haiti." }
   }
 
   // Resolve the rate: an admin override wins; otherwise use the destination's

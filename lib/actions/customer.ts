@@ -8,6 +8,7 @@ import {
   getCustomerSession,
   clearCustomerSession,
 } from "@/lib/session"
+import { CUSTOMER_DESTINATIONS } from "@/lib/types"
 
 type ActionResult = { error?: string }
 
@@ -23,11 +24,11 @@ export async function registerCustomer(_prev: ActionResult, formData: FormData):
   const password = String(formData.get("password") ?? "")
   const confirm = String(formData.get("confirm_password") ?? "")
   const destination = String(formData.get("destination") ?? "").trim()
-  const allowedDestinations = ["Okay (Les Cayes)", "Okap (Cap-Ha\u00EFtien)"]
+  const allowedDestinations = CUSTOMER_DESTINATIONS as readonly string[]
 
   if (!firstName || !lastName || !email) return { error: "All fields are required." }
   if (!allowedDestinations.includes(destination)) {
-    return { error: "Please choose your destination: Okay (Les Cayes) or Okap (Cap-Ha\u00EFtien)." }
+    return { error: "Please choose your destination in Haiti." }
   }
   if (password.length < 6) return { error: "Password must be at least 6 characters." }
   if (password !== confirm) return { error: "Passwords do not match." }

@@ -174,7 +174,7 @@ export function ShipmentForm({
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
           <label className={labelClass} htmlFor="declared_value">
-            Declared Value / Vale Machandiz
+            Declared Value
           </label>
           <div className="relative">
             <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
@@ -255,7 +255,7 @@ export function ShipmentForm({
             className={inputClass}
           >
             <option value="" disabled>
-              Chwazi destinasyon
+              Select destination
             </option>
             {destinationOptions.map((d) => (
               <option key={d} value={d}>

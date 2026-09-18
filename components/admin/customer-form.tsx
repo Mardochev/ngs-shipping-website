@@ -90,7 +90,7 @@ export function CustomerForm({ customer, onDone }: { customer?: Customer; onDone
           className={inputClass}
         >
           <option value="" disabled>
-            Chwazi destinasyon
+            Select destination
           </option>
           {destinationOptions.map((d) => (
             <option key={d} value={d}>

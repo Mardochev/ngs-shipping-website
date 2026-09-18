@@ -10,7 +10,7 @@ import { SubmitButton } from "@/components/admin/submit-button"
 const inputClass =
   "rounded-lg border border-input bg-navy-deep px-4 py-3 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
 
-const VALID_DESTINATIONS = ["Okay (Les Cayes)", "Okap (Cap-Ha\u00EFtien)"]
+const VALID_DESTINATIONS = ["Les Cayes, Haiti", "Cap-Ha\u00EFtien, Haiti", "Port-au-Prince, Haiti"]
 
 export default function RegisterPage() {
   const [state, formAction] = useActionState(registerCustomer, {})
@@ -41,8 +41,8 @@ export default function RegisterPage() {
         </div>
 
         <p className="mt-6 rounded-lg border border-primary/40 bg-primary/5 px-4 py-3 text-sm leading-relaxed text-foreground">
-          Ou se yon kliyan Okay oswa Okap? Kreye kont ou, apre sa kontakte NGS pou resevwa enstriksyon adrès ou
-          anvan premye acha ou.
+          Shipping to Haiti? Create your account, then contact NGS to receive your address instructions
+          before your first purchase.
         </p>
 
         {state?.error && (
@@ -55,7 +55,7 @@ export default function RegisterPage() {
           <div className="flex flex-col gap-1.5">
             <label htmlFor="destination" className="flex items-center gap-2 text-sm font-medium text-foreground">
               <MapPin className="h-4 w-4 flex-shrink-0 text-primary" aria-hidden="true" />
-              Destinasyon ou <span className="text-apricot-light">*</span>
+              Your destination <span className="text-apricot-light">*</span>
             </label>
             <select
               id="destination"
@@ -65,7 +65,7 @@ export default function RegisterPage() {
               className={inputClass}
             >
               <option value="" disabled>
-                Chwazi destinasyon
+                Select destination
               </option>
               {VALID_DESTINATIONS.map((d) => (
                 <option key={d} value={d}>
