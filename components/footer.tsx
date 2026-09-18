@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Plane, Phone, Mail, MapPin } from "lucide-react"
+import { Plane, Phone, MessageCircle, Mail, MapPin, Globe } from "lucide-react"
 import { navLinks, site } from "@/lib/site"
 
 export function Footer() {
@@ -13,11 +13,11 @@ export function Footer() {
                 <Plane className="h-5 w-5" aria-hidden="true" />
               </span>
               <span className="flex flex-col leading-none">
-                <span className="font-display text-lg font-extrabold tracking-tight text-foreground">
+                <span className="font-display text-xl font-extrabold tracking-tight text-foreground">
                   NGS
                 </span>
-                <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                  Global Shipping
+                <span className="mt-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-primary">
+                  NEXTLANE GLOBAL SHIPPING
                 </span>
               </span>
             </Link>
@@ -49,11 +49,10 @@ export function Footer() {
               Services
             </h3>
             <ul className="mt-4 space-y-2.5 text-sm text-muted-foreground">
-              <li>Ocean Freight</li>
-              <li>Air Freight</li>
-              <li>Barrel Shipping</li>
-              <li>Vehicle Shipping</li>
+              <li>Air Cargo</li>
               <li>Package Delivery</li>
+              <li>Tracking Services</li>
+              <li>Commercial Shipments</li>
             </ul>
           </div>
 
@@ -63,15 +62,37 @@ export function Footer() {
             </h3>
             <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
               <li>
-                <a href={site.phoneHref} className="flex items-start gap-2.5 transition-colors hover:text-primary">
+                <a href={site.callHref} className="flex items-start gap-2.5 transition-colors hover:text-primary">
                   <Phone className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" aria-hidden="true" />
-                  {site.phone}
+                  Call: {site.callNumber}
+                </a>
+              </li>
+              <li>
+                <a
+                  href={site.whatsapp}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start gap-2.5 transition-colors hover:text-primary"
+                >
+                  <MessageCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" aria-hidden="true" />
+                  WhatsApp: {site.whatsappNumber}
                 </a>
               </li>
               <li>
                 <a href={site.emailHref} className="flex items-start gap-2.5 transition-colors hover:text-primary">
                   <Mail className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" aria-hidden="true" />
                   {site.email}
+                </a>
+              </li>
+              <li>
+                <a
+                  href={site.websiteHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start gap-2.5 transition-colors hover:text-primary"
+                >
+                  <Globe className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" aria-hidden="true" />
+                  {site.website}
                 </a>
               </li>
               <li className="flex items-start gap-2.5">

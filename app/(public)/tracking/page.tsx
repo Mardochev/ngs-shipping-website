@@ -31,11 +31,11 @@ export default function TrackingPage() {
             delivery to Haiti.
           </p>
           <a
-            href={site.phoneHref}
+            href={site.callHref}
             className="mt-6 inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-base font-semibold text-primary-foreground transition-colors hover:bg-apricot-light"
           >
             <Phone className="h-5 w-5" aria-hidden="true" />
-            Call {site.phone}
+            Call {site.callNumber}
           </a>
         </div>
       </section>

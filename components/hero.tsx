@@ -1,6 +1,6 @@
 import Image from "next/image"
 import Link from "next/link"
-import { Phone, ArrowRight, ShieldCheck, Plane, Ship } from "lucide-react"
+import { Phone, ArrowRight, Plane, CheckCircle2 } from "lucide-react"
 import { site } from "@/lib/site"
 
 export function Hero() {
@@ -9,7 +9,7 @@ export function Hero() {
       <div className="absolute inset-0">
         <Image
           src="/hero-plane.png"
-          alt="Cargo freighter airplane flying above a cargo ship on neon light trails"
+          alt="Cargo freighter airplane flying through neon light trails"
           fill
           priority
           className="object-cover object-center opacity-90"
@@ -21,27 +21,20 @@ export function Hero() {
       <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 sm:py-28 lg:grid-cols-2 lg:px-8 lg:py-32">
         <div className="max-w-2xl">
           <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
-            <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
-            USA {"\u2192"} Haiti {"\u{1F1ED}\u{1F1F9}"}
+            USA {"\u{1F1FA}\u{1F1F8}"} {"\u279C"} Haiti {"\u{1F1ED}\u{1F1F9}"}
           </span>
           <h1 className="mt-5 font-display text-4xl font-extrabold leading-[1.05] text-balance text-foreground sm:text-6xl">
-            Air & ocean shipping to{" "}
-            <span className="text-primary">Haiti</span>
+            Air Cargo from USA to{" "}
+            <span className="text-primary">Les Cayes, Cap-Ha&iuml;tien &amp; Port-au-Prince, Haiti</span>
           </h1>
           <p className="mt-5 max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground">
-            NEXTLANE GLOBAL SHIPPING moves your barrels, packages, and vehicles from the United
-            States to Haiti by air and sea {"\u2014"} with care, speed, and full tracking every step
-            of the way.
+            Reliable air cargo service from the USA to Les Cayes, Cap-Ha&iuml;tien, and Port-au-Prince, Haiti.
           </p>
 
-          <div className="mt-6 flex flex-wrap gap-3">
-            <span className="inline-flex items-center gap-2 rounded-lg border border-border bg-secondary/40 px-4 py-2 text-sm font-semibold text-foreground backdrop-blur">
-              <Plane className="h-4 w-4 text-primary" aria-hidden="true" />
-              Air Freight
-            </span>
-            <span className="inline-flex items-center gap-2 rounded-lg border border-border bg-secondary/40 px-4 py-2 text-sm font-semibold text-foreground backdrop-blur">
-              <Ship className="h-4 w-4 text-primary" aria-hidden="true" />
-              Ocean Freight
+          <div className="mt-6 inline-flex items-center gap-2 rounded-lg border border-primary/40 bg-primary/10 px-4 py-2">
+            <Plane className="h-4 w-4 text-primary" aria-hidden="true" />
+            <span className="font-display text-sm font-bold uppercase tracking-wider text-primary">
+              {site.slogan}
             </span>
           </div>
 
@@ -54,26 +47,29 @@ export function Hero() {
               <ArrowRight className="h-5 w-5" aria-hidden="true" />
             </Link>
             <a
-              href={site.phoneHref}
+              href={site.callHref}
               className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-secondary/60 px-6 py-3 text-base font-semibold text-foreground backdrop-blur transition-colors hover:border-primary"
             >
               <Phone className="h-5 w-5 text-primary" aria-hidden="true" />
-              {site.phone}
+              Call: {site.callNumber}
             </a>
           </div>
 
-          <dl className="mt-12 grid max-w-lg grid-cols-3 gap-6">
+          <ul className="mt-10 flex flex-wrap gap-3">
             {[
-              { value: "10K+", label: "Shipments delivered" },
-              { value: "48hr", label: "Air freight to Haiti" },
-              { value: "100%", label: "Tracked & insured" },
-            ].map((stat) => (
-              <div key={stat.label}>
-                <dt className="font-display text-3xl font-bold text-primary">{stat.value}</dt>
-                <dd className="mt-1 text-sm text-muted-foreground">{stat.label}</dd>
-              </div>
+              "Now serving Les Cayes, Cap-Ha\u00EFtien & Port-au-Prince",
+              "Estimated delivery: 5\u201310 business days",
+              "Secure & tracked shipping",
+            ].map((item) => (
+              <li
+                key={item}
+                className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-4 py-2 text-sm font-semibold text-foreground"
+              >
+                <CheckCircle2 className="h-4 w-4 text-primary" aria-hidden="true" />
+                {item}
+              </li>
             ))}
-          </dl>
+          </ul>
         </div>
 
         <div className="relative hidden lg:block">
@@ -92,8 +88,8 @@ export function Hero() {
               <Plane className="h-5 w-5" aria-hidden="true" />
             </span>
             <div>
-              <p className="font-display text-sm font-bold text-foreground">Express Air Cargo</p>
-              <p className="text-xs text-muted-foreground">Delivered in as little as 48 hours</p>
+              <p className="font-display text-sm font-bold text-foreground">Air Cargo to Haiti</p>
+              <p className="text-xs text-muted-foreground">Estimated delivery: 5{"\u2013"}10 business days</p>
             </div>
           </div>
         </div>

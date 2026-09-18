@@ -1,7 +1,5 @@
 import type { Metadata } from "next"
 import { Inter, Poppins } from "next/font/google"
-import { Navbar } from "@/components/navbar"
-import { Footer } from "@/components/footer"
 import { site } from "@/lib/site"
 import "./globals.css"
 
@@ -24,7 +22,7 @@ export const metadata: Metadata = {
     template: `%s | ${site.shortName}`,
   },
   description:
-    "NEXTLANE GLOBAL SHIPPING (NGS) provides fast, reliable, and affordable shipping services from the USA to Haiti. Air and ocean freight, barrels, cars, and package delivery.",
+    "NEXTLANE GLOBAL SHIPPING (NGS) provides fast, secure, and reliable air cargo from the USA to Haiti. Air cargo, package delivery, tracking, and commercial shipments. Your Cargo, Our Priority.",
   keywords: [
     "shipping to Haiti",
     "USA to Haiti shipping",
@@ -47,11 +45,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`bg-background ${inter.variable} ${poppins.variable}`}>
-      <body className="font-sans antialiased">
-        <Navbar />
-        <main>{children}</main>
-        <Footer />
-      </body>
+      <body className="font-sans antialiased">{children}</body>
     </html>
   )
 }

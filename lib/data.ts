@@ -1,41 +1,29 @@
-import { Ship, Plane, Package, Car, Boxes, Truck } from "lucide-react"
+import { Plane, Package, Radar, Building2 } from "lucide-react"
 
 export const services = [
   {
-    icon: Ship,
-    title: "Ocean Freight",
-    description:
-      "Affordable container and LCL ocean shipping for large loads, furniture, and bulk cargo bound for Haiti.",
-  },
-  {
     icon: Plane,
-    title: "Air Freight",
+    title: "Air Cargo",
     description:
-      "Express air cargo delivering urgent shipments from the USA to Port-au-Prince in as little as 48 hours.",
-  },
-  {
-    icon: Boxes,
-    title: "Barrel Shipping",
-    description:
-      "The classic way to send food, clothing, and household goods to family. We supply, pack, and ship your barrels.",
-  },
-  {
-    icon: Car,
-    title: "Vehicle Shipping",
-    description:
-      "Cars, trucks, and motorcycles shipped safely with roll-on/roll-off and container options to Haitian ports.",
+      "Reliable air cargo delivering your shipments from USA to Haiti, with estimated delivery in 5\u201310 business days.",
   },
   {
     icon: Package,
     title: "Package Delivery",
     description:
-      "Send small parcels and documents with reliable door-to-door and pickup-point delivery across Haiti.",
+      "Send parcels, documents, and care packages with reliable air cargo to Les Cayes, Cap-Ha\u00EFtien, and Port-au-Prince, Haiti.",
   },
   {
-    icon: Truck,
-    title: "Door-to-Door",
+    icon: Radar,
+    title: "Tracking Services",
     description:
-      "Full-service logistics from your address in the USA all the way to the recipient's door in Haiti.",
+      "Follow every shipment in real time with a tracking number, from drop-off in the USA to delivery in Haiti.",
+  },
+  {
+    icon: Building2,
+    title: "Commercial Shipments",
+    description:
+      "Dependable air cargo solutions for businesses, with customs documentation and dedicated account support.",
   },
 ] as const
 
@@ -47,8 +35,9 @@ export const steps = [
   },
   {
     step: "02",
-    title: "Drop Off or Pickup",
-    description: "Bring your items to our Pompano Beach facility or schedule a convenient pickup.",
+    title: "Drop Off Your Package",
+    description:
+      "Bring your packages to our Pompano Beach, Florida location. Our team will receive, weigh, prepare, and process your shipment for Haiti.",
   },
   {
     step: "03",
@@ -57,52 +46,8 @@ export const steps = [
   },
   {
     step: "04",
-    title: "Delivered in Haiti",
-    description: "Your shipment arrives safely and is ready for pickup or door-to-door delivery in Haiti.",
-  },
-] as const
-
-export const pricingPlans = [
-  {
-    name: "Barrel",
-    price: "$95",
-    unit: "per barrel",
-    description: "Best for sending food, clothing, and everyday household goods to loved ones.",
-    features: [
-      "Standard 55-gallon barrel",
-      "Ocean freight to Haiti",
-      "Up to 2-3 weeks transit",
-      "Tracking included",
-      "Pickup point delivery",
-    ],
-    highlighted: false,
-  },
-  {
-    name: "Express Air",
-    price: "$4.50",
-    unit: "per lb",
-    description: "Our fastest option for urgent packages and time-sensitive cargo.",
-    features: [
-      "48-hour air freight",
-      "Priority handling",
-      "Full insurance coverage",
-      "Real-time tracking",
-      "Door-to-door available",
-    ],
-    highlighted: true,
-  },
-  {
-    name: "Ocean Cargo",
-    price: "Custom",
-    unit: "by volume",
-    description: "For vehicles, furniture, and large-volume commercial shipments.",
-    features: [
-      "Container & LCL options",
-      "Vehicle shipping",
-      "Commercial freight",
-      "Customs documentation",
-      "Dedicated account manager",
-    ],
-    highlighted: false,
+    title: "Arrives in Haiti",
+    description:
+      "Your shipment arrives safely in Haiti. Pickup details will be provided directly to the recipient when the shipment is ready.",
   },
 ] as const

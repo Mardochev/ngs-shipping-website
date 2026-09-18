@@ -3,10 +3,11 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu, X, Phone, Plane } from "lucide-react"
+import { Menu, X, Mail, Plane, LayoutDashboard, LogIn, UserPlus } from "lucide-react"
 import { navLinks, site } from "@/lib/site"
+import type { CustomerSession } from "@/lib/session"
 
-export function Navbar() {
+export function Navbar({ customer }: { customer: CustomerSession | null }) {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
 
@@ -18,11 +19,11 @@ export function Navbar() {
             <Plane className="h-5 w-5" aria-hidden="true" />
           </span>
           <span className="flex flex-col leading-none">
-            <span className="font-display text-lg font-extrabold tracking-tight text-foreground">
+            <span className="font-display text-xl font-extrabold tracking-tight text-foreground">
               NGS
             </span>
-            <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-              Global Shipping
+            <span className="mt-1 text-center text-[9px] font-semibold uppercase tracking-[0.16em] text-primary sm:text-[11px] sm:tracking-[0.2em]">
+              NEXTLANE GLOBAL SHIPPING
             </span>
           </span>
         </Link>
@@ -48,18 +49,36 @@ export function Navbar() {
 
         <div className="hidden items-center gap-3 lg:flex">
           <a
-            href={site.phoneHref}
+            href={site.emailHref}
             className="flex items-center gap-2 text-sm font-semibold text-foreground transition-colors hover:text-primary"
           >
-            <Phone className="h-4 w-4 text-primary" aria-hidden="true" />
-            {site.phone}
+            <Mail className="h-4 w-4 text-primary" aria-hidden="true" />
+            {site.email}
           </a>
-          <Link
-            href="/tracking"
-            className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-apricot-light"
-          >
-            Track Shipment
-          </Link>
+          {customer ? (
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-apricot-light"
+            >
+              <LayoutDashboard className="h-4 w-4" aria-hidden="true" />
+              Customer Dashboard
+            </Link>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="rounded-lg border border-border px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:border-primary hover:text-primary"
+              >
+                Login
+              </Link>
+              <Link
+                href="/register"
+                className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-apricot-light"
+              >
+                Create Account
+              </Link>
+            </>
+          )}
         </div>
 
         <button
@@ -95,19 +114,41 @@ export function Navbar() {
             })}
             <div className="mt-2 flex flex-col gap-2 border-t border-border/60 pt-4">
               <a
-                href={site.phoneHref}
+                href={site.emailHref}
                 className="flex items-center gap-2 px-3 text-base font-semibold text-foreground"
               >
-                <Phone className="h-4 w-4 text-primary" aria-hidden="true" />
-                {site.phone}
+                <Mail className="h-4 w-4 text-primary" aria-hidden="true" />
+                {site.email}
               </a>
-              <Link
-                href="/tracking"
-                onClick={() => setOpen(false)}
-                className="rounded-lg bg-primary px-4 py-2.5 text-center text-base font-semibold text-primary-foreground"
-              >
-                Track Shipment
-              </Link>
+              {customer ? (
+                <Link
+                  href="/dashboard"
+                  onClick={() => setOpen(false)}
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-center text-base font-semibold text-primary-foreground"
+                >
+                  <LayoutDashboard className="h-5 w-5" aria-hidden="true" />
+                  Customer Dashboard
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    onClick={() => setOpen(false)}
+                    className="inline-flex items-center justify-center gap-2 rounded-lg border border-border px-4 py-2.5 text-center text-base font-semibold text-foreground"
+                  >
+                    <LogIn className="h-5 w-5 text-primary" aria-hidden="true" />
+                    Login
+                  </Link>
+                  <Link
+                    href="/register"
+                    onClick={() => setOpen(false)}
+                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-center text-base font-semibold text-primary-foreground"
+                  >
+                    <UserPlus className="h-5 w-5" aria-hidden="true" />
+                    Create Account
+                  </Link>
+                </>
+              )}
             </div>
           </nav>
         </div>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { Phone, Mail, MapPin, Clock, MessageCircle } from "lucide-react"
+import { Phone, Mail, MapPin, Clock, MessageCircle, Globe } from "lucide-react"
 import { PageHeader } from "@/components/page-header"
 import { ContactForm } from "@/components/contact-form"
 import { site } from "@/lib/site"
@@ -7,7 +7,7 @@ import { site } from "@/lib/site"
 export const metadata: Metadata = {
   title: "Contact Us",
   description:
-    "Contact NEXTLANE GLOBAL SHIPPING (NGS) for shipping quotes and support. Call 754-326-3413 or visit us in Pompano Beach, FL.",
+    "Contact NEXTLANE GLOBAL SHIPPING (NGS) for shipping quotes and support. Call (754) 800-6115 or visit us in Pompano Beach, FL.",
 }
 
 export default function ContactPage() {
@@ -31,16 +31,16 @@ export default function ContactPage() {
             <ul className="mt-8 space-y-5">
               <li>
                 <a
-                  href={site.phoneHref}
+                  href={site.callHref}
                   className="flex items-start gap-4 rounded-2xl border border-border bg-card p-5 transition-colors hover:border-primary/60"
                 >
                   <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary">
                     <Phone className="h-5 w-5" aria-hidden="true" />
                   </span>
                   <span>
-                    <span className="block text-sm text-muted-foreground">Call us</span>
+                    <span className="block text-sm text-muted-foreground">Call</span>
                     <span className="font-display text-lg font-semibold text-foreground">
-                      {site.phone}
+                      {site.callNumber}
                     </span>
                   </span>
                 </a>
@@ -56,9 +56,9 @@ export default function ContactPage() {
                     <MessageCircle className="h-5 w-5" aria-hidden="true" />
                   </span>
                   <span>
-                    <span className="block text-sm text-muted-foreground">WhatsApp</span>
+                    <span className="block text-sm text-muted-foreground">Chat on WhatsApp</span>
                     <span className="font-display text-lg font-semibold text-foreground">
-                      Chat with us
+                      {site.whatsappNumber}
                     </span>
                   </span>
                 </a>
@@ -75,6 +75,24 @@ export default function ContactPage() {
                     <span className="block text-sm text-muted-foreground">Email</span>
                     <span className="font-display text-lg font-semibold text-foreground">
                       {site.email}
+                    </span>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href={site.websiteHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start gap-4 rounded-2xl border border-border bg-card p-5 transition-colors hover:border-primary/60"
+                >
+                  <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary">
+                    <Globe className="h-5 w-5" aria-hidden="true" />
+                  </span>
+                  <span>
+                    <span className="block text-sm text-muted-foreground">Website</span>
+                    <span className="font-display text-lg font-semibold text-foreground">
+                      {site.website}
                     </span>
                   </span>
                 </a>

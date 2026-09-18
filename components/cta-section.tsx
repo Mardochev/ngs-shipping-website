@@ -10,16 +10,15 @@ export function CtaSection() {
           Ready to ship to Haiti {"\u{1F1ED}\u{1F1F9}"}?
         </h2>
         <p className="mx-auto mt-4 max-w-2xl text-pretty leading-relaxed text-muted-foreground">
-          Get a free quote today and discover why thousands trust NEXTLANE GLOBAL SHIPPING for fast,
-          safe, and affordable delivery from the USA to Haiti.
+          Get a free quote today for reliable air cargo from the USA to Les Cayes, Cap-Ha&iuml;tien, and Port-au-Prince, Haiti.
         </p>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <a
-            href={site.phoneHref}
+            href={site.callHref}
             className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-base font-semibold text-primary-foreground transition-colors hover:bg-apricot-light sm:w-auto"
           >
             <Phone className="h-5 w-5" aria-hidden="true" />
-            Call {site.phone}
+            Call: {site.callNumber}
           </a>
           <Link
             href="/contact"

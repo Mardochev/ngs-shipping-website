@@ -7,7 +7,7 @@ import { services, steps } from "@/lib/data"
 export const metadata: Metadata = {
   title: "Services",
   description:
-    "Explore NGS shipping services: ocean freight, air freight, barrel shipping, vehicle shipping, package delivery, and door-to-door logistics from the USA to Haiti.",
+    "Explore NGS air cargo services: air cargo, package delivery, tracking services, and commercial shipments from the USA to Haiti.",
 }
 
 export default function ServicesPage() {
@@ -15,8 +15,8 @@ export default function ServicesPage() {
     <>
       <PageHeader
         eyebrow="Our Services"
-        title="Complete shipping services to Haiti"
-        description="From a single barrel to full container loads, NGS offers flexible options to move anything you need from the USA to Haiti."
+        title="Air cargo services to Haiti"
+        description="From a single package to full commercial shipments, NGS moves everything you need from the USA to Haiti by air cargo."
       />
 
       <section className="px-4 py-20 sm:px-6 lg:px-8">
@@ -56,10 +56,10 @@ export default function ServicesPage() {
             </p>
             <ul className="mt-8 space-y-4">
               {[
-                "Direct routes to Port-au-Prince and Cap-Haïtien",
+                "Direct routes to Les Cayes, Cap-Ha\u00EFtien, and Port-au-Prince, Haiti",
                 "Customs documentation and clearance support",
-                "Consolidation services to lower your costs",
-                "Flexible pickup and drop-off scheduling",
+                "Consolidation services for your shipments",
+                "Convenient drop-off at our Pompano Beach facility",
                 "Commercial and personal shipment handling",
               ].map((item) => (
                 <li key={item} className="flex items-start gap-3">

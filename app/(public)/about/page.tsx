@@ -21,7 +21,7 @@ const values = [
     icon: Globe2,
     title: "Global Reach",
     description:
-      "From Florida to every corner of Haiti, our network ensures your cargo gets where it needs to go.",
+      "From the USA to every corner of Haiti, our network ensures your cargo gets where it needs to go.",
   },
   {
     icon: Award,
@@ -60,9 +60,9 @@ export default function AboutPage() {
                 packages, and we knew there was a better way.
               </p>
               <p>
-                Today, we move thousands of barrels, packages, vehicles, and freight shipments from
-                the USA to Haiti every year. Whether you are sending a care package to family or
-                managing commercial cargo, our team handles every detail with precision and care.
+                We are now serving USA to Haiti, moving packages and commercial air cargo for
+                our community. Whether you are sending a care package to family or managing
+                commercial cargo, our team handles every detail with precision and care.
               </p>
               <p>
                 Our bilingual staff, modern tracking technology, and deep ties to the community make
@@ -73,8 +73,8 @@ export default function AboutPage() {
           </div>
           <div className="relative overflow-hidden rounded-3xl border border-border">
             <Image
-              src="/cargo-ship.png"
-              alt="Cargo containers being loaded at a shipping port"
+              src="/air-cargo.png"
+              alt="Cargo boxes and pallets being loaded into a freighter airplane"
               width={800}
               height={700}
               className="h-full w-full object-cover"
