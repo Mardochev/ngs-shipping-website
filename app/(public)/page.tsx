@@ -182,8 +182,8 @@ export default function HomePage() {
         <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-2">
           <div className="relative overflow-hidden rounded-3xl border border-border">
             <Image
-              src="/air-cargo.png"
-              alt="Boxes and pallets being loaded into a cargo airplane"
+              src="/packed-parcels-warehouse.png"
+              alt="Securely packed and labeled parcels stacked at a shipping warehouse drop-off counter"
               width={800}
               height={600}
               className="h-full w-full object-cover"
