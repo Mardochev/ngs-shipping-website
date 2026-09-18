@@ -47,11 +47,11 @@ export function Hero() {
               <ArrowRight className="h-5 w-5" aria-hidden="true" />
             </Link>
             <a
-              href={site.phoneHref}
+              href={site.callHref}
               className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-secondary/60 px-6 py-3 text-base font-semibold text-foreground backdrop-blur transition-colors hover:border-primary"
             >
               <Phone className="h-5 w-5 text-primary" aria-hidden="true" />
-              Call / WhatsApp: {site.phone}
+              Call: {site.callNumber}
             </a>
           </div>
 

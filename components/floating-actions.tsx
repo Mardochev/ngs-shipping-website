@@ -24,12 +24,12 @@ export function FloatingActions() {
 
       {/* Call */}
       <a
-        href={site.phoneHref}
-        aria-label={`Call us at ${site.phone}`}
+        href={site.callHref}
+        aria-label={`Call us at ${site.callNumber}`}
         className="group flex h-11 w-11 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-navy-deep/30 transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:h-14 sm:w-14"
       >
         <Phone className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
-        <span className="sr-only">Call {site.phone}</span>
+        <span className="sr-only">Call {site.callNumber}</span>
       </a>
     </div>
   )

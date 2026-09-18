@@ -182,8 +182,8 @@ export function OkayOnlineShopping() {
               WhatsApp
             </a>
             <a
-              href={site.phoneHref}
-              aria-label={`Call NGS at ${site.phone}`}
+              href={site.callHref}
+              aria-label={`Call NGS at ${site.callNumber}`}
               className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.02]"
             >
               <Phone className="h-5 w-5" aria-hidden="true" />

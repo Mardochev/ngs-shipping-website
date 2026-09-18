@@ -101,7 +101,7 @@ export default function RegisterPage() {
             <label htmlFor="phone" className="text-sm font-medium text-foreground">
               Phone
             </label>
-            <input id="phone" name="phone" type="tel" autoComplete="tel" placeholder="754-326-3413" className={inputClass} />
+            <input id="phone" name="phone" type="tel" autoComplete="tel" placeholder="(754) 000-0000" className={inputClass} />
           </div>
 
           <div className="flex flex-col gap-1.5">

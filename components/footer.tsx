@@ -62,9 +62,9 @@ export function Footer() {
             </h3>
             <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
               <li>
-                <a href={site.phoneHref} className="flex items-start gap-2.5 transition-colors hover:text-primary">
+                <a href={site.callHref} className="flex items-start gap-2.5 transition-colors hover:text-primary">
                   <Phone className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" aria-hidden="true" />
-                  Call / WhatsApp: {site.phone}
+                  Call: {site.callNumber}
                 </a>
               </li>
               <li>
@@ -75,7 +75,7 @@ export function Footer() {
                   className="flex items-start gap-2.5 transition-colors hover:text-primary"
                 >
                   <MessageCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" aria-hidden="true" />
-                  Chat on WhatsApp
+                  WhatsApp: {site.whatsappNumber}
                 </a>
               </li>
               <li>

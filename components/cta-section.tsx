@@ -14,11 +14,11 @@ export function CtaSection() {
         </p>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <a
-            href={site.phoneHref}
+            href={site.callHref}
             className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-base font-semibold text-primary-foreground transition-colors hover:bg-apricot-light sm:w-auto"
           >
             <Phone className="h-5 w-5" aria-hidden="true" />
-            Call / WhatsApp: {site.phone}
+            Call: {site.callNumber}
           </a>
           <Link
             href="/contact"

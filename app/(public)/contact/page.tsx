@@ -7,7 +7,7 @@ import { site } from "@/lib/site"
 export const metadata: Metadata = {
   title: "Contact Us",
   description:
-    "Contact NEXTLANE GLOBAL SHIPPING (NGS) for shipping quotes and support. Call 754-326-3413 or visit us in Pompano Beach, FL.",
+    "Contact NEXTLANE GLOBAL SHIPPING (NGS) for shipping quotes and support. Call (754) 800-6115 or visit us in Pompano Beach, FL.",
 }
 
 export default function ContactPage() {
@@ -31,16 +31,16 @@ export default function ContactPage() {
             <ul className="mt-8 space-y-5">
               <li>
                 <a
-                  href={site.phoneHref}
+                  href={site.callHref}
                   className="flex items-start gap-4 rounded-2xl border border-border bg-card p-5 transition-colors hover:border-primary/60"
                 >
                   <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary">
                     <Phone className="h-5 w-5" aria-hidden="true" />
                   </span>
                   <span>
-                    <span className="block text-sm text-muted-foreground">Call / WhatsApp</span>
+                    <span className="block text-sm text-muted-foreground">Call</span>
                     <span className="font-display text-lg font-semibold text-foreground">
-                      {site.phone}
+                      {site.callNumber}
                     </span>
                   </span>
                 </a>
@@ -58,7 +58,7 @@ export default function ContactPage() {
                   <span>
                     <span className="block text-sm text-muted-foreground">Chat on WhatsApp</span>
                     <span className="font-display text-lg font-semibold text-foreground">
-                      {site.phone}
+                      {site.whatsappNumber}
                     </span>
                   </span>
                 </a>
