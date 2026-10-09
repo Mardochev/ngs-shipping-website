@@ -70,6 +70,8 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
   const rate =
     shipment.rate_per_lb != null ? Number(shipment.rate_per_lb) : weight > 0 ? Number(shipment.cost) / weight : 0
   const amount = Math.round(weight * rate * 100) / 100
+  const generalFee = Math.max(0, Number(shipment.general_fee) || 0)
+  const total = Math.round((amount + generalFee) * 100) / 100
   const invoiceNo = `INV-${shipment.tracking_number.replace(/[^0-9A-Za-z]/g, "").slice(-8).toUpperCase()}`
   const paymentStatus = shipment.payment_status ?? "UNPAID"
   const isPaid = paymentStatus === "PAID"
@@ -221,15 +223,19 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
             <div className="mt-6 flex justify-end">
               <div className="w-full max-w-xs space-y-2">
                 <div className="flex justify-between text-sm text-slate-500">
-                  <span>Subtotal</span>
+                  <span>Shipping Amount</span>
                   <span>${amount.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-sm text-slate-500">
+                  <span>General Fee</span>
+                  <span>${generalFee.toFixed(2)}</span>
                 </div>
                 <div
                   className="flex justify-between rounded-md px-3 py-2 text-base font-bold text-white"
                   style={{ backgroundColor: NAVY }}
                 >
-                  <span>Total (USD)</span>
-                  <span>${amount.toFixed(2)}</span>
+                  <span>Final Total (USD)</span>
+                  <span>${total.toFixed(2)}</span>
                 </div>
               </div>
             </div>
