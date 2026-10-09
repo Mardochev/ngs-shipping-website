@@ -4,6 +4,7 @@ import { useActionState, useEffect, useMemo, useState } from "react"
 import { createShipment, updateShipment } from "@/lib/actions/admin"
 import {
   ACTIVE_DESTINATIONS,
+  DEFAULT_GENERAL_FEE,
   SHIPMENT_STATUSES,
   type Customer,
   type DestinationRate,
@@ -50,6 +51,9 @@ export function ShipmentForm({
   const [destination, setDestination] = useState(shipment?.destination ?? "")
   const [weight, setWeight] = useState(shipment?.weight_lb != null ? String(shipment.weight_lb) : "")
   const [rate, setRate] = useState(shipment?.rate_per_lb != null ? String(shipment.rate_per_lb) : "")
+  const [generalFee, setGeneralFee] = useState(
+    shipment ? String(Number(shipment.general_fee ?? 0).toFixed(2)) : DEFAULT_GENERAL_FEE.toFixed(2),
+  )
 
   function handleDestinationChange(value: string) {
     setDestination(value)
@@ -60,6 +64,8 @@ export function ShipmentForm({
   const numericRate = Number.parseFloat(rate) || 0
   const numericWeight = Number.parseFloat(weight) || 0
   const amount = Math.round(numericWeight * numericRate * 100) / 100
+  const numericFee = Math.max(0, Number.parseFloat(generalFee) || 0)
+  const total = Math.round((amount + numericFee) * 100) / 100
   const hasConfiguredRate = destination !== "" && rateMap.get(destination) != null
 
   useEffect(() => {
@@ -266,10 +272,39 @@ export function ShipmentForm({
         </div>
       </div>
 
-      {/* Live amount preview + missing-rate warning */}
-      <div className="flex items-center justify-between rounded-lg border border-border bg-card px-3 py-2.5 text-sm">
-        <span className="text-muted-foreground">Amount (Weight × Rate)</span>
-        <span className="font-semibold text-foreground">${amount.toFixed(2)}</span>
+      {/* Live amount preview, separate General Fee, and Total + missing-rate warning */}
+      <div className="flex flex-col divide-y divide-border rounded-lg border border-border bg-card text-sm">
+        <div className="flex items-center justify-between px-3 py-2.5">
+          <span className="text-muted-foreground">Amount (Weight × Rate)</span>
+          <span className="font-semibold text-foreground">${amount.toFixed(2)}</span>
+        </div>
+        <div className="flex items-center justify-between gap-3 px-3 py-2">
+          <label htmlFor="general_fee" className="text-muted-foreground">
+            General Fee
+          </label>
+          <div className="relative w-32">
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+              $
+            </span>
+            <input
+              id="general_fee"
+              name="general_fee"
+              type="number"
+              step="0.01"
+              min="0"
+              inputMode="decimal"
+              value={generalFee}
+              onChange={(e) => setGeneralFee(e.target.value)}
+              className={`${inputClass} py-1.5 pl-7 text-right`}
+            />
+          </div>
+        </div>
+        <div className="flex items-center justify-between px-3 py-2.5">
+          <span className="font-semibold text-foreground">Total</span>
+          <span className="text-base font-bold text-primary" aria-live="polite">
+            ${total.toFixed(2)}
+          </span>
+        </div>
       </div>
       {destination !== "" && !hasConfiguredRate && (
         <p className="text-xs text-apricot-light">

@@ -9,7 +9,7 @@ import {
   getAdminSession,
   clearAdminSession,
 } from "@/lib/session"
-import { ACTIVE_DESTINATIONS, SHIPMENT_STATUSES, type ShipmentStatus } from "@/lib/types"
+import { ACTIVE_DESTINATIONS, DEFAULT_GENERAL_FEE, SHIPMENT_STATUSES, type ShipmentStatus } from "@/lib/types"
 
 type ActionResult = { error?: string; success?: string }
 
@@ -193,6 +193,15 @@ async function resolveShipmentRate(
   return null
 }
 
+// Blank falls back to the default fee; an explicit 0 is allowed (fee waived).
+function parseGeneralFee(formData: FormData): number | null {
+  const raw = String(formData.get("general_fee") ?? "").trim()
+  if (raw === "") return DEFAULT_GENERAL_FEE
+  const fee = Number.parseFloat(raw)
+  if (Number.isNaN(fee) || fee < 0 || fee > 100000) return null
+  return Math.round(fee * 100) / 100
+}
+
 export async function createShipment(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
   await requireAdmin()
   const supabase = getServiceClient()
@@ -228,6 +237,8 @@ export async function createShipment(_prev: ActionResult, formData: FormData): P
     }
   }
   const cost = Math.round(rate * weight * 100) / 100
+  const generalFee = parseGeneralFee(formData)
+  if (generalFee == null) return { error: "General Fee must be zero or more." }
 
   // Auto-generate tracking number if not provided
   if (!tracking) {
@@ -245,6 +256,7 @@ export async function createShipment(_prev: ActionResult, formData: FormData): P
       weight_lb: weight,
       cost,
       rate_per_lb: rate,
+      general_fee: generalFee,
       status,
       origin,
       destination,
@@ -301,6 +313,8 @@ export async function updateShipment(_prev: ActionResult, formData: FormData): P
     return { error: `No rate is configured for ${destination}. Enter a rate per pound.` }
   }
   const cost = Math.round(rate * weight * 100) / 100
+  const generalFee = parseGeneralFee(formData)
+  if (generalFee == null) return { error: "General Fee must be zero or more." }
 
   const { error } = await supabase
     .from("packages")
@@ -311,6 +325,7 @@ export async function updateShipment(_prev: ActionResult, formData: FormData): P
       weight_lb: weight,
       cost,
       rate_per_lb: rate,
+      general_fee: generalFee,
       status,
       origin,
       destination,

@@ -78,6 +78,7 @@ export type Shipment = {
   weight_lb: number
   cost: number
   rate_per_lb: number | null
+  general_fee: number
   status: ShipmentStatus
   origin: string
   destination: string
@@ -93,6 +94,9 @@ export type Shipment = {
   created_at: string
   updated_at: string
 }
+
+// Flat per-shipment fee charged separately from Weight × Rate.
+export const DEFAULT_GENERAL_FEE = 8.5
 
 export type ShipmentWithCustomer = Shipment & {
   customers: Pick<Customer, "id" | "full_name" | "customer_code" | "email" | "phone"> | null

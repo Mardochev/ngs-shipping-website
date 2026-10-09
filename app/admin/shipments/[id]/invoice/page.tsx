@@ -25,12 +25,21 @@ const invoicePrintCss = `
 @media print {
   @page {
     size: letter;
-    margin: 0.3in;
+    margin: 0.35in;
   }
   html, body {
     margin: 0 !important;
     padding: 0 !important;
     background: #fff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .invoice-page .max-w-3xl {
+    max-width: none !important;
+  }
+  .keep-together {
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
   .invoice-page {
     min-height: 0 !important;
@@ -70,6 +79,8 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
   const rate =
     shipment.rate_per_lb != null ? Number(shipment.rate_per_lb) : weight > 0 ? Number(shipment.cost) / weight : 0
   const amount = Math.round(weight * rate * 100) / 100
+  const generalFee = Math.max(0, Number(shipment.general_fee) || 0)
+  const total = Math.round((amount + generalFee) * 100) / 100
   const invoiceNo = `INV-${shipment.tracking_number.replace(/[^0-9A-Za-z]/g, "").slice(-8).toUpperCase()}`
   const paymentStatus = shipment.payment_status ?? "UNPAID"
   const isPaid = paymentStatus === "PAID"
@@ -104,16 +115,16 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
             <div className="h-full w-1/3" style={{ backgroundColor: GOLD }} />
           </div>
 
-          <div className="p-8 sm:p-10">
+          <div className="p-6 sm:p-8 print:p-6">
             {/* Header */}
-            <div className="flex flex-col gap-6 border-b border-slate-200 pb-6 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex flex-col gap-4 border-b border-slate-200 pb-4 sm:flex-row sm:items-start sm:justify-between print:flex-row print:items-start print:justify-between">
               <div className="flex items-start gap-3">
                 <span
-                  className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl text-white"
+                  className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl text-white"
                   style={{ backgroundColor: NAVY }}
                   aria-hidden="true"
                 >
-                  <Plane className="h-7 w-7" style={{ color: GOLD }} />
+                  <Plane className="h-6 w-6" style={{ color: GOLD }} />
                 </span>
                 <div>
                   <h1 className="font-display text-2xl font-extrabold leading-none tracking-tight" style={{ color: NAVY }}>
@@ -122,7 +133,7 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
                   <p className="mt-1 text-xs font-bold uppercase tracking-[0.15em]" style={{ color: GOLD }}>
                     {company.name}
                   </p>
-                  <address className="mt-2 text-xs not-italic leading-relaxed text-slate-500">
+                  <address className="mt-1.5 text-xs not-italic leading-snug text-slate-500">
                     {company.addressLines.map((line) => (
                       <span key={line}>
                         {line}
@@ -136,7 +147,7 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
                 </div>
               </div>
 
-              <div className="sm:text-right">
+              <div className="sm:text-right print:text-right">
                 <p className="font-display text-2xl font-extrabold" style={{ color: NAVY }}>
                   INVOICE
                 </p>
@@ -144,7 +155,7 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
                 <p className="text-sm text-slate-500">Issued: {formatDate(shipment.created_at)}</p>
                 {/* Payment status stamp */}
                 <span
-                  className={`mt-3 inline-flex items-center gap-1.5 rounded-md border-2 px-3 py-1 text-sm font-extrabold uppercase tracking-widest ${
+                  className={`mt-2 inline-flex items-center gap-1.5 rounded-md border-2 px-3 py-1 text-sm font-extrabold uppercase tracking-widest ${
                     isPaid ? "border-emerald-600 text-emerald-600" : "border-red-600 text-red-600"
                   }`}
                 >
@@ -153,22 +164,23 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
               </div>
             </div>
 
+            <div className="keep-together grid gap-3 py-4 sm:grid-cols-2 print:grid-cols-2 print:text-[13px] print:leading-snug">
             {/* Shipment */}
-            <div className="py-6">
+            <div className="rounded-lg bg-slate-50 p-3">
               <p className="text-xs font-bold uppercase tracking-wide" style={{ color: GOLD }}>
                 Shipment
               </p>
-              <p className="mt-1 font-mono text-sm font-semibold text-slate-900">{shipment.tracking_number}</p>
-              <p className="text-sm text-slate-500">
+              <p className="mt-1 font-mono text-sm font-semibold text-slate-900 print:text-[13px]">{shipment.tracking_number}</p>
+              <p className="text-sm text-slate-500 print:text-[13px]">
                 {shipment.origin} → {shipment.destination}
               </p>
-              <p className="text-sm text-slate-500">Status: {shipment.status}</p>
-              <p className="text-sm text-slate-500">ETA: {formatDate(shipment.estimated_delivery)}</p>
+              <p className="text-sm text-slate-500 print:text-[13px]">Status: {shipment.status}</p>
+              <p className="text-sm text-slate-500 print:text-[13px]">ETA: {formatDate(shipment.estimated_delivery)}</p>
             </div>
 
             {/* Recipient in Haiti */}
             {(shipment.recipient_name || shipment.recipient_address) && (
-              <div className="mb-6 rounded-lg bg-slate-50 p-4">
+              <div className="rounded-lg bg-slate-50 p-3 print:[&_p]:text-[13px]">
                 <p className="text-xs font-bold uppercase tracking-wide" style={{ color: GOLD }}>
                   Recipient in Haiti
                 </p>
@@ -185,7 +197,7 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
 
             {/* Sent by (only when the sender is a different person than the recipient) */}
             {showSentBy && (
-              <div className="mb-6 rounded-lg bg-slate-50 p-4">
+              <div className="rounded-lg bg-slate-50 p-3 print:[&_p]:text-[13px]">
                 <p className="text-xs font-bold uppercase tracking-wide" style={{ color: GOLD }}>
                   Sent by
                 </p>
@@ -194,6 +206,7 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
                 {customer?.email && <p className="text-sm text-slate-500">{customer.email}</p>}
               </div>
             )}
+            </div>
 
             {/* Line items */}
             <table className="w-full text-left text-sm">
@@ -207,50 +220,54 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
                 </tr>
               </thead>
               <tbody>
-                <tr className="border-b border-slate-100">
-                  <td className="px-3 py-3 text-slate-700">{shipment.description || "Air cargo shipment to Haiti"}</td>
-                  <td className="px-3 py-3 text-center text-slate-500">{shipment.shipping_method}</td>
-                  <td className="px-3 py-3 text-center text-slate-500">{shipment.weight_lb} lb</td>
-                  <td className="px-3 py-3 text-center text-slate-500">${rate.toFixed(2)}/lb</td>
-                  <td className="px-3 py-3 text-right font-semibold text-slate-900">${amount.toFixed(2)}</td>
+                <tr className="border-b border-slate-100 print:text-[13px]">
+                  <td className="px-3 py-2 text-slate-700">{shipment.description || "Air cargo shipment to Haiti"}</td>
+                  <td className="px-3 py-2 text-center text-slate-500">{shipment.shipping_method}</td>
+                  <td className="px-3 py-2 text-center text-slate-500">{shipment.weight_lb} lb</td>
+                  <td className="px-3 py-2 text-center text-slate-500">${rate.toFixed(2)}/lb</td>
+                  <td className="px-3 py-2 text-right font-semibold text-slate-900">${amount.toFixed(2)}</td>
                 </tr>
               </tbody>
             </table>
 
             {/* Totals */}
-            <div className="mt-6 flex justify-end">
-              <div className="w-full max-w-xs space-y-2">
+            <div className="keep-together mt-4 flex justify-end">
+              <div className="flex w-full max-w-xs flex-col gap-1.5">
                 <div className="flex justify-between text-sm text-slate-500">
-                  <span>Subtotal</span>
+                  <span>Shipping Amount</span>
                   <span>${amount.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-sm text-slate-500">
+                  <span>General Fee</span>
+                  <span>${generalFee.toFixed(2)}</span>
                 </div>
                 <div
                   className="flex justify-between rounded-md px-3 py-2 text-base font-bold text-white"
                   style={{ backgroundColor: NAVY }}
                 >
-                  <span>Total (USD)</span>
-                  <span>${amount.toFixed(2)}</span>
+                  <span>Final Total (USD)</span>
+                  <span>${total.toFixed(2)}</span>
                 </div>
               </div>
             </div>
 
             {/* Terms + QR */}
-            <div className="mt-8 grid gap-6 border-t border-slate-200 pt-6 sm:grid-cols-[1fr_auto] sm:items-start">
+            <div className="keep-together mt-5 grid gap-4 border-t border-slate-200 pt-4 sm:grid-cols-[1fr_auto] sm:items-start print:grid-cols-[1fr_auto] print:items-start">
               <div>
                 <p className="text-xs font-bold uppercase tracking-wide" style={{ color: GOLD }}>
                   Terms &amp; Conditions
                 </p>
-                <ul className="mt-2 space-y-1 text-xs leading-relaxed text-slate-500">
+                <ul className="mt-1.5 flex flex-col gap-0.5 text-xs leading-snug text-slate-500">
                   <li>• Air Cargo Service.</li>
                   <li>• Tracking number provided.</li>
                   <li>• Customer must present ID when collecting shipment.</li>
                   <li>• NEXTLANE GLOBAL SHIPPING is not responsible for prohibited items.</li>
                 </ul>
               </div>
-              <div className="flex flex-col items-center gap-1 sm:items-end">
+              <div className="flex flex-col items-center gap-1 sm:items-end print:items-end">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={qrDataUrl || "/placeholder.svg"} alt="Scan to track your shipment" className="h-28 w-28" />
-                <p className="text-center text-[10px] leading-tight text-slate-400 sm:text-right">
+                <img src={qrDataUrl || "/placeholder.svg"} alt="Scan to track your shipment" className="h-24 w-24" />
+                <p className="text-center text-[10px] leading-tight text-slate-400 sm:text-right print:text-right">
                   Scan to track
                   <br />
                   your shipment
@@ -258,7 +275,7 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
               </div>
             </div>
 
-            <p className="mt-8 border-t border-slate-200 pt-6 text-center text-xs text-slate-400">
+            <p className="mt-4 border-t border-slate-200 pt-3 text-center text-xs text-slate-400">
               Thank you for shipping with {company.name}. Your Cargo, Our Priority.
             </p>
           </div>
