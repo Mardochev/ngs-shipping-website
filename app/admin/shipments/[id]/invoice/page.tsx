@@ -22,7 +22,14 @@ const TRACKING_URL = "https://www.ngsshipping.com/tracking"
 // Keep the invoice on a single Letter page: neutralize the screen-only
 // min-height/margins and prevent any page breaks inside the invoice.
 const invoicePrintCss = `
+div:has(> .invoice-page) {
+  background: #f1f5f9 !important;
+}
 @media print {
+  div:has(> .invoice-page) {
+    min-height: 0 !important;
+    background: #fff !important;
+  }
   @page {
     size: letter;
     margin: 0.35in;
@@ -102,7 +109,7 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
   })
 
   return (
-    <div className="invoice-page min-h-screen bg-navy-deep px-4 py-8 print:bg-white print:p-0">
+    <div className="invoice-page min-h-screen bg-slate-100 px-4 py-8 print:bg-white print:p-0">
       <style dangerouslySetInnerHTML={{ __html: invoicePrintCss }} />
       <div className="mx-auto max-w-3xl">
         <div className="no-print mb-6">
