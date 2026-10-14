@@ -1,5 +1,4 @@
 import { notFound, redirect } from "next/navigation"
-import { Plane } from "lucide-react"
 import { getAdminSession } from "@/lib/session"
 import { getShipperLetterById } from "@/lib/shipper-letter-queries"
 import { getBarcodeSvg } from "@/lib/barcode"
@@ -16,10 +15,9 @@ const company = {
 } as const
 
 const TERMS = [
-  "Air Cargo Service.",
-  "Tracking number provided.",
-  "Customer must present ID when collecting shipment.",
-  "NEXTLANE GLOBAL SHIPPING is not responsible for prohibited items.",
+  "Air cargo service. Tracking number provided.",
+  "Photo ID required to collect shipment.",
+  "NGS is not responsible for prohibited items.",
 ]
 
 // The thermal head prints black only, so strip page chrome and any
@@ -32,7 +30,6 @@ const thermalPrintCss = `
   .no-print { display: none !important; }
   .receipt-page { padding: 0 !important; min-height: 0 !important; }
   .thermal-receipt { width: 80mm !important; margin: 0 !important; border: none !important; }
-  .receipt-section { break-inside: avoid; page-break-inside: avoid; }
 }
 `
 
@@ -50,28 +47,19 @@ function formatMoney(value: number | string | null) {
   return value === null ? "—" : usd.format(Number(value))
 }
 
-function Divider({ heavy = false }: { heavy?: boolean }) {
-  return <hr className={heavy ? "my-2 border-t-2 border-black" : "my-2 border-t border-dashed border-black"} />
+function Divider() {
+  return <hr className="my-1.5 border-t border-dashed border-black" />
 }
 
-function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <h2 className="text-[13px] font-extrabold uppercase tracking-wider">{children}</h2>
+function Heading({ children }: { children: React.ReactNode }) {
+  return <h2 className="text-[12px] font-bold uppercase">{children}</h2>
 }
 
-function Line({ label, value, bold = false }: { label: string; value: string; bold?: boolean }) {
+function Line({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between gap-3 text-[12px] leading-snug">
+    <div className="flex justify-between gap-3">
       <span className="shrink-0">{label}</span>
-      <span className={`text-right ${bold ? "font-bold" : ""}`}>{value}</span>
-    </div>
-  )
-}
-
-function Field({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="text-[12px] leading-snug">
-      <p className="text-[10px] font-bold uppercase">{label}</p>
-      <p className="whitespace-pre-line break-words">{value || "—"}</p>
+      <span className="text-right">{value}</span>
     </div>
   )
 }
@@ -85,14 +73,13 @@ export default async function ShipperLetterReceiptPage({ params }: { params: Pro
   if (!letter) notFound()
 
   const barcodeSvg = getBarcodeSvg(letter.reference_number, { height: 60 })
-  const printedDate = new Date().toLocaleString("en-US", {
+  const printedDate = new Date().toLocaleDateString("en-US", {
     timeZone: "America/New_York",
     year: "numeric",
     month: "short",
     day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
   })
+  const specialInstructions = letter.special_instructions?.trim()
 
   return (
     <div className="receipt-page min-h-screen bg-navy-deep px-4 py-8">
@@ -105,111 +92,86 @@ export default async function ShipperLetterReceiptPage({ params }: { params: Pro
         </div>
 
         <article
-          className="thermal-receipt mx-auto bg-white text-black shadow-2xl"
-          style={{ width: "80mm", padding: "4mm", fontFamily: "Arial, Helvetica, sans-serif" }}
+          className="thermal-receipt mx-auto bg-white text-[12px] leading-snug text-black"
+          style={{ width: "80mm", padding: "3mm 4mm", fontFamily: "Arial, Helvetica, sans-serif" }}
         >
-          <header className="receipt-section flex flex-col items-center text-center">
-            <div className="flex items-center gap-2">
-              <span className="flex h-10 w-10 items-center justify-center rounded border-2 border-black">
-                <Plane className="h-5 w-5" aria-hidden="true" />
-              </span>
-              <span className="text-[30px] font-black leading-none tracking-wide">{company.shortName}</span>
-            </div>
-            <p className="mt-1.5 text-[13px] font-extrabold uppercase leading-tight">{company.name}</p>
-            <p className="mt-1 text-[12px]">{company.website}</p>
-            <p className="text-[12px]">{company.phone}</p>
-            <p className="text-[12px] leading-snug">{company.address}</p>
+          <header className="text-center">
+            <p className="text-[24px] font-black leading-none">{company.shortName}</p>
+            <p className="text-[12px] font-bold">{company.name}</p>
+            <p>{company.website}</p>
+            <p>{company.phone}</p>
+            <p>{company.address}</p>
           </header>
 
-          <Divider heavy />
+          <Divider />
 
-          <section className="receipt-section flex flex-col items-center">
-            <div
-              role="img"
-              aria-label={`Barcode for ${letter.reference_number}`}
-              className="w-full px-1"
-              style={{ height: "18mm" }}
-              // eslint-disable-next-line react/no-danger
-              dangerouslySetInnerHTML={{ __html: barcodeSvg }}
-            />
-            <p className="mt-2 text-[10px] font-bold uppercase tracking-wider">Tracking / Reference Number</p>
-            <p className="font-mono text-[18px] font-extrabold tracking-wide">{letter.reference_number}</p>
-          </section>
+          <div
+            role="img"
+            aria-label={`Barcode for ${letter.reference_number}`}
+            className="w-full"
+            style={{ height: "16mm" }}
+            // eslint-disable-next-line react/no-danger
+            dangerouslySetInnerHTML={{ __html: barcodeSvg }}
+          />
+          <p className="mt-1 text-center font-mono text-[15px] font-bold">{letter.reference_number}</p>
 
           <Divider />
 
-          <section className="receipt-section flex flex-col gap-0.5">
-            <Line label="Printed Date" value={printedDate} />
-            <Line
-              label="Est. Delivery Date"
-              value={letter.estimated_delivery_date ? formatDate(letter.estimated_delivery_date) : "—"}
-              bold
-            />
-            <Line label="Status" value={letter.status} bold />
-          </section>
-
-          <Divider heavy />
-
-          <section className="receipt-section flex flex-col gap-1.5">
-            <SectionTitle>From / Shipper</SectionTitle>
-            <Field label="Full Name" value={letter.shipper_full_name} />
-            <Field label="Phone Number" value={letter.shipper_phone} />
-            <Field
-              label="Address"
-              value={`${letter.shipper_street}\n${letter.shipper_city}, ${letter.shipper_state} ${letter.shipper_zip}`}
-            />
-          </section>
+          <Line label="Printed" value={printedDate} />
+          <Line
+            label="Est. Delivery"
+            value={letter.estimated_delivery_date ? formatDate(letter.estimated_delivery_date) : "—"}
+          />
 
           <Divider />
 
-          <section className="receipt-section flex flex-col gap-1.5">
-            <SectionTitle>To / Recipient</SectionTitle>
-            <Field label="Full Name" value={letter.recipient_full_name} />
-            <Field label="Phone Number" value={letter.recipient_phone} />
-            <Field label="Destination City" value={letter.destination_city} />
-          </section>
+          <Heading>From</Heading>
+          <p>{letter.shipper_full_name}</p>
+          <p>{letter.shipper_street}</p>
+          <p>
+            {letter.shipper_city}, {letter.shipper_state} {letter.shipper_zip}
+          </p>
 
           <Divider />
 
-          <section className="receipt-section flex flex-col gap-1.5">
-            <SectionTitle>Packages</SectionTitle>
-            <Field label="Package Description" value={letter.package_description} />
-            <div className="flex flex-col gap-0.5">
-              <Line label="Quantity" value={String(letter.number_of_packages)} />
-              <Line label="Total Weight" value={`${Number(letter.total_weight).toFixed(2)} lbs`} />
-              <Line label="Declared Value" value={usd.format(Number(letter.declared_value))} />
-            </div>
-          </section>
-
-          <Divider heavy />
-
-          <section className="receipt-section flex flex-col gap-1">
-            <SectionTitle>Payment</SectionTitle>
-            <Line label="Price" value={formatMoney(letter.price)} />
-            <Line label="Fees" value={formatMoney(letter.fees)} />
-            <div className="mt-1 flex items-baseline justify-between gap-3 border-t-2 border-black pt-1.5">
-              <span className="text-[16px] font-black uppercase">Total</span>
-              <span className="text-[20px] font-black">{formatMoney(letter.total)}</span>
-            </div>
-          </section>
-
-          <Divider heavy />
-
-          <section className="receipt-section text-center">
-            <p className="text-[12px]">Thank you for choosing</p>
-            <p className="text-[13px] font-extrabold uppercase">{company.name}</p>
-          </section>
+          <Heading>To</Heading>
+          <p>{letter.recipient_full_name}</p>
+          <p>{letter.destination_city}, Haiti</p>
 
           <Divider />
 
-          <section className="receipt-section flex flex-col gap-1">
-            <SectionTitle>Terms &amp; Conditions</SectionTitle>
-            <ul className="flex flex-col gap-0.5 text-[11px] leading-snug">
-              {TERMS.map((term) => (
-                <li key={term}>• {term}</li>
-              ))}
-            </ul>
-          </section>
+          <Heading>Packages</Heading>
+          <p className="break-words">{letter.package_description}</p>
+          <Line label="Quantity" value={String(letter.number_of_packages)} />
+          <Line label="Price" value={formatMoney(letter.price)} />
+          {specialInstructions ? <p className="mt-0.5 break-words">Note: {specialInstructions}</p> : null}
+
+          <Divider />
+
+          <Heading>Payment</Heading>
+          <Line label="Price" value={formatMoney(letter.price)} />
+          <Line label="Fees" value={formatMoney(letter.fees)} />
+          <div className="mt-0.5 flex justify-between gap-3 text-[15px] font-bold">
+            <span>TOTAL</span>
+            <span>{formatMoney(letter.total)}</span>
+          </div>
+
+          <Divider />
+
+          <p className="text-center">
+            Thank you for choosing
+            <br />
+            <span className="font-bold">{company.name}</span>
+          </p>
+
+          <Divider />
+
+          <Heading>Terms</Heading>
+          <ul className="text-[11px]">
+            {TERMS.map((term) => (
+              <li key={term}>- {term}</li>
+            ))}
+          </ul>
         </article>
       </div>
     </div>
