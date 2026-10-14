@@ -3,6 +3,7 @@ import { getAdminSession } from "@/lib/session"
 import { getShipperLetterById } from "@/lib/shipper-letter-queries"
 import { getBarcodeSvg } from "@/lib/barcode"
 import { ThermalReceiptActions } from "@/components/admin/thermal-receipt-actions"
+import { PrintAirplaneIcon } from "@/components/print/print-airplane-icon"
 
 export const dynamic = "force-dynamic"
 
@@ -52,7 +53,7 @@ function Divider() {
 }
 
 function Heading({ children }: { children: React.ReactNode }) {
-  return <h2 className="text-[12px] font-bold uppercase">{children}</h2>
+  return <h2 className="text-[15px] font-bold uppercase leading-tight">{children}</h2>
 }
 
 function Line({ label, value }: { label: string; value: string }) {
@@ -92,7 +93,7 @@ export default async function ShipperLetterReceiptPage({ params }: { params: Pro
         </div>
 
         <article
-          className="thermal-receipt mx-auto bg-white text-[12px] leading-snug text-black"
+          className="thermal-receipt mx-auto bg-white text-[13.5px] leading-snug text-black"
           style={{ width: "80mm", padding: "3mm 4mm", fontFamily: "Arial, Helvetica, sans-serif" }}
         >
           <header className="text-center">
@@ -113,7 +114,8 @@ export default async function ShipperLetterReceiptPage({ params }: { params: Pro
             // eslint-disable-next-line react/no-danger
             dangerouslySetInnerHTML={{ __html: barcodeSvg }}
           />
-          <p className="mt-1 text-center font-mono text-[15px] font-bold">{letter.reference_number}</p>
+          <PrintAirplaneIcon size={24} />
+          <p className="text-center font-mono text-[16px] font-bold">{letter.reference_number}</p>
 
           <Divider />
 
@@ -151,7 +153,7 @@ export default async function ShipperLetterReceiptPage({ params }: { params: Pro
           <Heading>Payment</Heading>
           <Line label="Price" value={formatMoney(letter.price)} />
           <Line label="Fees" value={formatMoney(letter.fees)} />
-          <div className="mt-0.5 flex justify-between gap-3 text-[15px] font-bold">
+          <div className="mt-0.5 flex justify-between gap-3 text-[18px] font-bold">
             <span>TOTAL</span>
             <span>{formatMoney(letter.total)}</span>
           </div>
@@ -167,7 +169,7 @@ export default async function ShipperLetterReceiptPage({ params }: { params: Pro
           <Divider />
 
           <Heading>Terms</Heading>
-          <ul className="text-[11px]">
+          <ul className="text-[12px]">
             {TERMS.map((term) => (
               <li key={term}>- {term}</li>
             ))}
