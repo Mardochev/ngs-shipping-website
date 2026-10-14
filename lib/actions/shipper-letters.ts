@@ -164,6 +164,41 @@ export async function updateShipperLetterPayment(
   return { savedAt: Date.now() }
 }
 
+export type ShipperLetterDeliveryState = {
+  error?: string
+  savedAt?: number
+}
+
+export async function updateShipperLetterDeliveryDate(
+  _prev: ShipperLetterDeliveryState,
+  formData: FormData,
+): Promise<ShipperLetterDeliveryState> {
+  const session = await getAdminSession()
+  if (!session) return { error: "Your session has expired. Please log in again." }
+
+  const id = String(formData.get("id") ?? "")
+  if (!id) return { error: "Missing Shipper Letter." }
+
+  const raw = String(formData.get("estimated_delivery_date") ?? "").trim()
+  if (raw && (!DATE_RE.test(raw) || Number.isNaN(Date.parse(raw)))) {
+    return { error: "Please choose a valid date." }
+  }
+
+  const supabase = getServiceClient()
+  const { error } = await supabase
+    .from("shipper_letters")
+    .update({ estimated_delivery_date: raw || null, updated_at: new Date().toISOString() })
+    .eq("id", id)
+
+  if (error) {
+    console.error("Saving estimated delivery date failed:", error)
+    return { error: "We couldn't save the date. Please try again." }
+  }
+
+  revalidatePath(`/admin/shipper-letters/${id}`)
+  return { savedAt: Date.now() }
+}
+
 export async function updateShipperLetterStatus(formData: FormData): Promise<void> {
   const session = await getAdminSession()
   if (!session) throw new Error("Unauthorized")

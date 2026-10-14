@@ -7,6 +7,7 @@ import { updateShipperLetterStatus } from "@/lib/actions/shipper-letters"
 import { SHIPPER_LETTER_STATUSES } from "@/lib/shipper-letter-types"
 import { ShipperLetterPrintButton } from "@/components/admin/shipper-letter-print-button"
 import { ShipperLetterPaymentForm } from "@/components/admin/shipper-letter-payment-form"
+import { ShipperLetterDeliveryForm } from "@/components/admin/shipper-letter-delivery-form"
 
 export const dynamic = "force-dynamic"
 
@@ -108,6 +109,8 @@ export default async function ShipperLetterDetailPage({ params }: { params: Prom
           </div>
         </div>
 
+        <ShipperLetterDeliveryForm id={letter.id} date={letter.estimated_delivery_date} />
+
         <ShipperLetterPaymentForm id={letter.id} price={letter.price} fees={letter.fees} />
 
         <article className="sl-paper rounded-xl border border-slate-200 bg-white p-6 text-slate-900 shadow-xl sm:p-10">
@@ -126,9 +129,17 @@ export default async function ShipperLetterDetailPage({ params }: { params: Prom
             <div className="text-right">
               <h1 className="font-display text-xl font-extrabold uppercase text-[#0a1f44]">Shipper Letter</h1>
               <p className="mt-1 font-mono text-base font-bold text-[#0a1f44]">{letter.reference_number}</p>
-              <p className="mt-1 text-xs text-slate-500">Submitted {formatDateTime(letter.created_at)}</p>
+              <p className="mt-1 text-xs text-slate-500">
+                Submitted Date: <span className="text-slate-900">{formatDateTime(letter.created_at)}</span>
+              </p>
               <p className="mt-1 text-xs text-slate-500">
                 Status: <span className="font-semibold text-slate-900">{letter.status}</span>
+              </p>
+              <p className="mt-1 text-xs text-slate-500">
+                Estimated Delivery Date:{" "}
+                <span className="font-semibold text-slate-900">
+                  {letter.estimated_delivery_date ? formatSignedDate(letter.estimated_delivery_date) : "—"}
+                </span>
               </p>
             </div>
           </header>
