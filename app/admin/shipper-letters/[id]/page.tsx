@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { notFound, redirect } from "next/navigation"
-import { ArrowLeft, Plane } from "lucide-react"
+import { ArrowLeft, Plane, Receipt } from "lucide-react"
 import { getAdminSession } from "@/lib/session"
 import { getShipperLetterById } from "@/lib/shipper-letter-queries"
 import { updateShipperLetterStatus } from "@/lib/actions/shipper-letters"
@@ -105,6 +105,12 @@ export default async function ShipperLetterDetailPage({ params }: { params: Prom
                 Update
               </button>
             </form>
+            <Link
+              href={`/admin/shipper-letters/${letter.id}/receipt`}
+              className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
+            >
+              <Receipt className="h-4 w-4" aria-hidden="true" /> Thermal Receipt
+            </Link>
             <ShipperLetterPrintButton />
           </div>
         </div>
