@@ -25,6 +25,9 @@ export type ShipperLetter = {
   signature: string
   signed_date: string
   status: ShipperLetterStatus
+  price: number | null
+  fees: number | null
+  total: number | null
   created_at: string
   updated_at: string
 }

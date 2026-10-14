@@ -6,6 +6,7 @@ import { getShipperLetterById } from "@/lib/shipper-letter-queries"
 import { updateShipperLetterStatus } from "@/lib/actions/shipper-letters"
 import { SHIPPER_LETTER_STATUSES } from "@/lib/shipper-letter-types"
 import { ShipperLetterPrintButton } from "@/components/admin/shipper-letter-print-button"
+import { ShipperLetterPaymentForm } from "@/components/admin/shipper-letter-payment-form"
 
 export const dynamic = "force-dynamic"
 
@@ -107,6 +108,8 @@ export default async function ShipperLetterDetailPage({ params }: { params: Prom
           </div>
         </div>
 
+        <ShipperLetterPaymentForm id={letter.id} price={letter.price} fees={letter.fees} />
+
         <article className="sl-paper rounded-xl border border-slate-200 bg-white p-6 text-slate-900 shadow-xl sm:p-10">
           <header className="flex flex-wrap items-start justify-between gap-4 border-b-4 border-[#f5a623] pb-5">
             <div className="flex items-center gap-3">
@@ -158,6 +161,30 @@ export default async function ShipperLetterDetailPage({ params }: { params: Prom
                 <Row label="Special Instructions" value={letter.special_instructions ?? ""} />
               </div>
             </Block>
+
+            <section className="sl-section border-t border-slate-200 pt-4">
+              <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-[#0a1f44]">Payment</h2>
+              <dl className="mt-3 ml-auto flex w-full max-w-xs flex-col gap-1.5 text-sm">
+                <div className="flex justify-between gap-4">
+                  <dt className="text-slate-600">Price</dt>
+                  <dd className="font-mono text-slate-900">
+                    {letter.price === null ? "—" : usd.format(Number(letter.price))}
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-slate-600">Fees</dt>
+                  <dd className="font-mono text-slate-900">
+                    {letter.fees === null ? "—" : usd.format(Number(letter.fees))}
+                  </dd>
+                </div>
+                <div className="mt-1 flex justify-between gap-4 border-t-2 border-[#0a1f44] pt-2">
+                  <dt className="font-bold uppercase text-[#0a1f44]">Total</dt>
+                  <dd className="font-mono text-lg font-extrabold text-[#0a1f44]">
+                    {letter.total === null ? "—" : usd.format(Number(letter.total))}
+                  </dd>
+                </div>
+              </dl>
+            </section>
 
             <section className="sl-section border-t border-slate-200 pt-4">
               <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-[#0a1f44]">Agreement</h2>
