@@ -4,7 +4,7 @@ import { ArrowLeft, Plane, Receipt, Tag } from "lucide-react"
 import { getAdminSession } from "@/lib/session"
 import { getShipperLetterById } from "@/lib/shipper-letter-queries"
 import { updateShipperLetterStatus } from "@/lib/actions/shipper-letters"
-import { SHIPPER_LETTER_STATUSES } from "@/lib/shipper-letter-types"
+import { SHIPPER_LETTER_STATUSES, formatShipperAddressLines } from "@/lib/shipper-letter-types"
 import { ShipperLetterPrintButton } from "@/components/admin/shipper-letter-print-button"
 import { ShipperLetterPaymentForm } from "@/components/admin/shipper-letter-payment-form"
 import { ShipperLetterDeliveryForm } from "@/components/admin/shipper-letter-delivery-form"
@@ -163,7 +163,7 @@ export default async function ShipperLetterDetailPage({ params }: { params: Prom
               <Row label="Email Address" value={letter.shipper_email} />
               <Row
                 label="Address"
-                value={`${letter.shipper_street}\n${letter.shipper_city}, ${letter.shipper_state} ${letter.shipper_zip}`}
+                value={formatShipperAddressLines(letter).join("\n")}
               />
             </Block>
 

@@ -88,30 +88,13 @@ export function ShipperLetterForm() {
         <input id="company_website" name="company_website" type="text" tabIndex={-1} autoComplete="off" />
       </div>
 
-      <Section title="Shipper Information">
-        <Field id="shipper_full_name" label="Full Name" className="sm:col-span-2">
+      <Section title="Sender Information">
+        <Field id="shipper_full_name" label="Full Name">
           <input id="shipper_full_name" name="shipper_full_name" required autoComplete="name" className={inputClass} />
         </Field>
         <Field id="shipper_phone" label="Phone Number">
           <input id="shipper_phone" name="shipper_phone" type="tel" inputMode="tel" required autoComplete="tel" className={inputClass} />
         </Field>
-        <Field id="shipper_email" label="Email Address">
-          <input id="shipper_email" name="shipper_email" type="email" inputMode="email" required autoComplete="email" className={inputClass} />
-        </Field>
-        <Field id="shipper_street" label="Street Address" className="sm:col-span-2">
-          <input id="shipper_street" name="shipper_street" required autoComplete="street-address" className={inputClass} />
-        </Field>
-        <Field id="shipper_city" label="City">
-          <input id="shipper_city" name="shipper_city" required autoComplete="address-level2" className={inputClass} />
-        </Field>
-        <div className="grid grid-cols-2 gap-5">
-          <Field id="shipper_state" label="State">
-            <input id="shipper_state" name="shipper_state" required autoComplete="address-level1" className={inputClass} />
-          </Field>
-          <Field id="shipper_zip" label="ZIP Code">
-            <input id="shipper_zip" name="shipper_zip" required inputMode="numeric" autoComplete="postal-code" className={inputClass} />
-          </Field>
-        </div>
       </Section>
 
       <Section title="Recipient Information in Haiti">
@@ -121,7 +104,7 @@ export function ShipperLetterForm() {
         <Field id="recipient_phone" label="Phone Number">
           <input id="recipient_phone" name="recipient_phone" type="tel" inputMode="tel" required className={inputClass} />
         </Field>
-        <Field id="destination_city" label="Destination City">
+        <Field id="destination_city" label="City">
           <select id="destination_city" name="destination_city" required defaultValue="" className={inputClass}>
             <option value="" disabled>
               Select a city
@@ -148,26 +131,14 @@ export function ShipperLetterForm() {
         <Field id="declared_value" label="Declared Merchandise Value (USD)" className="sm:col-span-2">
           <input id="declared_value" name="declared_value" type="number" inputMode="decimal" min={0} step="0.01" required className={inputClass} />
         </Field>
-        <Field id="special_instructions" label="Special Instructions (optional)" className="sm:col-span-2">
-          <textarea id="special_instructions" name="special_instructions" rows={3} className={inputClass} />
-        </Field>
       </Section>
 
-      <Section title="Agreement">
-        <label htmlFor="agreed_terms" className="flex cursor-pointer items-start gap-3 sm:col-span-2">
-          <input
-            id="agreed_terms"
-            name="agreed_terms"
-            type="checkbox"
-            required
-            className="mt-0.5 h-6 w-6 shrink-0 rounded border-input accent-primary"
-          />
-          <span className="text-pretty leading-relaxed text-foreground">
-            I confirm that the information provided is correct and I agree to NGS NEXTLANE GLOBAL SHIPPING Terms &amp;
-            Conditions.
-          </span>
-        </label>
-        <Field id="signature" label="Customer Signature (type your full name)">
+      <Section title="Confirmation">
+        <p className="text-pretty text-sm leading-relaxed text-muted-foreground sm:col-span-2">
+          By signing, I confirm that the information provided is correct and I agree to NGS NEXTLANE GLOBAL SHIPPING
+          Terms &amp; Conditions.
+        </p>
+        <Field id="signature" label="Signature (type your full name)">
           <input id="signature" name="signature" required className={`${inputClass} font-display italic`} />
         </Field>
         <Field id="signed_date" label="Date">
