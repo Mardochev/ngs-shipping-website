@@ -4,6 +4,7 @@ import { getShipmentForPrint } from "@/lib/queries"
 import { getCachedQrDataUrl } from "@/lib/qr-cache"
 import { getBarcodeSvg } from "@/lib/barcode"
 import { LabelActions } from "@/components/admin/label-actions"
+import { PrintAirplaneIcon } from "@/components/print/print-airplane-icon"
 
 const company = {
   name: "NEXTLANE GLOBAL SHIPPING",
@@ -101,53 +102,55 @@ export default async function LabelPage({ params }: { params: Promise<{ id: stri
 
           {/* From */}
           <div className="border-b border-black py-1.5">
-            <p className="font-bold uppercase" style={{ fontSize: "8px" }}>
+            <p className="font-bold uppercase" style={{ fontSize: "10px" }}>
               From / Sender
             </p>
-            <p className="font-semibold" style={{ fontSize: "10px" }}>
+            <p className="font-semibold" style={{ fontSize: "11px" }}>
               {company.shortName} — {company.addressLines.join(", ")}
             </p>
-            <p style={{ fontSize: "9px" }}>{company.phone}</p>
+            <p style={{ fontSize: "10px" }}>{company.phone}</p>
           </div>
 
           {/* To */}
           <div className="border-b-2 border-black py-2">
-            <p className="font-bold uppercase" style={{ fontSize: "8px" }}>
+            <p className="font-bold uppercase" style={{ fontSize: "10px" }}>
               Ship To / Recipient
             </p>
-            <p className="font-extrabold" style={{ fontSize: "15px", lineHeight: 1.2 }}>
+            <p className="font-extrabold" style={{ fontSize: "17px", lineHeight: 1.2 }}>
               {shipment.recipient_name || customer?.full_name || "—"}
             </p>
             {shipment.recipient_address && (
-              <p style={{ fontSize: "11px", lineHeight: 1.3 }}>{shipment.recipient_address}</p>
+              <p style={{ fontSize: "12px", lineHeight: 1.3 }}>{shipment.recipient_address}</p>
             )}
-            <p style={{ fontSize: "11px" }}>{shipment.destination}</p>
-            {shipment.recipient_phone && <p style={{ fontSize: "11px" }}>Tel: {shipment.recipient_phone}</p>}
+            <p className="font-bold" style={{ fontSize: "13px" }}>
+              {shipment.destination}
+            </p>
+            {shipment.recipient_phone && <p style={{ fontSize: "12px" }}>Tel: {shipment.recipient_phone}</p>}
           </div>
 
           {/* Details row */}
           <div className="grid grid-cols-2 gap-2 border-b border-black py-2" style={{ fontSize: "9px" }}>
             <div>
-              <p className="font-bold uppercase" style={{ fontSize: "7px" }}>
+              <p className="font-bold uppercase" style={{ fontSize: "9px" }}>
                 Weight
               </p>
-              <p className="font-semibold" style={{ fontSize: "11px" }}>
+              <p className="font-semibold" style={{ fontSize: "13px" }}>
                 {shipment.weight_lb} lb
               </p>
             </div>
             <div>
-              <p className="font-bold uppercase" style={{ fontSize: "7px" }}>
+              <p className="font-bold uppercase" style={{ fontSize: "9px" }}>
                 Ship Date
               </p>
-              <p className="font-semibold" style={{ fontSize: "11px" }}>
+              <p className="font-semibold" style={{ fontSize: "13px" }}>
                 {formatDate(shipment.created_at)}
               </p>
             </div>
             <div className="col-span-2">
-              <p className="font-bold uppercase" style={{ fontSize: "7px" }}>
+              <p className="font-bold uppercase" style={{ fontSize: "9px" }}>
                 Customer
               </p>
-              <p className="font-semibold" style={{ fontSize: "11px" }}>
+              <p className="font-semibold" style={{ fontSize: "13px" }}>
                 {customer?.full_name ?? "—"}
                 {customer?.customer_code ? ` (${customer.customer_code})` : ""}
               </p>
@@ -166,21 +169,24 @@ export default async function LabelPage({ params }: { params: Promise<{ id: stri
 
           {/* Tracking + QR */}
           <div className="flex items-end justify-between pt-2">
-            <div>
-              <p className="font-bold uppercase" style={{ fontSize: "8px" }}>
-                Tracking Number
-              </p>
-              <p className="font-mono font-extrabold" style={{ fontSize: "16px", letterSpacing: "0.5px" }}>
-                {shipment.tracking_number}
-              </p>
+            <div style={{ width: "2.2in" }}>
               {/* Barcode (cached inline SVG — cheap to print, never regenerated) */}
               <div
                 aria-hidden="true"
-                className="mt-1"
-                style={{ height: "34px", width: "2in" }}
+                style={{ height: "34px", width: "2.2in" }}
                 // eslint-disable-next-line react/no-danger
                 dangerouslySetInnerHTML={{ __html: barcodeSvg }}
               />
+              <PrintAirplaneIcon size={18} />
+              <p className="text-center font-bold uppercase" style={{ fontSize: "9px" }}>
+                Tracking Number
+              </p>
+              <p
+                className="text-center font-mono font-extrabold"
+                style={{ fontSize: "18px", letterSpacing: "0.5px", lineHeight: 1.1 }}
+              >
+                {shipment.tracking_number}
+              </p>
             </div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={qrDataUrl || "/placeholder.svg"} alt="Scan to track shipment" style={{ height: "1in", width: "1in" }} />
