@@ -28,6 +28,7 @@ export type ShipperLetter = {
   price: number | null
   fees: number | null
   total: number | null
+  estimated_delivery_date: string | null
   created_at: string
   updated_at: string
 }
