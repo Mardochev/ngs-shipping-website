@@ -116,6 +116,54 @@ export async function submitShipperLetter(
   }
 }
 
+export type ShipperLetterPaymentState = {
+  error?: string
+  savedAt?: number
+}
+
+const MAX_AMOUNT = 1_000_000
+
+function parseAmount(raw: FormDataEntryValue | null) {
+  const value = String(raw ?? "").trim()
+  if (value === "") return 0
+  const n = Number(value)
+  if (!Number.isFinite(n) || n < 0 || n > MAX_AMOUNT) return null
+  return Math.round(n * 100) / 100
+}
+
+export async function updateShipperLetterPayment(
+  _prev: ShipperLetterPaymentState,
+  formData: FormData,
+): Promise<ShipperLetterPaymentState> {
+  const session = await getAdminSession()
+  if (!session) return { error: "Your session has expired. Please log in again." }
+
+  const id = String(formData.get("id") ?? "")
+  if (!id) return { error: "Missing Shipper Letter." }
+
+  const price = parseAmount(formData.get("price"))
+  const fees = parseAmount(formData.get("fees"))
+  if (price === null) return { error: "Please enter a valid price." }
+  if (fees === null) return { error: "Please enter valid fees." }
+
+  // Total is always recomputed on the server; any client-sent total is ignored.
+  const total = Math.round((price + fees) * 100) / 100
+
+  const supabase = getServiceClient()
+  const { error } = await supabase
+    .from("shipper_letters")
+    .update({ price, fees, total, updated_at: new Date().toISOString() })
+    .eq("id", id)
+
+  if (error) {
+    console.error("Saving shipper letter payment failed:", error)
+    return { error: "We couldn't save the payment. Please try again." }
+  }
+
+  revalidatePath(`/admin/shipper-letters/${id}`)
+  return { savedAt: Date.now() }
+}
+
 export async function updateShipperLetterStatus(formData: FormData): Promise<void> {
   const session = await getAdminSession()
   if (!session) throw new Error("Unauthorized")
