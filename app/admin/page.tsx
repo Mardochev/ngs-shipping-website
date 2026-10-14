@@ -8,6 +8,7 @@ import {
   listManifestEligiblePackages,
   listDestinationRates,
 } from "@/lib/queries"
+import { listShipperLetters } from "@/lib/shipper-letter-queries"
 import { AdminDashboard } from "@/components/admin/admin-dashboard"
 
 export const dynamic = "force-dynamic"
@@ -16,14 +17,16 @@ export default async function AdminPage() {
   const session = await getAdminSession()
   if (!session) redirect("/admin/login")
 
-  const [shipments, customers, settings, manifests, eligiblePackages, destinationRates] = await Promise.all([
-    listShipments(),
-    listCustomers(),
-    getSettings(),
-    listManifests(),
-    listManifestEligiblePackages(),
-    listDestinationRates(),
-  ])
+  const [shipments, customers, settings, manifests, eligiblePackages, destinationRates, shipperLetters] =
+    await Promise.all([
+      listShipments(),
+      listCustomers(),
+      getSettings(),
+      listManifests(),
+      listManifestEligiblePackages(),
+      listDestinationRates(),
+      listShipperLetters(),
+    ])
 
   return (
     <AdminDashboard
@@ -34,6 +37,7 @@ export default async function AdminPage() {
       manifests={manifests}
       eligiblePackages={eligiblePackages}
       destinationRates={destinationRates}
+      shipperLetters={shipperLetters}
     />
   )
 }

@@ -1,20 +1,23 @@
 "use client"
 
 import { useState } from "react"
-import { Package, Users, Settings, LogOut, Plane, LayoutDashboard, Truck, PackageCheck, ClipboardList } from "lucide-react"
+import { Package, Users, Settings, LogOut, Plane, LayoutDashboard, Truck, PackageCheck, ClipboardList, FileSignature } from "lucide-react"
 import { adminLogout } from "@/lib/actions/admin"
 import type { AppSettings, Customer, DestinationRate, Manifest, ShipmentWithCustomer } from "@/lib/types"
+import type { ShipperLetter } from "@/lib/shipper-letter-types"
 import { ShipmentsPanel } from "./shipments-panel"
 import { CustomersPanel } from "./customers-panel"
 import { SettingsPanel } from "./settings-panel"
 import { ManifestsPanel } from "./manifests-panel"
+import { ShipperLettersPanel } from "./shipper-letters-panel"
 
-type Tab = "overview" | "shipments" | "manifests" | "customers" | "settings"
+type Tab = "overview" | "shipments" | "manifests" | "shipper-letters" | "customers" | "settings"
 
 const tabs: { id: Tab; label: string; icon: typeof Package }[] = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "shipments", label: "Shipments", icon: Package },
   { id: "manifests", label: "Manifests", icon: ClipboardList },
+  { id: "shipper-letters", label: "Shipper Letters", icon: FileSignature },
   { id: "customers", label: "Customers", icon: Users },
   { id: "settings", label: "Settings", icon: Settings },
 ]
@@ -27,6 +30,7 @@ export function AdminDashboard({
   manifests,
   eligiblePackages,
   destinationRates,
+  shipperLetters,
 }: {
   adminName: string
   shipments: ShipmentWithCustomer[]
@@ -35,6 +39,7 @@ export function AdminDashboard({
   manifests: Manifest[]
   eligiblePackages: ShipmentWithCustomer[]
   destinationRates: DestinationRate[]
+  shipperLetters: ShipperLetter[]
 }) {
   const [tab, setTab] = useState<Tab>("overview")
 
@@ -160,6 +165,7 @@ export function AdminDashboard({
           {tab === "manifests" && (
             <ManifestsPanel manifests={manifests} eligiblePackages={eligiblePackages} />
           )}
+          {tab === "shipper-letters" && <ShipperLettersPanel letters={shipperLetters} />}
           {tab === "customers" && <CustomersPanel customers={customers} />}
           {tab === "settings" && <SettingsPanel settings={settings} destinationRates={destinationRates} />}
         </div>
