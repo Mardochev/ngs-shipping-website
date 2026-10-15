@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation"
 import { getAdminSession } from "@/lib/session"
 import { getShipperLetterById } from "@/lib/shipper-letter-queries"
 import { getBarcodeSvg } from "@/lib/barcode"
+import { formatShipperAddressLines } from "@/lib/shipper-letter-types"
 import { ThermalReceiptActions } from "@/components/admin/thermal-receipt-actions"
 import { PrintAirplaneIcon } from "@/components/print/print-airplane-icon"
 
@@ -129,10 +130,9 @@ export default async function ShipperLetterReceiptPage({ params }: { params: Pro
 
           <Heading>From</Heading>
           <p>{letter.shipper_full_name}</p>
-          <p>{letter.shipper_street}</p>
-          <p>
-            {letter.shipper_city}, {letter.shipper_state} {letter.shipper_zip}
-          </p>
+          {formatShipperAddressLines(letter).map((line) => (
+            <p key={line}>{line}</p>
+          ))}
 
           <Divider />
 

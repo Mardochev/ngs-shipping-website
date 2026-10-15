@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation"
 import { getAdminSession } from "@/lib/session"
 import { getShipperLetterById } from "@/lib/shipper-letter-queries"
 import { getBarcodeSvg } from "@/lib/barcode"
+import { formatShipperAddressLines } from "@/lib/shipper-letter-types"
 import { ShipperLetterLabelActions } from "@/components/admin/shipper-letter-label-actions"
 import { PrintAirplaneIcon } from "@/components/print/print-airplane-icon"
 
@@ -56,7 +57,7 @@ export default async function ShipperLetterLabelPage({ params }: { params: Promi
   if (!letter) notFound()
 
   const barcodeSvg = getBarcodeSvg(letter.reference_number, { height: 48 })
-  const shipperAddress = `${letter.shipper_street}, ${letter.shipper_city}, ${letter.shipper_state} ${letter.shipper_zip}`
+  const shipperAddress = formatShipperAddressLines(letter).join(", ")
 
   return (
     <div className="label-page min-h-screen bg-navy-deep px-4 py-8 print:bg-white print:p-0">
