@@ -26,12 +26,13 @@ const TERMS = [
 // background colors. Page size is set at print time by ThermalReceiptActions.
 const thermalPrintCss = `
 @media print {
-  @page { size: 80mm 300mm; margin: 0; }
-  html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; }
+  @page { size: 72mm 300mm; margin: 0; }
+  html, body { width: 72mm !important; margin: 0 !important; padding: 0 !important; background: #fff !important; overflow: hidden; }
   body * { background: transparent !important; box-shadow: none !important; }
   .no-print { display: none !important; }
-  .receipt-page { padding: 0 !important; min-height: 0 !important; }
-  .thermal-receipt { width: 80mm !important; margin: 0 !important; border: none !important; }
+  .receipt-page { width: 72mm !important; padding: 0 !important; min-height: 0 !important; }
+  .receipt-page > div { max-width: none !important; width: 72mm !important; margin: 0 !important; gap: 0 !important; }
+  .thermal-receipt { box-sizing: border-box !important; width: 72mm !important; margin: 0 auto !important; padding: 3mm 1mm !important; border: none !important; overflow: hidden; }
 }
 .thermal-receipt, .thermal-receipt * {
   color: #000 !important;
