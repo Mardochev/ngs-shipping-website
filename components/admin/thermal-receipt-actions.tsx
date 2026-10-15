@@ -18,7 +18,9 @@ function printReceipt() {
     style.id = "thermal-page-size"
     document.head.appendChild(style)
   }
-  style.textContent = `@media print { @page { size: 80mm ${heightMm}mm; margin: 0; } }`
+  // 72mm = the TM-T20II's printable width on 80mm paper; the printer's own
+  // ~4mm unprintable edges then center the content with equal margins.
+  style.textContent = `@media print { @page { size: 72mm ${heightMm}mm; margin: 0; } }`
 
   window.print()
 }
