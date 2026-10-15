@@ -3,7 +3,14 @@
 import { useState } from "react"
 import { Package, Users, Settings, LogOut, Plane, LayoutDashboard, Truck, PackageCheck, ClipboardList, FileSignature } from "lucide-react"
 import { adminLogout } from "@/lib/actions/admin"
-import type { AppSettings, Customer, DestinationRate, Manifest, ShipmentWithCustomer } from "@/lib/types"
+import type {
+  AppSettings,
+  Customer,
+  DestinationRate,
+  Manifest,
+  ManifestLetter,
+  ShipmentWithCustomer,
+} from "@/lib/types"
 import type { ShipperLetter } from "@/lib/shipper-letter-types"
 import { ShipmentsPanel } from "./shipments-panel"
 import { CustomersPanel } from "./customers-panel"
@@ -29,6 +36,7 @@ export function AdminDashboard({
   settings,
   manifests,
   eligiblePackages,
+  eligibleLetters,
   destinationRates,
   shipperLetters,
 }: {
@@ -38,6 +46,7 @@ export function AdminDashboard({
   settings: AppSettings
   manifests: Manifest[]
   eligiblePackages: ShipmentWithCustomer[]
+  eligibleLetters: ManifestLetter[]
   destinationRates: DestinationRate[]
   shipperLetters: ShipperLetter[]
 }) {
@@ -163,7 +172,11 @@ export function AdminDashboard({
             <ShipmentsPanel shipments={shipments} customers={customers} destinationRates={destinationRates} />
           )}
           {tab === "manifests" && (
-            <ManifestsPanel manifests={manifests} eligiblePackages={eligiblePackages} />
+            <ManifestsPanel
+              manifests={manifests}
+              eligiblePackages={eligiblePackages}
+              eligibleLetters={eligibleLetters}
+            />
           )}
           {tab === "shipper-letters" && <ShipperLettersPanel letters={shipperLetters} />}
           {tab === "customers" && <CustomersPanel customers={customers} />}

@@ -3,7 +3,12 @@
 import { useActionState, useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { createManifest } from "@/lib/actions/manifests"
-import { MANIFEST_DESTINATIONS, type ShipmentWithCustomer } from "@/lib/types"
+import {
+  MANIFEST_DESTINATIONS,
+  letterMatchesDestination,
+  type ManifestLetter,
+  type ShipmentWithCustomer,
+} from "@/lib/types"
 import { SubmitButton } from "./submit-button"
 
 const inputClass =
@@ -12,14 +17,17 @@ const labelClass = "text-xs font-medium uppercase tracking-wide text-muted-foreg
 
 export function ManifestBuilder({
   eligiblePackages,
+  eligibleLetters,
   onDone,
 }: {
   eligiblePackages: ShipmentWithCustomer[]
+  eligibleLetters: ManifestLetter[]
   onDone: () => void
 }) {
   const router = useRouter()
   const [state, formAction] = useActionState(createManifest, {})
   const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [selectedLetters, setSelectedLetters] = useState<Set<string>>(new Set())
   const [qty, setQty] = useState<Record<string, number>>({})
   const [val, setVal] = useState<Record<string, number>>({})
   const [destination, setDestination] = useState("")
@@ -30,6 +38,15 @@ export function ManifestBuilder({
     () => (destination ? eligiblePackages.filter((p) => p.destination === destination) : eligiblePackages),
     [destination, eligiblePackages],
   )
+  const visibleLetters = useMemo(
+    () =>
+      destination
+        ? eligibleLetters.filter((l) => letterMatchesDestination(l.destination_city, destination))
+        : eligibleLetters,
+    [destination, eligibleLetters],
+  )
+  const visibleCount = visiblePackages.length + visibleLetters.length
+  const selectedCount = selected.size + selectedLetters.size
 
   useEffect(() => {
     if (state?.manifestId) {
@@ -48,10 +65,23 @@ export function ManifestBuilder({
     })
   }
 
+  function toggleLetter(id: string) {
+    setSelectedLetters((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
   function toggleAll() {
-    setSelected((prev) =>
-      prev.size === visiblePackages.length ? new Set() : new Set(visiblePackages.map((p) => p.id)),
-    )
+    if (selectedCount === visibleCount) {
+      setSelected(new Set())
+      setSelectedLetters(new Set())
+    } else {
+      setSelected(new Set(visiblePackages.map((p) => p.id)))
+      setSelectedLetters(new Set(visibleLetters.map((l) => l.id)))
+    }
   }
 
   const totals = useMemo(() => {
@@ -66,14 +96,20 @@ export function ManifestBuilder({
       totalWeight += Number(p.weight_lb) || 0
       totalDeclaredValue += v
     }
+    for (const l of visibleLetters) {
+      if (!selectedLetters.has(l.id)) continue
+      totalPackages += Number(l.number_of_packages) || 0
+      totalWeight += Number(l.total_weight) || 0
+      totalDeclaredValue += Number(l.declared_value) || 0
+    }
     return {
       totalPackages,
       totalWeight: Math.round(totalWeight * 100) / 100,
       totalDeclaredValue: Math.round(totalDeclaredValue * 100) / 100,
     }
-  }, [selected, qty, val, visiblePackages])
+  }, [selected, selectedLetters, qty, val, visiblePackages, visibleLetters])
 
-  const allSelected = selected.size === visiblePackages.length && visiblePackages.length > 0
+  const allSelected = selectedCount === visibleCount && visibleCount > 0
 
   return (
     <form action={formAction} className="flex flex-col gap-5">
@@ -98,6 +134,7 @@ export function ManifestBuilder({
             onChange={(e) => {
               setDestination(e.target.value)
               setSelected(new Set())
+              setSelectedLetters(new Set())
             }}
             required
             className={inputClass}
@@ -139,8 +176,8 @@ export function ManifestBuilder({
 
       <div>
         <div className="mb-2 flex items-center justify-between">
-          <p className={labelClass}>Ready for shipment ({visiblePackages.length})</p>
-          {visiblePackages.length > 0 && (
+          <p className={labelClass}>Ready for shipment ({visibleCount})</p>
+          {visibleCount > 0 && (
             <button
               type="button"
               onClick={toggleAll}
@@ -166,7 +203,7 @@ export function ManifestBuilder({
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {visiblePackages.length === 0 && (
+              {visibleCount === 0 && (
                 <tr>
                   <td colSpan={8} className="px-3 py-8 text-center text-muted-foreground">
                     {destination
@@ -225,6 +262,40 @@ export function ManifestBuilder({
                         disabled={!checked}
                         className="w-20 rounded-md border border-input bg-navy-deep px-2 py-1 text-xs text-foreground focus:border-primary focus:outline-none disabled:opacity-50"
                       />
+                    </td>
+                  </tr>
+                )
+              })}
+              {visibleLetters.map((l) => {
+                const checked = selectedLetters.has(l.id)
+                return (
+                  <tr key={l.id} className={checked ? "bg-primary/5" : "transition-colors hover:bg-secondary/30"}>
+                    <td className="px-3 py-2.5">
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => toggleLetter(l.id)}
+                        className="h-4 w-4 accent-primary"
+                        aria-label={`Select ${l.reference_number}`}
+                      />
+                      {checked && <input type="hidden" name="letter_ids" value={l.id} />}
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <div className="font-mono text-xs font-semibold text-foreground">{l.reference_number}</div>
+                      <div className="text-[11px] font-semibold uppercase tracking-wide text-primary">
+                        Shipper Letter
+                      </div>
+                    </td>
+                    <td className="px-3 py-2.5 text-muted-foreground">{l.shipper_full_name}</td>
+                    <td className="px-3 py-2.5 text-muted-foreground">
+                      <div>{l.recipient_full_name}</div>
+                      <div className="text-xs">{l.recipient_phone}</div>
+                    </td>
+                    <td className="px-3 py-2.5 text-muted-foreground">{l.destination_city}</td>
+                    <td className="px-3 py-2.5 text-muted-foreground">{l.number_of_packages}</td>
+                    <td className="px-3 py-2.5 text-muted-foreground">{l.total_weight} lb</td>
+                    <td className="px-3 py-2.5 text-muted-foreground">
+                      ${(Number(l.declared_value) || 0).toFixed(2)}
                     </td>
                   </tr>
                 )

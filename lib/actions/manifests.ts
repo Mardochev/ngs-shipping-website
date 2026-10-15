@@ -7,6 +7,7 @@ import {
   MANIFEST_DESTINATIONS,
   MANIFEST_STATUSES,
   MANIFEST_TO_PACKAGE_STATUS,
+  letterMatchesDestination,
   type ManifestStatus,
 } from "@/lib/types"
 
@@ -37,7 +38,21 @@ async function recalcTotals(manifestId: string) {
     .select("weight_lb, declared_value, quantity")
     .eq("manifest_id", manifestId)
 
-  const rows = (pkgs ?? []) as { weight_lb: number; declared_value: number; quantity: number }[]
+  const { data: letterLinks } = await supabase
+    .from("manifest_shipper_letters")
+    .select("shipper_letters ( number_of_packages, total_weight, declared_value )")
+    .eq("manifest_id", manifestId)
+
+  const packageRows = (pkgs ?? []) as { weight_lb: number; declared_value: number; quantity: number }[]
+  const letterRows = (
+    (letterLinks ?? []) as unknown as {
+      shipper_letters: { number_of_packages: number; total_weight: number; declared_value: number } | null
+    }[]
+  )
+    .map((l) => l.shipper_letters)
+    .filter((l): l is NonNullable<typeof l> => Boolean(l))
+    .map((l) => ({ weight_lb: l.total_weight, declared_value: l.declared_value, quantity: l.number_of_packages }))
+  const rows = [...packageRows, ...letterRows]
   const totalPackages = rows.reduce((sum, r) => sum + (Number(r.quantity) || 0), 0)
   const totalWeight = Math.round(rows.reduce((sum, r) => sum + (Number(r.weight_lb) || 0), 0) * 100) / 100
   const totalDeclaredValue =
@@ -64,25 +79,43 @@ export async function createManifest(_prev: ActionResult, formData: FormData): P
   const carrier = String(formData.get("carrier") ?? "").trim()
   const flightNumber = String(formData.get("flight_number") ?? "").trim()
   const packageIds = (formData.getAll("package_ids") as string[]).filter(Boolean)
+  const letterIds = (formData.getAll("letter_ids") as string[]).filter(Boolean)
 
   if (!MANIFEST_DESTINATIONS.includes(destination as (typeof MANIFEST_DESTINATIONS)[number])) {
     return { error: "Please choose a valid destination." }
   }
-  if (packageIds.length === 0) {
-    return { error: "Select at least one package to add to the manifest." }
+  if (packageIds.length === 0 && letterIds.length === 0) {
+    return { error: "Select at least one package or Shipper Letter to add to the manifest." }
+  }
+
+  if (letterIds.length > 0) {
+    const [{ data: letterRows }, { data: existingLinks }] = await Promise.all([
+      supabase.from("shipper_letters").select("id, destination_city").in("id", letterIds),
+      supabase.from("manifest_shipper_letters").select("shipper_letter_id").in("shipper_letter_id", letterIds),
+    ])
+    const found = (letterRows ?? []) as { id: string; destination_city: string }[]
+    if (found.length !== letterIds.length) return { error: "One or more Shipper Letters no longer exist." }
+    if (found.some((l) => !letterMatchesDestination(l.destination_city, destination))) {
+      return { error: `All Shipper Letters must ship to ${destination}. Remove letters for other destinations.` }
+    }
+    if ((existingLinks ?? []).length > 0) {
+      return { error: "One or more Shipper Letters are already on another manifest." }
+    }
   }
 
   // Safety: every selected package must ship to the manifest's destination, so
   // Okay and Okap packages can never be mixed on the same manifest.
-  const { data: destRows } = await supabase
-    .from("packages")
-    .select("id, destination")
-    .in("id", packageIds)
-  const mismatched = (destRows ?? []).filter(
-    (p) => (p as { destination: string }).destination !== destination,
-  )
-  if (mismatched.length > 0) {
-    return { error: `All packages must ship to ${destination}. Remove packages for other destinations.` }
+  if (packageIds.length > 0) {
+    const { data: destRows } = await supabase
+      .from("packages")
+      .select("id, destination")
+      .in("id", packageIds)
+    const mismatched = (destRows ?? []).filter(
+      (p) => (p as { destination: string }).destination !== destination,
+    )
+    if (mismatched.length > 0) {
+      return { error: `All packages must ship to ${destination}. Remove packages for other destinations.` }
+    }
   }
 
   // Optional per-package quantity / declared value overrides captured in the builder.
@@ -120,22 +153,32 @@ export async function createManifest(_prev: ActionResult, formData: FormData): P
 
   const manifestId = manifest.id as string
 
-  // Attach packages and flip their status to Manifested.
-  const { error: attachError } = await supabase
-    .from("packages")
-    .update({ manifest_id: manifestId, status: "Manifested", updated_at: new Date().toISOString() })
-    .in("id", packageIds)
-  if (attachError) return { error: attachError.message }
+  if (packageIds.length > 0) {
+    // Attach packages and flip their status to Manifested.
+    const { error: attachError } = await supabase
+      .from("packages")
+      .update({ manifest_id: manifestId, status: "Manifested", updated_at: new Date().toISOString() })
+      .in("id", packageIds)
+    if (attachError) return { error: attachError.message }
 
-  // Write a tracking event per package so public tracking reflects the change.
-  await supabase.from("tracking_events").insert(
-    packageIds.map((pid) => ({
-      package_id: pid,
-      status: "Manifested",
-      location: "Pompano Beach, Florida, USA",
-      note: `Added to manifest ${manifestNumber}`,
-    })),
-  )
+    // Write a tracking event per package so public tracking reflects the change.
+    await supabase.from("tracking_events").insert(
+      packageIds.map((pid) => ({
+        package_id: pid,
+        status: "Manifested",
+        location: "Pompano Beach, Florida, USA",
+        note: `Added to manifest ${manifestNumber}`,
+      })),
+    )
+  }
+
+  // Shipper Letters are linked, not copied, so the letter record is unchanged.
+  if (letterIds.length > 0) {
+    const { error: linkError } = await supabase
+      .from("manifest_shipper_letters")
+      .insert(letterIds.map((lid) => ({ manifest_id: manifestId, shipper_letter_id: lid })))
+    if (linkError) return { error: linkError.message }
+  }
 
   await recalcTotals(manifestId)
 
@@ -250,6 +293,25 @@ export async function removePackageFromManifest(formData: FormData): Promise<voi
     location: "Pompano Beach, Florida, USA",
     note: "Removed from manifest",
   })
+
+  await recalcTotals(manifestId)
+  revalidatePath(`/admin/manifests/${manifestId}`)
+  revalidatePath("/admin")
+}
+
+// Unlink a Shipper Letter from a manifest. The letter itself is not modified.
+export async function removeShipperLetterFromManifest(formData: FormData): Promise<void> {
+  await requireAdmin()
+  const supabase = getServiceClient()
+  const manifestId = String(formData.get("manifest_id") ?? "")
+  const letterId = String(formData.get("letter_id") ?? "")
+  if (!manifestId || !letterId) return
+
+  await supabase
+    .from("manifest_shipper_letters")
+    .delete()
+    .eq("manifest_id", manifestId)
+    .eq("shipper_letter_id", letterId)
 
   await recalcTotals(manifestId)
   revalidatePath(`/admin/manifests/${manifestId}`)

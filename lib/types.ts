@@ -117,8 +117,39 @@ export type Manifest = {
   updated_at: string
 }
 
+// A Shipper Letter as it appears on a manifest. Linked through the
+// manifest_shipper_letters table so the letter record itself is never copied
+// into packages or modified.
+export type ManifestLetter = {
+  id: string
+  reference_number: string
+  shipper_full_name: string
+  recipient_full_name: string
+  recipient_phone: string
+  destination_city: string
+  package_description: string
+  number_of_packages: number
+  total_weight: number
+  declared_value: number
+  status: string
+}
+
+export const MANIFEST_LETTER_COLUMNS =
+  "id, reference_number, shipper_full_name, recipient_full_name, recipient_phone, destination_city, package_description, number_of_packages, total_weight, declared_value, status"
+
+// Shipper Letters can be added to a manifest while they are still open.
+export const MANIFEST_ELIGIBLE_LETTER_STATUSES = ["New", "Processing"] as const
+
+// Shipper Letters store the bare city ("Les Cayes") while manifests use the
+// full destination ("Les Cayes, Haiti").
+export function letterMatchesDestination(city: string, destination: string) {
+  const norm = (s: string) => s.normalize("NFC").trim().toLowerCase()
+  return norm(destination.split(",")[0] ?? "") === norm(city)
+}
+
 export type ManifestWithPackages = Manifest & {
   packages: ShipmentWithCustomer[]
+  letters: ManifestLetter[]
 }
 
 export type TrackingEvent = {

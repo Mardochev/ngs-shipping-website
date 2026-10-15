@@ -7,6 +7,7 @@ import {
   updateManifest,
   updateManifestStatus,
   removePackageFromManifest,
+  removeShipperLetterFromManifest,
 } from "@/lib/actions/manifests"
 import { MANIFEST_DESTINATIONS, type Manifest, type ManifestStatus } from "@/lib/types"
 import { Modal } from "./modal"
@@ -18,7 +19,9 @@ export type ManifestRow = {
   sender: string
   receiver: string
   phone: string
+  destination: string
   description: string
+  status: string
   quantity: number
   weight: number
   declaredValue: number
@@ -97,19 +100,25 @@ export function ManifestActions({ manifest, rows }: { manifest: Manifest; rows: 
 
     autoTable(doc, {
       startY: 130,
-      head: [["#", "Tracking #", "Sender", "Receiver", "Description", "Qty", "Weight (lb)", "Declared $"]],
+      head: [
+        ["#", "Tracking #", "Sender", "Receiver", "Destination", "Description", "Status", "Qty", "Weight (lb)", "Declared $"],
+      ],
       body: rows.map((r) => [
         r.index,
         r.tracking,
         r.sender,
         `${r.receiver}${r.phone ? `\n${r.phone}` : ""}`,
+        r.destination,
         r.description,
+        r.status,
         r.quantity,
         r.weight.toFixed(1),
         r.declaredValue.toFixed(2),
       ]),
       foot: [
         [
+          "",
+          "",
           "",
           "",
           "",
@@ -136,7 +145,9 @@ export function ManifestActions({ manifest, rows }: { manifest: Manifest; rows: 
       Sender: r.sender,
       Receiver: r.receiver,
       Phone: r.phone,
+      Destination: r.destination,
       Description: r.description,
+      Status: r.status,
       Qty: r.quantity,
       "Weight (lb)": r.weight,
       "Declared Value": r.declaredValue,
@@ -147,7 +158,9 @@ export function ManifestActions({ manifest, rows }: { manifest: Manifest; rows: 
       Sender: "",
       Receiver: "",
       Phone: "",
+      Destination: "",
       Description: "TOTALS",
+      Status: "",
       Qty: manifest.total_packages,
       "Weight (lb)": Number(manifest.total_weight),
       "Declared Value": Number(manifest.total_declared_value),
@@ -303,6 +316,34 @@ export function ManifestActions({ manifest, rows }: { manifest: Manifest; rows: 
         </form>
       </Modal>
     </div>
+  )
+}
+
+export function RemoveLetterButton({
+  manifestId,
+  letterId,
+  reference,
+}: {
+  manifestId: string
+  letterId: string
+  reference: string
+}) {
+  return (
+    <form action={removeShipperLetterFromManifest} className="no-print">
+      <input type="hidden" name="manifest_id" value={manifestId} />
+      <input type="hidden" name="letter_id" value={letterId} />
+      <button
+        type="submit"
+        onClick={(e) => {
+          if (!confirm(`Remove Shipper Letter ${reference} from this manifest?`)) e.preventDefault()
+        }}
+        className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-red-400"
+        aria-label={`Remove ${reference}`}
+        title="Remove from manifest"
+      >
+        <Trash2 className="h-4 w-4" />
+      </button>
+    </form>
   )
 }
 
