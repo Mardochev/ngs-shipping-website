@@ -33,6 +33,17 @@ const thermalPrintCss = `
   .receipt-page { padding: 0 !important; min-height: 0 !important; }
   .thermal-receipt { width: 80mm !important; margin: 0 !important; border: none !important; }
 }
+.thermal-receipt, .thermal-receipt * {
+  color: #000 !important;
+  border-color: #000 !important;
+  opacity: 1 !important;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+  -webkit-font-smoothing: none;
+  text-rendering: geometricPrecision;
+}
+.thermal-receipt svg { shape-rendering: crispEdges; }
+.thermal-receipt svg rect { fill: #000 !important; }
 `
 
 const usd = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" })
@@ -50,18 +61,18 @@ function formatMoney(value: number | string | null) {
 }
 
 function Divider() {
-  return <hr className="my-1.5 border-t border-dashed border-black" />
+  return <hr className="my-1.5 border-0 border-t-[1.5px] border-dashed border-black" />
 }
 
 function Heading({ children }: { children: React.ReactNode }) {
-  return <h2 className="text-[15px] font-bold uppercase leading-tight">{children}</h2>
+  return <h2 className="text-[15px] font-black uppercase leading-tight tracking-wide">{children}</h2>
 }
 
 function Line({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between gap-3">
       <span className="shrink-0">{label}</span>
-      <span className="text-right">{value}</span>
+      <span className="text-right font-bold">{value}</span>
     </div>
   )
 }
@@ -116,7 +127,7 @@ export default async function ShipperLetterReceiptPage({ params }: { params: Pro
             dangerouslySetInnerHTML={{ __html: barcodeSvg }}
           />
           <PrintAirplaneIcon size={24} />
-          <p className="text-center font-mono text-[16px] font-bold">{letter.reference_number}</p>
+          <p className="text-center font-mono text-[16px] font-black">{letter.reference_number}</p>
 
           <Divider />
 
@@ -129,7 +140,7 @@ export default async function ShipperLetterReceiptPage({ params }: { params: Pro
           <Divider />
 
           <Heading>From</Heading>
-          <p>{letter.shipper_full_name}</p>
+          <p className="font-bold">{letter.shipper_full_name}</p>
           {formatShipperAddressLines(letter).map((line) => (
             <p key={line}>{line}</p>
           ))}
@@ -137,13 +148,13 @@ export default async function ShipperLetterReceiptPage({ params }: { params: Pro
           <Divider />
 
           <Heading>To</Heading>
-          <p>{letter.recipient_full_name}</p>
-          <p>{letter.destination_city}, Haiti</p>
+          <p className="font-bold">{letter.recipient_full_name}</p>
+          <p className="font-bold">{letter.destination_city}, Haiti</p>
 
           <Divider />
 
           <Heading>Packages</Heading>
-          <p className="break-words">{letter.package_description}</p>
+          <p className="break-words font-bold">{letter.package_description}</p>
           <Line label="Quantity" value={String(letter.number_of_packages)} />
           <Line label="Price" value={formatMoney(letter.price)} />
           {specialInstructions ? <p className="mt-0.5 break-words">Note: {specialInstructions}</p> : null}
@@ -153,7 +164,7 @@ export default async function ShipperLetterReceiptPage({ params }: { params: Pro
           <Heading>Payment</Heading>
           <Line label="Price" value={formatMoney(letter.price)} />
           <Line label="Fees" value={formatMoney(letter.fees)} />
-          <div className="mt-0.5 flex justify-between gap-3 text-[18px] font-bold">
+          <div className="mt-0.5 flex justify-between gap-3 text-[18px] font-black">
             <span>TOTAL</span>
             <span>{formatMoney(letter.total)}</span>
           </div>
