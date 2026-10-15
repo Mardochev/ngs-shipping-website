@@ -15,6 +15,19 @@ export async function listShipperLetters(): Promise<ShipperLetter[]> {
   return (data ?? []) as ShipperLetter[]
 }
 
+export async function getShipperLetterByReference(reference: string): Promise<ShipperLetter | null> {
+  const normalized = reference.trim()
+  if (!normalized) return null
+  const pattern = normalized.replace(/[\\%_]/g, (c) => `\\${c}`)
+  const supabase = getServiceClient()
+  const { data } = await supabase
+    .from("shipper_letters")
+    .select("*")
+    .ilike("reference_number", pattern)
+    .maybeSingle()
+  return (data as ShipperLetter | null) ?? null
+}
+
 export async function getShipperLetterById(id: string): Promise<ShipperLetter | null> {
   const supabase = getServiceClient()
   const { data } = await supabase.from("shipper_letters").select("*").eq("id", id).maybeSingle()

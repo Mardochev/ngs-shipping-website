@@ -98,7 +98,7 @@ export async function getShipmentByTracking(tracking: string): Promise<{
   const { data: shipment } = await supabase
     .from("packages")
     .select("*")
-    .ilike("tracking_number", tracking.trim())
+    .ilike("tracking_number", tracking.trim().replace(/[\\%_]/g, (c) => `\\${c}`))
     .maybeSingle()
   if (!shipment) return { shipment: null, events: [] }
   const { data: events } = await supabase
