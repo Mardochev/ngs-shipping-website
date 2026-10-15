@@ -6,6 +6,7 @@ import {
   getSettings,
   listManifests,
   listManifestEligiblePackages,
+  listManifestEligibleLetters,
   listDestinationRates,
 } from "@/lib/queries"
 import { listShipperLetters } from "@/lib/shipper-letter-queries"
@@ -17,16 +18,25 @@ export default async function AdminPage() {
   const session = await getAdminSession()
   if (!session) redirect("/admin/login")
 
-  const [shipments, customers, settings, manifests, eligiblePackages, destinationRates, shipperLetters] =
-    await Promise.all([
-      listShipments(),
-      listCustomers(),
-      getSettings(),
-      listManifests(),
-      listManifestEligiblePackages(),
-      listDestinationRates(),
-      listShipperLetters(),
-    ])
+  const [
+    shipments,
+    customers,
+    settings,
+    manifests,
+    eligiblePackages,
+    destinationRates,
+    shipperLetters,
+    eligibleLetters,
+  ] = await Promise.all([
+    listShipments(),
+    listCustomers(),
+    getSettings(),
+    listManifests(),
+    listManifestEligiblePackages(),
+    listDestinationRates(),
+    listShipperLetters(),
+    listManifestEligibleLetters(),
+  ])
 
   return (
     <AdminDashboard
@@ -36,6 +46,7 @@ export default async function AdminPage() {
       settings={settings}
       manifests={manifests}
       eligiblePackages={eligiblePackages}
+      eligibleLetters={eligibleLetters}
       destinationRates={destinationRates}
       shipperLetters={shipperLetters}
     />

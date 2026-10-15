@@ -2,6 +2,9 @@ import "server-only"
 import { getServiceClient } from "@/lib/supabase/admin"
 import {
   MANIFEST_ELIGIBLE_STATUSES,
+  MANIFEST_ELIGIBLE_LETTER_STATUSES,
+  MANIFEST_LETTER_COLUMNS,
+  type ManifestLetter,
   type AppSettings,
   type Customer,
   type DestinationRate,
@@ -145,10 +148,34 @@ export async function getManifestById(id: string): Promise<ManifestWithPackages 
     .select("*, customers ( id, full_name, customer_code, email, phone )")
     .eq("manifest_id", id)
     .order("tracking_number", { ascending: true })
+  const { data: links } = await supabase
+    .from("manifest_shipper_letters")
+    .select(`shipper_letters ( ${MANIFEST_LETTER_COLUMNS} )`)
+    .eq("manifest_id", id)
+  const letters = ((links ?? []) as unknown as { shipper_letters: ManifestLetter | null }[])
+    .map((l) => l.shipper_letters)
+    .filter((l): l is ManifestLetter => Boolean(l))
+    .sort((a, b) => a.reference_number.localeCompare(b.reference_number))
   return {
     ...(manifest as unknown as Manifest),
     packages: (packages ?? []) as unknown as ShipmentWithCustomer[],
+    letters,
   }
+}
+
+// Open Shipper Letters that are not yet linked to any manifest.
+export async function listManifestEligibleLetters(): Promise<ManifestLetter[]> {
+  const supabase = getServiceClient()
+  const [{ data: letters }, { data: links }] = await Promise.all([
+    supabase
+      .from("shipper_letters")
+      .select(MANIFEST_LETTER_COLUMNS)
+      .in("status", MANIFEST_ELIGIBLE_LETTER_STATUSES as unknown as string[])
+      .order("created_at", { ascending: false }),
+    supabase.from("manifest_shipper_letters").select("shipper_letter_id"),
+  ])
+  const linked = new Set(((links ?? []) as { shipper_letter_id: string }[]).map((l) => l.shipper_letter_id))
+  return ((letters ?? []) as unknown as ManifestLetter[]).filter((l) => !linked.has(l.id))
 }
 
 // Packages that can be added to a new manifest: eligible status and not

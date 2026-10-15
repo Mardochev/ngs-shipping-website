@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { Plus, FileText, Search } from "lucide-react"
-import type { Manifest, ManifestStatus, ShipmentWithCustomer } from "@/lib/types"
+import type { Manifest, ManifestLetter, ManifestStatus, ShipmentWithCustomer } from "@/lib/types"
 import { Modal } from "./modal"
 import { ManifestBuilder } from "./manifest-builder"
 
@@ -23,9 +23,11 @@ function formatDate(value: string | null) {
 export function ManifestsPanel({
   manifests,
   eligiblePackages,
+  eligibleLetters,
 }: {
   manifests: Manifest[]
   eligiblePackages: ShipmentWithCustomer[]
+  eligibleLetters: ManifestLetter[]
 }) {
   const [creating, setCreating] = useState(false)
   const [query, setQuery] = useState("")
@@ -114,7 +116,11 @@ export function ManifestsPanel({
       </div>
 
       <Modal open={creating} onClose={() => setCreating(false)} title="Create Manifest">
-        <ManifestBuilder eligiblePackages={eligiblePackages} onDone={() => setCreating(false)} />
+        <ManifestBuilder
+          eligiblePackages={eligiblePackages}
+          eligibleLetters={eligibleLetters}
+          onDone={() => setCreating(false)}
+        />
       </Modal>
     </div>
   )

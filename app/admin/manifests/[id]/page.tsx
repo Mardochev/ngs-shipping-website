@@ -4,6 +4,7 @@ import { getManifestById } from "@/lib/queries"
 import {
   ManifestActions,
   RemovePackageButton,
+  RemoveLetterButton,
   type ManifestRow,
 } from "@/components/admin/manifest-actions"
 
@@ -38,17 +39,39 @@ export default async function ManifestPage({ params }: { params: Promise<{ id: s
   const manifest = await getManifestById(id)
   if (!manifest) notFound()
 
-  const rows: ManifestRow[] = manifest.packages.map((p, i) => ({
-    index: i + 1,
+  const packageRows = manifest.packages.map((p) => ({
+    key: `p-${p.id}`,
+    kind: "package" as const,
+    id: p.id,
     tracking: p.tracking_number,
     sender: p.customers?.full_name ?? "—",
     receiver: p.recipient_name ?? "—",
     phone: p.recipient_phone ?? "",
+    destination: p.destination ?? manifest.destination,
     description: p.description ?? "",
+    status: p.status,
     quantity: p.quantity ?? 1,
     weight: Number(p.weight_lb) || 0,
     declaredValue: Number(p.declared_value) || 0,
   }))
+  const letterRows = manifest.letters.map((l) => ({
+    key: `l-${l.id}`,
+    kind: "letter" as const,
+    id: l.id,
+    tracking: l.reference_number,
+    sender: l.shipper_full_name || "—",
+    receiver: l.recipient_full_name || "—",
+    phone: l.recipient_phone ?? "",
+    destination: l.destination_city,
+    description: l.package_description ?? "",
+    status: l.status,
+    quantity: Number(l.number_of_packages) || 0,
+    weight: Number(l.total_weight) || 0,
+    declaredValue: Number(l.declared_value) || 0,
+  }))
+  const items = [...packageRows, ...letterRows]
+
+  const rows: ManifestRow[] = items.map(({ key: _key, kind: _kind, id: _id, ...r }, i) => ({ index: i + 1, ...r }))
 
   return (
     <div className="manifest-page min-h-screen bg-navy-deep px-4 py-8">
@@ -118,7 +141,9 @@ export default async function ManifestPage({ params }: { params: Promise<{ id: s
                   <th className="border border-neutral-300 px-2 py-2 font-semibold">Tracking #</th>
                   <th className="border border-neutral-300 px-2 py-2 font-semibold">Sender</th>
                   <th className="border border-neutral-300 px-2 py-2 font-semibold">Receiver</th>
+                  <th className="border border-neutral-300 px-2 py-2 font-semibold">Destination</th>
                   <th className="border border-neutral-300 px-2 py-2 font-semibold">Description</th>
+                  <th className="border border-neutral-300 px-2 py-2 font-semibold">Status</th>
                   <th className="border border-neutral-300 px-2 py-2 text-right font-semibold">Qty</th>
                   <th className="border border-neutral-300 px-2 py-2 text-right font-semibold">Weight</th>
                   <th className="border border-neutral-300 px-2 py-2 text-right font-semibold">Declared $</th>
@@ -126,45 +151,50 @@ export default async function ManifestPage({ params }: { params: Promise<{ id: s
                 </tr>
               </thead>
               <tbody>
-                {manifest.packages.length === 0 && (
+                {items.length === 0 && (
                   <tr>
-                    <td colSpan={9} className="border border-neutral-300 px-2 py-8 text-center text-neutral-500">
+                    <td colSpan={11} className="border border-neutral-300 px-2 py-8 text-center text-neutral-500">
                       No packages on this manifest.
                     </td>
                   </tr>
                 )}
-                {manifest.packages.map((p, i) => (
-                  <tr key={p.id} className="even:bg-neutral-50">
+                {items.map((r, i) => (
+                  <tr key={r.key} className="even:bg-neutral-50">
                     <td className="border border-neutral-300 px-2 py-2">{i + 1}</td>
-                    <td className="border border-neutral-300 px-2 py-2 font-mono text-xs font-semibold">
-                      {p.tracking_number}
-                    </td>
-                    <td className="border border-neutral-300 px-2 py-2">{p.customers?.full_name ?? "—"}</td>
                     <td className="border border-neutral-300 px-2 py-2">
-                      <div>{p.recipient_name ?? "—"}</div>
-                      {p.recipient_phone && <div className="text-xs text-neutral-500">{p.recipient_phone}</div>}
+                      <div className="font-mono text-xs font-semibold">{r.tracking}</div>
+                      {r.kind === "letter" && (
+                        <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-500">
+                          Shipper Letter
+                        </div>
+                      )}
                     </td>
-                    <td className="border border-neutral-300 px-2 py-2">{p.description ?? ""}</td>
-                    <td className="border border-neutral-300 px-2 py-2 text-right">{p.quantity ?? 1}</td>
-                    <td className="border border-neutral-300 px-2 py-2 text-right">
-                      {(Number(p.weight_lb) || 0).toFixed(1)} lb
+                    <td className="border border-neutral-300 px-2 py-2">{r.sender}</td>
+                    <td className="border border-neutral-300 px-2 py-2">
+                      <div>{r.receiver}</div>
+                      {r.phone && <div className="text-xs text-neutral-500">{r.phone}</div>}
                     </td>
+                    <td className="border border-neutral-300 px-2 py-2">{r.destination}</td>
+                    <td className="border border-neutral-300 px-2 py-2">{r.description}</td>
+                    <td className="border border-neutral-300 px-2 py-2">{r.status}</td>
+                    <td className="border border-neutral-300 px-2 py-2 text-right">{r.quantity}</td>
+                    <td className="border border-neutral-300 px-2 py-2 text-right">{r.weight.toFixed(1)} lb</td>
                     <td className="border border-neutral-300 px-2 py-2 text-right">
-                      ${(Number(p.declared_value) || 0).toFixed(2)}
+                      ${r.declaredValue.toFixed(2)}
                     </td>
                     <td className="no-print border border-neutral-300 px-2 py-2">
-                      <RemovePackageButton
-                        manifestId={manifest.id}
-                        packageId={p.id}
-                        tracking={p.tracking_number}
-                      />
+                      {r.kind === "package" ? (
+                        <RemovePackageButton manifestId={manifest.id} packageId={r.id} tracking={r.tracking} />
+                      ) : (
+                        <RemoveLetterButton manifestId={manifest.id} letterId={r.id} reference={r.tracking} />
+                      )}
                     </td>
                   </tr>
                 ))}
               </tbody>
               <tfoot>
                 <tr className="bg-neutral-100 font-bold">
-                  <td className="border border-neutral-300 px-2 py-2" colSpan={5}>
+                  <td className="border border-neutral-300 px-2 py-2" colSpan={7}>
                     TOTALS
                   </td>
                   <td className="border border-neutral-300 px-2 py-2 text-right">{manifest.total_packages}</td>
