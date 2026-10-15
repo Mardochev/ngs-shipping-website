@@ -25,7 +25,7 @@ export async function submitShipperLetter(
   formData: FormData,
 ): Promise<ShipperLetterFormState> {
   // Honeypot: real users never fill this hidden field.
-  if (text(formData, "company_website")) return { referenceNumber: "SL-SUBMITTED" }
+  if (text(formData, "company_website")) return { referenceNumber: "NGS-SUBMITTED" }
 
   const values = {
     shipper_full_name: text(formData, "shipper_full_name", 120),
@@ -80,7 +80,7 @@ export async function submitShipperLetter(
     } as never)
     if (counterError) throw counterError
 
-    const referenceNumber = `SL-${new Date().getFullYear()}-${String(Number(counter)).padStart(6, "0")}`
+    const referenceNumber = `NGS-${new Date().getFullYear()}-${String(Number(counter)).padStart(6, "0")}`
 
     const { error } = await supabase.from("shipper_letters").insert({
       ...values,
