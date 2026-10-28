@@ -20,6 +20,7 @@ function text(formData: FormData, key: string, max = 200) {
 }
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export async function submitShipperLetter(
   _prev: ShipperLetterFormState,
@@ -31,6 +32,7 @@ export async function submitShipperLetter(
   const values = {
     shipper_full_name: text(formData, "shipper_full_name", 120),
     shipper_phone: text(formData, "shipper_phone", 40),
+    shipper_email: text(formData, "shipper_email", 200),
     recipient_full_name: text(formData, "recipient_full_name", 120),
     recipient_phone: text(formData, "recipient_phone", 40),
     destination_city: text(formData, "destination_city", 60),
@@ -55,6 +57,9 @@ export async function submitShipperLetter(
 
   if (!(SHIPPER_LETTER_DESTINATIONS as readonly string[]).includes(values.destination_city)) {
     return { error: "Please choose a valid destination city." }
+  }
+  if (values.shipper_email && !EMAIL_RE.test(values.shipper_email)) {
+    return { error: "Please enter a valid email address." }
   }
   if (!DATE_RE.test(values.signed_date) || Number.isNaN(Date.parse(values.signed_date))) {
     return { error: "Please enter a valid date." }
@@ -86,7 +91,6 @@ export async function submitShipperLetter(
     const { error } = await supabase.from("shipper_letters").insert({
       ...values,
       // Columns kept for older letters; the simplified form no longer collects them.
-      shipper_email: "",
       shipper_street: "",
       shipper_city: "",
       shipper_state: "",
@@ -152,7 +156,7 @@ export async function updateShipperLetter(
     if (!values[key]) return { error: `${label} is required.` }
   }
 
-  if (values.shipper_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.shipper_email)) {
+  if (values.shipper_email && !EMAIL_RE.test(values.shipper_email)) {
     return { error: "Please enter a valid email address." }
   }
   if (!DATE_RE.test(values.signed_date) || Number.isNaN(Date.parse(values.signed_date))) {

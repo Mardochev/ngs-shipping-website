@@ -166,7 +166,7 @@ export default async function ShipperLetterDetailPage({ params }: { params: Prom
             <Block title="Shipper Information">
               <Row label="Full Name" value={letter.shipper_full_name} />
               <Row label="Phone Number" value={letter.shipper_phone} />
-              <Row label="Email Address" value={letter.shipper_email} />
+              <Row label="Email Address" value={letter.shipper_email || "—"} />
               <Row
                 label="Address"
                 value={formatShipperAddressLines(letter).join("\n")}

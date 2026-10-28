@@ -60,7 +60,7 @@ export function ShipperLetterEditForm({ letter }: { letter: ShipperLetter }) {
         <Field id="shipper_phone" label="Phone Number" required>
           <input id="shipper_phone" name="shipper_phone" type="tel" required maxLength={40} defaultValue={letter.shipper_phone} className={inputClass} />
         </Field>
-        <Field id="shipper_email" label="Email Address" className="sm:col-span-2">
+        <Field id="shipper_email" label="Email (optional)" className="sm:col-span-2">
           <input id="shipper_email" name="shipper_email" type="email" maxLength={200} defaultValue={letter.shipper_email} className={inputClass} />
         </Field>
         <Field id="shipper_street" label="Street Address" className="sm:col-span-2">
