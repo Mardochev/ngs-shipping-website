@@ -164,7 +164,7 @@ export default async function ShipperLetterReceiptPage({ params }: { params: Pro
 
           <Heading>Payment</Heading>
           <Line label="Price" value={formatMoney(letter.price)} />
-          <Line label="Fees" value={formatMoney(letter.fees)} />
+          <Line label="Assurance fee" value={formatMoney(letter.fees)} />
           <div className="mt-0.5 flex justify-between gap-3 text-[18px] font-black">
             <span>TOTAL</span>
             <span>{formatMoney(letter.total)}</span>
