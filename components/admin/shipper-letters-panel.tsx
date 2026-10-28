@@ -4,6 +4,7 @@ import { useMemo, useState } from "react"
 import Link from "next/link"
 import { Search, ExternalLink } from "lucide-react"
 import { updateShipperLetterStatus } from "@/lib/actions/shipper-letters"
+import { ShareFormButton } from "@/components/admin/share-form-button"
 import { SHIPPER_LETTER_STATUSES, type ShipperLetter, type ShipperLetterStatus } from "@/lib/shipper-letter-types"
 
 export const shipperLetterStatusStyles: Record<ShipperLetterStatus, string> = {
@@ -47,6 +48,8 @@ export function ShipperLettersPanel({ letters }: { letters: ShipperLetter[] }) {
             {letters.length} total · {letters.filter((l) => l.status === "New").length} new
           </p>
         </div>
+        <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
+        <ShareFormButton />
         <div className="relative w-full sm:w-80">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
           <label htmlFor="shipper-letter-search" className="sr-only">
@@ -60,6 +63,7 @@ export function ShipperLettersPanel({ letters }: { letters: ShipperLetter[] }) {
             placeholder="Reference, name, or phone"
             className="w-full rounded-lg border border-input bg-navy-deep py-2.5 pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-ring"
           />
+        </div>
         </div>
       </div>
 

@@ -74,7 +74,7 @@ export function ShipperLetterPaymentForm({
 
           <div className="flex flex-col gap-1.5">
             <label htmlFor="payment-fees" className="text-sm font-medium text-foreground">
-              Fees
+              Assurance fee
             </label>
             <div className="relative">
               <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">

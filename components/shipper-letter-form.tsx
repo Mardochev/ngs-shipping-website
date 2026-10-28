@@ -95,6 +95,9 @@ export function ShipperLetterForm() {
         <Field id="shipper_phone" label="Phone Number">
           <input id="shipper_phone" name="shipper_phone" type="tel" inputMode="tel" required autoComplete="tel" className={inputClass} />
         </Field>
+        <Field id="shipper_email" label="Email (optional)" className="sm:col-span-2">
+          <input id="shipper_email" name="shipper_email" type="email" inputMode="email" maxLength={200} autoComplete="email" className={inputClass} />
+        </Field>
       </Section>
 
       <Section title="Recipient Information in Haiti">

@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { notFound, redirect } from "next/navigation"
-import { ArrowLeft, Plane, Receipt, Tag } from "lucide-react"
+import { ArrowLeft, Pencil, Plane, Receipt, Tag } from "lucide-react"
 import { getAdminSession } from "@/lib/session"
 import { getShipperLetterById } from "@/lib/shipper-letter-queries"
 import { updateShipperLetterStatus } from "@/lib/actions/shipper-letters"
@@ -106,6 +106,12 @@ export default async function ShipperLetterDetailPage({ params }: { params: Prom
               </button>
             </form>
             <Link
+              href={`/admin/shipper-letters/${letter.id}/edit`}
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-apricot-light"
+            >
+              <Pencil className="h-4 w-4" aria-hidden="true" /> Edit Shipper Letter
+            </Link>
+            <Link
               href={`/admin/shipper-letters/${letter.id}/receipt`}
               className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
             >
@@ -160,7 +166,7 @@ export default async function ShipperLetterDetailPage({ params }: { params: Prom
             <Block title="Shipper Information">
               <Row label="Full Name" value={letter.shipper_full_name} />
               <Row label="Phone Number" value={letter.shipper_phone} />
-              <Row label="Email Address" value={letter.shipper_email} />
+              <Row label="Email Address" value={letter.shipper_email || "—"} />
               <Row
                 label="Address"
                 value={formatShipperAddressLines(letter).join("\n")}
@@ -195,7 +201,7 @@ export default async function ShipperLetterDetailPage({ params }: { params: Prom
                   </dd>
                 </div>
                 <div className="flex justify-between gap-4">
-                  <dt className="text-slate-600">Fees</dt>
+                  <dt className="text-slate-600">Assurance fee</dt>
                   <dd className="font-mono text-slate-900">
                     {letter.fees === null ? "—" : usd.format(Number(letter.fees))}
                   </dd>
