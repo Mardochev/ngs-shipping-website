@@ -5,13 +5,13 @@ export const services = [
     icon: Plane,
     title: "Air Cargo",
     description:
-      "Reliable air cargo delivering your shipments from USA to Haiti, with estimated delivery in 5\u201310 business days.",
+      "Reliable air cargo delivering your shipments from the USA to Haiti. Contact NGS for delivery information.",
   },
   {
     icon: Package,
     title: "Package Delivery",
     description:
-      "Send parcels, documents, and care packages with reliable air cargo to Les Cayes, Cap-Ha\u00EFtien, and Port-au-Prince, Haiti.",
+      "Send parcels, documents, and care packages with reliable air cargo from the USA to Haiti.",
   },
   {
     icon: Radar,
@@ -35,9 +35,9 @@ export const steps = [
   },
   {
     step: "02",
-    title: "Drop Off Your Package",
+    title: "Drop Off or Schedule a Pickup",
     description:
-      "Bring your packages to our Pompano Beach, Florida location. Our team will receive, weigh, prepare, and process your shipment for Haiti.",
+      "Bring your packages to our Pompano Beach, Florida office, or call NGS to arrange a pickup. Our team will receive, weigh, prepare, and process your shipment for Haiti.",
   },
   {
     step: "03",
