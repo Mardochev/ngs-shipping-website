@@ -5,7 +5,7 @@ import { ShipperLetterForm } from "@/components/shipper-letter-form"
 export const metadata: Metadata = {
   title: "Shipper Letter | NGS NEXTLANE GLOBAL SHIPPING",
   description:
-    "Complete your NGS Shipper Letter for air cargo from the USA to Les Cayes, Cap-Haïtien, and Port-au-Prince, Haiti.",
+    "Complete your NGS Shipper Letter for air cargo from the USA to Haiti.",
 }
 
 export default function ShipperLetterPage() {

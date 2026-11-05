@@ -1,6 +1,5 @@
 import Image from "next/image"
-import Link from "next/link"
-import { Phone, ArrowRight, Plane, CheckCircle2 } from "lucide-react"
+import { Phone, Plane, CheckCircle2 } from "lucide-react"
 import { site } from "@/lib/site"
 
 export function Hero() {
@@ -28,28 +27,22 @@ export function Hero() {
             Air Cargo from USA to Haiti
           </h1>
           <p className="mt-5 max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground">
-            Reliable air cargo service to Les Cayes, Cap-Ha&iuml;tien, and Port-au-Prince.
+            Air cargo and package shipping from the USA to Haiti. Call NGS for shipping details.
           </p>
 
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Link
-              href="/contact"
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-base font-semibold text-primary-foreground transition-colors hover:bg-apricot-light"
-            >
-              Get a Free Quote
-              <ArrowRight className="h-5 w-5" aria-hidden="true" />
-            </Link>
+          <div className="mt-8 flex flex-col sm:flex-row">
             <a
-              href={site.callHref}
-              className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-secondary/60 px-6 py-3 text-base font-semibold text-foreground backdrop-blur transition-colors hover:border-primary"
+              href="tel:+17548006115"
+              aria-label={`Call NGS at ${site.callNumber}`}
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-8 py-4 text-lg font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-colors hover:bg-apricot-light"
             >
-              <Phone className="h-5 w-5 text-primary" aria-hidden="true" />
-              Call: {site.callNumber}
+              <Phone className="h-5 w-5" aria-hidden="true" />
+              Call NGS
             </a>
           </div>
 
           <ul className="mt-10 flex flex-wrap gap-3">
-            {["Estimated delivery: 5\u201310 business days", "Secure & tracked shipping"].map((item) => (
+            {["Secure & tracked shipping"].map((item) => (
               <li
                 key={item}
                 className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-4 py-2 text-sm font-semibold text-foreground"
