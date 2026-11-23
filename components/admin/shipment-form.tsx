@@ -1,6 +1,7 @@
 "use client"
 
 import { useActionState, useEffect, useMemo, useState } from "react"
+import { htgTotal, PAYMENT_CURRENCIES, type PaymentCurrency } from "@/lib/invoice-lines"
 import { createShipment, updateShipment } from "@/lib/actions/admin"
 import {
   ACTIVE_DESTINATIONS,
@@ -18,15 +19,19 @@ const inputClass =
   "w-full rounded-lg border border-input bg-navy-deep px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
 const labelClass = "text-xs font-medium uppercase tracking-wide text-muted-foreground"
 
+const htgFormat = new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+
 export function ShipmentForm({
   customers,
   shipment,
   destinationRates,
+  htgRate,
   onDone,
 }: {
   customers: Customer[]
   shipment?: Shipment
   destinationRates: DestinationRate[]
+  htgRate: number | null
   onDone: () => void
 }) {
   const action = shipment ? updateShipment : createShipment
@@ -78,6 +83,19 @@ export function ShipmentForm({
   const numericFee = Math.max(0, Number.parseFloat(generalFee) || 0)
   const numericInsurance = Math.max(0, Number.parseFloat(insurance) || 0)
   const total = roundMoney(amount + numericFee + numericInsurance)
+
+  // New invoices start from today's rate; saved invoices keep their own rate.
+  const [paymentCurrency, setPaymentCurrency] = useState<PaymentCurrency>(
+    shipment?.payment_currency === "HTG" ? "HTG" : "USD",
+  )
+  const [exchangeRate, setExchangeRate] = useState(() => {
+    const initial = shipment ? shipment.exchange_rate : htgRate
+    return initial != null && Number(initial) > 0 ? String(Number(initial)) : ""
+  })
+  const numericExchangeRate = Number.parseFloat(exchangeRate)
+  const hasExchangeRate = Number.isFinite(numericExchangeRate) && numericExchangeRate > 0
+  const totalInHtg = hasExchangeRate ? htgTotal(total, numericExchangeRate) : null
+
   const billedWeight = billableWeight(lineItems)
   const hasConfiguredRate = destination !== "" && rateMap.get(destination) != null
 
@@ -351,6 +369,79 @@ export function ShipmentForm({
           </span>
         </div>
       </div>
+
+      <fieldset className="flex flex-col gap-3 rounded-lg border border-border p-4">
+        <legend className="px-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">Payment</legend>
+        <div className="flex flex-col gap-1.5">
+          <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground" id="payment-currency-label">
+            Lajan peman
+          </span>
+          <div role="radiogroup" aria-labelledby="payment-currency-label" className="grid grid-cols-2 gap-2">
+            {PAYMENT_CURRENCIES.map((option) => (
+              <label
+                key={option}
+                className={`flex cursor-pointer items-center justify-center rounded-lg border px-3 py-2.5 text-sm font-semibold transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary ${
+                  paymentCurrency === option
+                    ? "border-primary bg-primary/10 text-foreground"
+                    : "border-input text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="payment_currency"
+                  value={option}
+                  checked={paymentCurrency === option}
+                  onChange={() => setPaymentCurrency(option)}
+                  className="sr-only"
+                />
+                {option}
+              </label>
+            ))}
+          </div>
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="exchange_rate" className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            To du jour: 1 USD = ___ HTG
+          </label>
+          <div className="relative">
+            <input
+              id="exchange_rate"
+              name="exchange_rate"
+              type="number"
+              step="0.0001"
+              min="0.0001"
+              inputMode="decimal"
+              required={paymentCurrency === "HTG"}
+              value={exchangeRate}
+              onChange={(e) => setExchangeRate(e.target.value)}
+              placeholder="e.g. 131.50"
+              className={`${inputClass} pr-14`}
+              aria-describedby="exchange-rate-help"
+            />
+            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+              HTG
+            </span>
+          </div>
+          <p id="exchange-rate-help" className="text-xs text-muted-foreground">
+            {shipment
+              ? "This invoice keeps its saved rate. Change it here only if needed."
+              : htgRate
+                ? `Prefilled from today's rate (1 USD = ${htgRate} HTG). You can change it for this invoice.`
+                : "No To du jour set in Settings. Enter a rate for this invoice."}
+          </p>
+        </div>
+        <div className="flex items-center justify-between rounded-lg bg-card px-3 py-2.5 text-sm">
+          <span className="font-semibold text-foreground">Total HTG</span>
+          <span className="text-base font-bold text-primary" aria-live="polite">
+            {totalInHtg != null ? `${htgFormat.format(totalInHtg)} HTG` : "—"}
+          </span>
+        </div>
+        {paymentCurrency === "HTG" && !hasExchangeRate && (
+          <p className="text-xs text-apricot-light" role="alert">
+            Enter a To du jour greater than zero for HTG payments.
+          </p>
+        )}
+      </fieldset>
       {destination !== "" && !hasConfiguredRate && !hasLines && (
         <p className="text-xs text-apricot-light">
           No saved rate for {destination}. Enter a rate per pound to create the invoice.

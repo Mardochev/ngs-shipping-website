@@ -73,7 +73,8 @@ export default async function ShipmentReceiptPage({ params }: { params: Promise<
   const shipment = await getShipmentForPrint(id)
   if (!shipment) notFound()
 
-  const { lines, subtotal, generalFee, insurance, total, isLegacy } = computeInvoice(shipment)
+  const { lines, subtotal, generalFee, insurance, total, payment, isLegacy } = computeInvoice(shipment)
+  const htgFormat = new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 4 })
   const barcodeSvg = getBarcodeSvg(shipment.tracking_number, { height: 60 })
   const printedDate = new Date().toLocaleDateString("en-US", {
     timeZone: "America/New_York",
@@ -164,9 +165,19 @@ export default async function ShipmentReceiptPage({ params }: { params: Promise<
           <Line label="General Fee" value={usd.format(generalFee)} />
           {insurance > 0 ? <Line label="Insurance" value={usd.format(insurance)} /> : null}
           <div className="mt-0.5 flex justify-between gap-3 text-[18px] font-black">
-            <span>TOTAL</span>
+            <span>TOTAL USD</span>
             <span>{usd.format(total)}</span>
           </div>
+          {payment.rate != null && payment.totalHtg != null ? (
+            <>
+              <Line label="To du jour" value={`1 USD = ${htgFormat.format(payment.rate)} HTG`} />
+              <div className="flex justify-between gap-3 text-[16px] font-black">
+                <span>TOTAL HTG</span>
+                <span>{htgFormat.format(payment.totalHtg)} HTG</span>
+              </div>
+            </>
+          ) : null}
+          <Line label="Lajan peman" value={payment.currency} />
 
           <Divider />
 

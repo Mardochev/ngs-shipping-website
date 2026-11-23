@@ -25,6 +25,23 @@ export function roundMoney(value: number) {
   return Math.round(value * 100) / 100
 }
 
+export type PaymentCurrency = "USD" | "HTG"
+export const PAYMENT_CURRENCIES: PaymentCurrency[] = ["USD", "HTG"]
+export const MAX_HTG_RATE = 100000
+
+export function htgTotal(totalUsd: number, rate: number) {
+  return roundMoney(totalUsd * rate)
+}
+
+// Returns null for a blank value, NaN for an invalid one.
+export function parseHtgRate(raw: string): number | null {
+  const trimmed = raw.trim()
+  if (trimmed === "") return null
+  const rate = Number.parseFloat(trimmed)
+  if (!Number.isFinite(rate) || rate <= 0 || rate > MAX_HTG_RATE) return Number.NaN
+  return Math.round(rate * 10000) / 10000
+}
+
 export function lineTotal(item: Pick<InvoiceLineItem, "mode" | "quantity" | "unit_price" | "weight_lb" | "rate_per_lb">) {
   return item.mode === "flat"
     ? roundMoney(item.quantity * item.unit_price)
@@ -102,6 +119,9 @@ type BillableShipment = {
   general_fee: number | null
   insurance_fee?: number | null
   line_items?: InvoiceLineItem[] | null
+  payment_currency?: string | null
+  exchange_rate?: number | null
+  total_htg?: number | null
 }
 
 // Shipments saved before item lines existed have no line_items and keep the
@@ -143,5 +163,14 @@ export function computeInvoice(shipment: BillableShipment) {
 
   const subtotal = roundMoney(lines.reduce((sum, l) => sum + l.total, 0))
   const total = roundMoney(subtotal + generalFee + insurance)
-  return { lines, subtotal, generalFee, insurance, total, isLegacy: stored.length === 0 }
+
+  // The HTG amount saved with the invoice is shown as-is, so later changes to
+  // today's rate never alter an existing invoice.
+  const rate = shipment.exchange_rate != null && Number(shipment.exchange_rate) > 0 ? Number(shipment.exchange_rate) : null
+  const payment = {
+    currency: (shipment.payment_currency === "HTG" ? "HTG" : "USD") as PaymentCurrency,
+    rate,
+    totalHtg: rate == null ? null : shipment.total_htg != null ? Number(shipment.total_htg) : htgTotal(total, rate),
+  }
+  return { lines, subtotal, generalFee, insurance, total, payment, isLegacy: stored.length === 0 }
 }

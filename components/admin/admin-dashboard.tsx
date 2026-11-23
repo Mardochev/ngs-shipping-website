@@ -169,7 +169,12 @@ export function AdminDashboard({
           )}
 
           {tab === "shipments" && (
-            <ShipmentsPanel shipments={shipments} customers={customers} destinationRates={destinationRates} />
+            <ShipmentsPanel
+            shipments={shipments}
+            customers={customers}
+            destinationRates={destinationRates}
+            htgRate={settings.htg_rate}
+          />
           )}
           {tab === "manifests" && (
             <ManifestsPanel

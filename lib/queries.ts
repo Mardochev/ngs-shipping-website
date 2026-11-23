@@ -49,6 +49,7 @@ export async function getSettings(): Promise<AppSettings> {
       id: 0,
       rate_per_lb: 3.5,
       currency: "USD",
+      htg_rate: null,
       updated_at: new Date().toISOString(),
     }
   )
