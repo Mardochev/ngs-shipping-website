@@ -11,6 +11,8 @@ import {
   type Shipment,
 } from "@/lib/types"
 import { SubmitButton } from "./submit-button"
+import { billableWeight, lineTotal, roundMoney } from "@/lib/invoice-lines"
+import { ShipmentLineItems, draftToItem, draftsFromItems, type LineDraft } from "./shipment-line-items"
 
 const inputClass =
   "w-full rounded-lg border border-input bg-navy-deep px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
@@ -61,11 +63,22 @@ export function ShipmentForm({
     setRate(configured != null ? String(configured) : "")
   }
 
+  const [lines, setLines] = useState<LineDraft[]>(() => draftsFromItems(shipment?.line_items))
+  const [insurance, setInsurance] = useState(
+    shipment ? String(Number(shipment.insurance_fee ?? 0).toFixed(2)) : "0.00",
+  )
+  const hasLines = lines.length > 0
+  const lineItems = lines.map(draftToItem)
+
   const numericRate = Number.parseFloat(rate) || 0
   const numericWeight = Number.parseFloat(weight) || 0
-  const amount = Math.round(numericWeight * numericRate * 100) / 100
+  const amount = hasLines
+    ? roundMoney(lineItems.reduce((sum, item) => sum + lineTotal(item), 0))
+    : roundMoney(numericWeight * numericRate)
   const numericFee = Math.max(0, Number.parseFloat(generalFee) || 0)
-  const total = Math.round((amount + numericFee) * 100) / 100
+  const numericInsurance = Math.max(0, Number.parseFloat(insurance) || 0)
+  const total = roundMoney(amount + numericFee + numericInsurance)
+  const billedWeight = billableWeight(lineItems)
   const hasConfiguredRate = destination !== "" && rateMap.get(destination) != null
 
   useEffect(() => {
@@ -75,6 +88,7 @@ export function ShipmentForm({
   return (
     <form action={formAction} className="flex flex-col gap-4">
       {shipment && <input type="hidden" name="id" value={shipment.id} />}
+      <input type="hidden" name="line_items" value={hasLines ? JSON.stringify(lineItems) : ""} />
 
       {state?.error && (
         <p className="rounded-lg border border-apricot-light/40 bg-apricot-light/10 px-3 py-2 text-sm text-apricot-light" role="alert">
@@ -132,7 +146,7 @@ export function ShipmentForm({
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="flex flex-col gap-1.5">
           <label className={labelClass} htmlFor="weight_lb">
-            Weight (lb)
+            {hasLines ? "Actual weight (lb) · manifest" : "Weight (lb)"}
           </label>
           <input
             id="weight_lb"
@@ -148,7 +162,7 @@ export function ShipmentForm({
         </div>
         <div className="flex flex-col gap-1.5">
           <label className={labelClass} htmlFor="rate_per_lb">
-            Rate / lb (USD)
+            {hasLines ? "Default rate / lb" : "Rate / lb (USD)"}
           </label>
           <input
             id="rate_per_lb"
@@ -156,7 +170,7 @@ export function ShipmentForm({
             type="number"
             step="0.01"
             min="0"
-            required
+            required={!hasLines}
             value={rate}
             onChange={(e) => setRate(e.target.value)}
             placeholder="Set by destination"
@@ -272,10 +286,20 @@ export function ShipmentForm({
         </div>
       </div>
 
+      <ShipmentLineItems lines={lines} onChange={setLines} defaultRate={rate} />
+      {hasLines && (
+        <p className="text-xs leading-relaxed text-muted-foreground">
+          Billable weight (per-lb lines): {billedWeight} lb. Actual weight for the manifest: {numericWeight} lb.
+          {billedWeight > numericWeight && numericWeight > 0 && (
+            <span className="text-apricot-light"> Billable weight is higher than the actual weight.</span>
+          )}
+        </p>
+      )}
+
       {/* Live amount preview, separate General Fee, and Total + missing-rate warning */}
       <div className="flex flex-col divide-y divide-border rounded-lg border border-border bg-card text-sm">
         <div className="flex items-center justify-between px-3 py-2.5">
-          <span className="text-muted-foreground">Amount (Weight × Rate)</span>
+          <span className="text-muted-foreground">{hasLines ? "Items subtotal" : "Amount (Weight × Rate)"}</span>
           <span className="font-semibold text-foreground">${amount.toFixed(2)}</span>
         </div>
         <div className="flex items-center justify-between gap-3 px-3 py-2">
@@ -299,6 +323,27 @@ export function ShipmentForm({
             />
           </div>
         </div>
+        <div className="flex items-center justify-between gap-3 px-3 py-2">
+          <label htmlFor="insurance_fee" className="text-muted-foreground">
+            Insurance
+          </label>
+          <div className="relative w-32">
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+              $
+            </span>
+            <input
+              id="insurance_fee"
+              name="insurance_fee"
+              type="number"
+              step="0.01"
+              min="0"
+              inputMode="decimal"
+              value={insurance}
+              onChange={(e) => setInsurance(e.target.value)}
+              className={`${inputClass} py-1.5 pl-7 text-right`}
+            />
+          </div>
+        </div>
         <div className="flex items-center justify-between px-3 py-2.5">
           <span className="font-semibold text-foreground">Total</span>
           <span className="text-base font-bold text-primary" aria-live="polite">
@@ -306,7 +351,7 @@ export function ShipmentForm({
           </span>
         </div>
       </div>
-      {destination !== "" && !hasConfiguredRate && (
+      {destination !== "" && !hasConfiguredRate && !hasLines && (
         <p className="text-xs text-apricot-light">
           No saved rate for {destination}. Enter a rate per pound to create the invoice.
         </p>

@@ -10,6 +10,7 @@ import {
   clearAdminSession,
 } from "@/lib/session"
 import { ACTIVE_DESTINATIONS, DEFAULT_GENERAL_FEE, SHIPMENT_STATUSES, type ShipmentStatus } from "@/lib/types"
+import { billableWeight, lineTotal, parseLineItems, roundMoney, type InvoiceLineItem } from "@/lib/invoice-lines"
 
 type ActionResult = { error?: string; success?: string }
 
@@ -202,6 +203,28 @@ function parseGeneralFee(formData: FormData): number | null {
   return Math.round(fee * 100) / 100
 }
 
+function parseInsuranceFee(formData: FormData): number | null {
+  const raw = String(formData.get("insurance_fee") ?? "").trim()
+  if (raw === "") return 0
+  const fee = Number.parseFloat(raw)
+  if (Number.isNaN(fee) || fee < 0 || fee > 100000) return null
+  return roundMoney(fee)
+}
+
+// With item lines, the shipping amount is the sum of the lines and the billable
+// weight is only the per-lb lines, so flat-priced devices are never also
+// charged by weight. Without lines, the original Weight × Rate applies.
+function resolveBilling(items: InvoiceLineItem[], weight: number, rate: number | null) {
+  if (items.length > 0) {
+    return {
+      cost: roundMoney(items.reduce((sum, item) => sum + lineTotal(item), 0)),
+      line_items: items,
+      billable_weight_lb: billableWeight(items),
+    }
+  }
+  return { cost: roundMoney((rate ?? 0) * weight), line_items: null, billable_weight_lb: null }
+}
+
 export async function createShipment(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
   await requireAdmin()
   const supabase = getServiceClient()
@@ -228,17 +251,23 @@ export async function createShipment(_prev: ActionResult, formData: FormData): P
     return { error: "Please choose a destination in Haiti." }
   }
 
+  const parsedLines = parseLineItems(String(formData.get("line_items") ?? ""))
+  if ("error" in parsedLines) return { error: parsedLines.error }
+
   // Resolve the rate: an admin override wins; otherwise use the destination's
-  // configured rate. If neither exists, require the admin to enter one.
+  // configured rate. Item lines carry their own prices, so a rate is only
+  // required for single-line (legacy) billing.
   const rate = await resolveShipmentRate(supabase, destination, rateInput)
-  if (rate == null) {
+  if (rate == null && parsedLines.items.length === 0) {
     return {
       error: `No rate is configured for ${destination}. Enter a rate per pound to create the invoice.`,
     }
   }
-  const cost = Math.round(rate * weight * 100) / 100
+  const billing = resolveBilling(parsedLines.items, weight, rate)
   const generalFee = parseGeneralFee(formData)
   if (generalFee == null) return { error: "General Fee must be zero or more." }
+  const insuranceFee = parseInsuranceFee(formData)
+  if (insuranceFee == null) return { error: "Insurance must be zero or more." }
 
   // Auto-generate tracking number if not provided
   if (!tracking) {
@@ -254,9 +283,10 @@ export async function createShipment(_prev: ActionResult, formData: FormData): P
       description: description || null,
       shipping_method: shippingMethod,
       weight_lb: weight,
-      cost,
+      ...billing,
       rate_per_lb: rate,
       general_fee: generalFee,
+      insurance_fee: insuranceFee,
       status,
       origin,
       destination,
@@ -305,16 +335,23 @@ export async function updateShipment(_prev: ActionResult, formData: FormData): P
 
   if (!SHIPMENT_STATUSES.includes(status)) return { error: "Invalid status." }
   if (!destination) return { error: "Destination is required." }
+  if (weight <= 0) return { error: "Weight must be greater than zero." }
+
+  const parsedLines = parseLineItems(String(formData.get("line_items") ?? ""))
+  if ("error" in parsedLines) return { error: parsedLines.error }
 
   // The submitted rate is the final saved rate for this shipment (an admin
-  // override, or the destination rate the form auto-loaded). Amount = weight × rate.
+  // override, or the destination rate the form auto-loaded). Without item
+  // lines, Amount = weight × rate exactly as before.
   const rate = await resolveShipmentRate(supabase, destination, rateInput)
-  if (rate == null) {
+  if (rate == null && parsedLines.items.length === 0) {
     return { error: `No rate is configured for ${destination}. Enter a rate per pound.` }
   }
-  const cost = Math.round(rate * weight * 100) / 100
+  const billing = resolveBilling(parsedLines.items, weight, rate)
   const generalFee = parseGeneralFee(formData)
   if (generalFee == null) return { error: "General Fee must be zero or more." }
+  const insuranceFee = parseInsuranceFee(formData)
+  if (insuranceFee == null) return { error: "Insurance must be zero or more." }
 
   const { error } = await supabase
     .from("packages")
@@ -323,9 +360,10 @@ export async function updateShipment(_prev: ActionResult, formData: FormData): P
       description: description || null,
       shipping_method: shippingMethod,
       weight_lb: weight,
-      cost,
+      ...billing,
       rate_per_lb: rate,
       general_fee: generalFee,
+      insurance_fee: insuranceFee,
       status,
       origin,
       destination,
