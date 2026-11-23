@@ -10,7 +10,15 @@ import {
   clearAdminSession,
 } from "@/lib/session"
 import { ACTIVE_DESTINATIONS, DEFAULT_GENERAL_FEE, SHIPMENT_STATUSES, type ShipmentStatus } from "@/lib/types"
-import { billableWeight, lineTotal, parseLineItems, roundMoney, type InvoiceLineItem } from "@/lib/invoice-lines"
+import {
+  billableWeight,
+  htgTotal,
+  lineTotal,
+  parseHtgRate,
+  parseLineItems,
+  roundMoney,
+  type InvoiceLineItem,
+} from "@/lib/invoice-lines"
 
 type ActionResult = { error?: string; success?: string }
 
@@ -211,6 +219,24 @@ function parseInsuranceFee(formData: FormData): number | null {
   return roundMoney(fee)
 }
 
+// The HTG total is recomputed here from the server-side USD total, never
+// taken from the browser. HTG payments require a rate above zero.
+function resolvePayment(formData: FormData, totalUsd: number) {
+  const currency = String(formData.get("payment_currency") ?? "USD") === "HTG" ? "HTG" : "USD"
+  const rate = parseHtgRate(String(formData.get("exchange_rate") ?? ""))
+  if (rate != null && Number.isNaN(rate)) {
+    return { error: "To du jour must be a number greater than zero." } as const
+  }
+  if (currency === "HTG" && rate == null) {
+    return { error: "Enter a To du jour greater than zero for HTG payments." } as const
+  }
+  return {
+    payment_currency: currency,
+    exchange_rate: rate,
+    total_htg: rate == null ? null : htgTotal(totalUsd, rate),
+  } as const
+}
+
 // With item lines, the shipping amount is the sum of the lines and the billable
 // weight is only the per-lb lines, so flat-priced devices are never also
 // charged by weight. Without lines, the original Weight × Rate applies.
@@ -268,6 +294,8 @@ export async function createShipment(_prev: ActionResult, formData: FormData): P
   if (generalFee == null) return { error: "General Fee must be zero or more." }
   const insuranceFee = parseInsuranceFee(formData)
   if (insuranceFee == null) return { error: "Insurance must be zero or more." }
+  const payment = resolvePayment(formData, roundMoney(billing.cost + generalFee + insuranceFee))
+  if ("error" in payment) return { error: payment.error }
 
   // Auto-generate tracking number if not provided
   if (!tracking) {
@@ -287,6 +315,7 @@ export async function createShipment(_prev: ActionResult, formData: FormData): P
       rate_per_lb: rate,
       general_fee: generalFee,
       insurance_fee: insuranceFee,
+      ...payment,
       status,
       origin,
       destination,
@@ -352,6 +381,8 @@ export async function updateShipment(_prev: ActionResult, formData: FormData): P
   if (generalFee == null) return { error: "General Fee must be zero or more." }
   const insuranceFee = parseInsuranceFee(formData)
   if (insuranceFee == null) return { error: "Insurance must be zero or more." }
+  const payment = resolvePayment(formData, roundMoney(billing.cost + generalFee + insuranceFee))
+  if ("error" in payment) return { error: payment.error }
 
   const { error } = await supabase
     .from("packages")
@@ -364,6 +395,7 @@ export async function updateShipment(_prev: ActionResult, formData: FormData): P
       rate_per_lb: rate,
       general_fee: generalFee,
       insurance_fee: insuranceFee,
+      ...payment,
       status,
       origin,
       destination,
@@ -446,6 +478,27 @@ export async function updateSettings(_prev: ActionResult, formData: FormData): P
   }
   revalidatePath("/admin")
   return { success: "Settings saved." }
+}
+
+// Today's USD → HTG rate. Only prefills new invoices; saved invoices keep
+// the rate and HTG total stored on them.
+export async function updateExchangeRate(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
+  await requireAdmin()
+  const supabase = getServiceClient()
+  const rate = parseHtgRate(String(formData.get("htg_rate") ?? ""))
+  if (rate == null || Number.isNaN(rate)) return { error: "Enter a To du jour greater than zero." }
+
+  const { data: existing } = await supabase.from("app_settings").select("id").limit(1).maybeSingle()
+  const { error } = existing
+    ? await supabase
+        .from("app_settings")
+        .update({ htg_rate: rate, updated_at: new Date().toISOString() })
+        .eq("id", existing.id)
+    : await supabase.from("app_settings").insert({ htg_rate: rate })
+  if (error) return { error: error.message }
+
+  revalidatePath("/admin")
+  return { success: `To du jour saved: 1 USD = ${rate} HTG.` }
 }
 
 // Save each destination's configured price per pound. Paired hidden

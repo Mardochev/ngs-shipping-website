@@ -98,6 +98,10 @@ export type Shipment = {
   line_items: InvoiceLineItem[] | null
   billable_weight_lb: number | null
   insurance_fee: number
+  // Rate and HTG total frozen on the invoice when it was saved.
+  payment_currency: "USD" | "HTG"
+  exchange_rate: number | null
+  total_htg: number | null
   created_at: string
   updated_at: string
 }
@@ -172,6 +176,8 @@ export type AppSettings = {
   id: number
   rate_per_lb: number
   currency: string
+  // Today's rate (1 USD = htg_rate HTG) prefilled on new invoices.
+  htg_rate: number | null
   updated_at: string
 }
 

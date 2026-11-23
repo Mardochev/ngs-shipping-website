@@ -67,6 +67,8 @@ div:has(> .invoice-page) {
 }
 `
 
+const htgFormat = new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 4 })
+
 function formatDate(value: string | null) {
   if (!value) return "—"
   return new Date(value).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
@@ -81,7 +83,7 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
   if (!shipment) notFound()
 
   const customer = shipment.customers
-  const { lines, subtotal: amount, generalFee, insurance, total, isLegacy } = computeInvoice(shipment)
+  const { lines, subtotal: amount, generalFee, insurance, total, payment, isLegacy } = computeInvoice(shipment)
   const invoiceNo = `INV-${shipment.tracking_number.replace(/[^0-9A-Za-z]/g, "").slice(-8).toUpperCase()}`
   const paymentStatus = shipment.payment_status ?? "UNPAID"
   const isPaid = paymentStatus === "PAID"
@@ -260,6 +262,22 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
                 >
                   <span>Final Total (USD)</span>
                   <span>${total.toFixed(2)}</span>
+                </div>
+                {payment.rate != null && payment.totalHtg != null && (
+                  <>
+                    <div className="mt-1 flex justify-between text-sm text-slate-700">
+                      <span>To du jour</span>
+                      <span>1 USD = {htgFormat.format(payment.rate)} HTG</span>
+                    </div>
+                    <div className="flex justify-between text-base font-bold text-slate-900">
+                      <span>Total pou peye (HTG)</span>
+                      <span>{htgFormat.format(payment.totalHtg)} HTG</span>
+                    </div>
+                  </>
+                )}
+                <div className="flex justify-between text-sm text-slate-700">
+                  <span>Lajan peman</span>
+                  <span className="font-semibold text-slate-900">{payment.currency}</span>
                 </div>
               </div>
             </div>

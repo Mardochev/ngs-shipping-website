@@ -18,10 +18,12 @@ export function ShipmentsPanel({
   shipments,
   customers,
   destinationRates,
+  htgRate,
 }: {
   shipments: ShipmentWithCustomer[]
   customers: Customer[]
   destinationRates: DestinationRate[]
+  htgRate: number | null
 }) {
   const [creating, setCreating] = useState(false)
   const [editing, setEditing] = useState<Shipment | null>(null)
@@ -158,7 +160,12 @@ export function ShipmentsPanel({
       </div>
 
       <Modal open={creating} onClose={() => setCreating(false)} title="New shipment">
-        <ShipmentForm customers={customers} destinationRates={destinationRates} onDone={() => setCreating(false)} />
+        <ShipmentForm
+            customers={customers}
+            destinationRates={destinationRates}
+            htgRate={htgRate}
+            onDone={() => setCreating(false)}
+          />
       </Modal>
       <Modal open={!!editing} onClose={() => setEditing(null)} title={`Edit ${editing?.tracking_number ?? ""}`}>
         {editing && (
@@ -166,6 +173,7 @@ export function ShipmentsPanel({
             customers={customers}
             shipment={editing}
             destinationRates={destinationRates}
+            htgRate={htgRate}
             onDone={() => setEditing(null)}
           />
         )}
