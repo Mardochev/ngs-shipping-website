@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Printer, ArrowLeft, Download, Check, X } from "lucide-react"
+import { Printer, ArrowLeft, Download, Check, X, Receipt } from "lucide-react"
 import { setPaymentStatus } from "@/lib/actions/admin"
 
 export function InvoiceActions({
@@ -52,6 +52,12 @@ export function InvoiceActions({
           </button>
         </form>
 
+        <Link
+          href={`/admin/shipments/${shipmentId}/receipt`}
+          className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
+        >
+          <Receipt className="h-4 w-4" /> Thermal Receipt
+        </Link>
         <button
           type="button"
           onClick={() => window.print()}

@@ -25,14 +25,20 @@ function printReceipt() {
   window.print()
 }
 
-export function ThermalReceiptActions({ backHref }: { backHref: string }) {
+export function ThermalReceiptActions({
+  backHref,
+  backLabel = "Back to Shipper Letter",
+}: {
+  backHref: string
+  backLabel?: string
+}) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
       <Link
         href={backHref}
         className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
       >
-        <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Back to Shipper Letter
+        <ArrowLeft className="h-4 w-4" aria-hidden="true" /> {backLabel}
       </Link>
       <button
         type="button"

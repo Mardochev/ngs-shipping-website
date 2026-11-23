@@ -1,3 +1,5 @@
+import type { InvoiceLineItem } from "@/lib/invoice-lines"
+
 export type ShipmentStatus =
   | "Processing"
   | "In Transit"
@@ -91,6 +93,11 @@ export type Shipment = {
   quantity: number
   declared_value: number
   manifest_id: string | null
+  // Itemized billing. Null on shipments saved before item lines existed;
+  // weight_lb stays the actual weight used for the manifest.
+  line_items: InvoiceLineItem[] | null
+  billable_weight_lb: number | null
+  insurance_fee: number
   created_at: string
   updated_at: string
 }
