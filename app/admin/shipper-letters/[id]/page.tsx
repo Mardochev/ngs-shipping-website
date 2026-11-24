@@ -14,8 +14,9 @@ import {
   getLetterPackages,
   summarizeLetterPayments,
   PAYMENT_TO_VERIFY,
+  formatPaymentAmount,
 } from "@/lib/shipper-letter-types"
-import { ShipperLetterPaymentsPanel, formatPaymentAmount } from "@/components/admin/shipper-letter-payments-panel"
+import { ShipperLetterPaymentsPanel } from "@/components/admin/shipper-letter-payments-panel"
 import { ShipperLetterPrintButton } from "@/components/admin/shipper-letter-print-button"
 import { ShipperLetterPaymentForm } from "@/components/admin/shipper-letter-payment-form"
 import { ShipperLetterDeliveryForm } from "@/components/admin/shipper-letter-delivery-form"

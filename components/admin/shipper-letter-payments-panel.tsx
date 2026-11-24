@@ -12,6 +12,7 @@ import {
   PAYMENT_CURRENCIES,
   PAYMENT_LOCATIONS,
   PAYMENT_METHODS,
+  formatPaymentAmount,
   summarizeLetterPayments,
   type PaymentCurrency,
   type ShipperLetterPayment,
@@ -26,10 +27,6 @@ const inputClass =
 function todayIso() {
   const d = new Date()
   return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10)
-}
-
-export function formatPaymentAmount(p: Pick<ShipperLetterPayment, "amount" | "currency">) {
-  return p.currency === "HTG" ? `${htg.format(p.amount)} HTG` : usd.format(p.amount)
 }
 
 export function ShipperLetterPaymentsPanel({

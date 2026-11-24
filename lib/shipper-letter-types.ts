@@ -168,3 +168,11 @@ export function summarizeLetterPayments(
   else if (totalPaid > 0) status = "Partially Paid"
   return { invoiceTotal, totalPaid, balanceDue, status, balanceConfirmed: historyVerified }
 }
+
+const usdAmount = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" })
+const htgAmount = new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+
+export function formatPaymentAmount(p: Pick<ShipperLetterPayment, "amount" | "currency">) {
+  const amount = Number(p.amount)
+  return p.currency === "HTG" ? `${htgAmount.format(amount)} HTG` : usdAmount.format(amount)
+}
