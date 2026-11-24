@@ -234,11 +234,12 @@ export default async function ShipperLetterReceiptPage({ params }: { params: Pro
           <Divider />
 
           <Line label="Total paid" value={usd.format(summary.totalPaid)} />
-          {summary.balanceConfirmed ? (
-            <div className="mt-0.5 flex justify-between gap-3 text-[18px] font-black">
-              <span>BALANCE DUE</span>
-              <span>{summary.balanceDue === null ? "—" : usd.format(summary.balanceDue)}</span>
-            </div>
+          <div className="mt-0.5 flex justify-between gap-3 text-[18px] font-black">
+            <span>BALANCE DUE</span>
+            <span>{summary.balanceDue === null ? "—" : usd.format(summary.balanceDue)}</span>
+          </div>
+          {!summary.balanceConfirmed ? (
+            <p className="text-right text-[12px] font-bold">Provisional, pending verification</p>
           ) : null}
           <p className="text-center text-[15px] font-black uppercase">{summary.status}</p>
 

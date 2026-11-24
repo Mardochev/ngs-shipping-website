@@ -100,8 +100,11 @@ export function ShipperLetterPaymentsPanel({
         <div className="flex flex-col gap-1 rounded-lg border border-primary/40 bg-primary/10 p-3">
           <dt className="text-muted-foreground">Balance due</dt>
           <dd className="font-mono font-bold text-foreground">
-            {!summary.balanceConfirmed ? "To verify" : summary.balanceDue === null ? "—" : usd.format(summary.balanceDue)}
-          </dd>
+                {summary.balanceDue === null ? "—" : usd.format(summary.balanceDue)}
+                {!summary.balanceConfirmed ? (
+                  <span className="block text-xs font-normal text-muted-foreground">Provisional, to verify</span>
+                ) : null}
+              </dd>
         </div>
       </dl>
 
