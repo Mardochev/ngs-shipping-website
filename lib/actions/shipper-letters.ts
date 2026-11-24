@@ -5,7 +5,12 @@ import { redirect } from "next/navigation"
 import { getServiceClient } from "@/lib/supabase/admin"
 import { getAdminSession } from "@/lib/session"
 import {
+  MAX_LETTER_FIXED_ITEMS,
   MAX_LETTER_PACKAGES,
+  computeLetterLoad,
+  fixedItemsCharge,
+  getLetterFixedItems,
+  type ShipperLetterFixedItem,
   PAYMENT_CURRENCIES,
   PAYMENT_LOCATIONS,
   PAYMENT_METHODS,
@@ -31,16 +36,60 @@ function text(formData: FormData, key: string, max = 200) {
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-// Package rows are the source of truth; the combined count, weight and description
-// columns are derived from them so the Manifest and older screens keep working.
-function parsePackages(raw: FormDataEntryValue | null) {
-  let input: unknown
+function parseJsonArray(raw: FormDataEntryValue | null): unknown[] | null {
   try {
-    input = JSON.parse(String(raw ?? "[]"))
+    const input = JSON.parse(String(raw ?? "[]"))
+    return Array.isArray(input) ? input : null
   } catch {
-    return { error: "Please check the package list and try again." }
+    return null
   }
-  if (!Array.isArray(input) || input.length === 0) return { error: "Add at least one package." }
+}
+
+function parseFixedItems(raw: FormDataEntryValue | null) {
+  const input = parseJsonArray(raw)
+  if (!input) return { error: "Please check the fixed-price items and try again." }
+  if (input.length > MAX_LETTER_FIXED_ITEMS) {
+    return { error: `A Shipper Letter can list up to ${MAX_LETTER_FIXED_ITEMS} fixed-price items.` }
+  }
+  const items: ShipperLetterFixedItem[] = []
+  for (const [index, entry] of input.entries()) {
+    const row = (entry ?? {}) as Record<string, unknown>
+    const n = index + 1
+    const description = String(row.description ?? "").trim().slice(0, 200)
+    const quantity = Number(row.quantity)
+    const unitPrice = Number(row.unit_price)
+    const weight = Number(row.weight)
+    if (!description) return { error: `Fixed-price item ${n}: description is required.` }
+    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 1000) {
+      return { error: `Fixed-price item ${n}: quantity must be a whole number from 1 to 1000.` }
+    }
+    if (!Number.isFinite(unitPrice) || unitPrice < 0 || unitPrice > 100000) {
+      return { error: `Fixed-price item ${n}: enter a valid shipping price per item.` }
+    }
+    if (!Number.isFinite(weight) || weight <= 0 || weight > 100000) {
+      return { error: `Fixed-price item ${n}: enter its actual weight in lbs.` }
+    }
+    items.push({
+      description,
+      quantity,
+      unit_price: Math.round(unitPrice * 100) / 100,
+      weight: Math.round(weight * 100) / 100,
+      in_existing_box: row.in_existing_box === true,
+    })
+  }
+  return { items }
+}
+
+// Package rows and fixed-price items are the source of truth; the combined count,
+// weight and description columns are derived from them so the Manifest, label and
+// older screens keep working without double-counting.
+function parseContents(
+  rawPackages: FormDataEntryValue | null,
+  rawFixedItems: FormDataEntryValue | null,
+  { allowFixedItems }: { allowFixedItems: boolean },
+) {
+  const input = parseJsonArray(rawPackages)
+  if (!input) return { error: "Please check the package list and try again." }
   if (input.length > MAX_LETTER_PACKAGES) return { error: `A Shipper Letter can list up to ${MAX_LETTER_PACKAGES} packages.` }
 
   const packages: ShipperLetterPackage[] = []
@@ -54,15 +103,39 @@ function parsePackages(raw: FormDataEntryValue | null) {
     packages.push({ description, weight: Math.round(weight * 100) / 100 })
   }
 
+  let fixedItems: ShipperLetterFixedItem[] = []
+  if (allowFixedItems) {
+    const parsed = parseFixedItems(rawFixedItems)
+    if ("error" in parsed) return { error: parsed.error }
+    fixedItems = parsed.items
+  }
+
+  if (packages.length === 0 && fixedItems.length === 0) return { error: "Add at least one package." }
+
+  const inBoxWeight = fixedItems.reduce((sum, i) => sum + (i.in_existing_box ? i.weight : 0), 0)
+  if (inBoxWeight > 0 && packages.length === 0) {
+    return { error: "An item marked as packed in an existing box needs that box listed under Packages." }
+  }
+  if (inBoxWeight > sumPackageWeight(packages) + 0.001) {
+    return { error: "Items packed inside a box can't weigh more than the boxes they are packed in." }
+  }
+
+  const load = computeLetterLoad(packages, fixedItems)
+  const description = [
+    ...packages.map((p) => p.description),
+    ...fixedItems.map((i) => (i.quantity > 1 ? `${i.quantity} × ${i.description}` : i.description)),
+  ]
+    .join(", ")
+    .slice(0, 1000)
+
   return {
+    fixedCharge: load.fixedCharge,
     columns: {
       packages,
-      number_of_packages: packages.length,
-      total_weight: sumPackageWeight(packages),
-      package_description: packages
-        .map((p) => p.description)
-        .join(", ")
-        .slice(0, 1000),
+      ...(allowFixedItems ? { fixed_items: fixedItems } : {}),
+      number_of_packages: load.packageCount,
+      total_weight: load.totalWeight,
+      package_description: description,
     },
   }
 }
@@ -108,7 +181,8 @@ export async function submitShipperLetter(
     return { error: "Please enter a valid date." }
   }
 
-  const parsedPackages = parsePackages(formData.get("packages"))
+  // Customers only list packages; fixed-price billing is added by staff.
+  const parsedPackages = parseContents(formData.get("packages"), null, { allowFixedItems: false })
   if ("error" in parsedPackages) return { error: parsedPackages.error }
   const declaredValue = Number(formData.get("declared_value"))
 
@@ -197,7 +271,9 @@ export async function updateShipperLetter(
     return { error: "Please enter a valid date." }
   }
 
-  const parsedPackages = parsePackages(formData.get("packages"))
+  const parsedPackages = parseContents(formData.get("packages"), formData.get("fixed_items"), {
+    allowFixedItems: true,
+  })
   if ("error" in parsedPackages) return { error: parsedPackages.error }
   const declaredValue = Number(formData.get("declared_value"))
 
@@ -206,28 +282,57 @@ export async function updateShipperLetter(
   }
 
   const supabase = getServiceClient()
-  const { data: existing, error: fetchError } = await supabase
-    .from("shipper_letters")
-    .select("destination_city")
-    .eq("id", id)
-    .maybeSingle()
+  const [{ data: existing, error: fetchError }, { data: received }] = await Promise.all([
+    supabase
+      .from("shipper_letters")
+      .select("destination_city, price, fees, total, fixed_items")
+      .eq("id", id)
+      .maybeSingle(),
+    supabase.from("shipper_letter_payments").select("amount_usd").eq("shipper_letter_id", id),
+  ])
   if (fetchError || !existing) return { error: "This Shipper Letter could not be found." }
+  const current = existing as {
+    destination_city: string
+    price: number | null
+    fees: number | null
+    total: number | null
+    fixed_items: ShipperLetterFixedItem[] | null
+  }
 
   // Older letters may carry a city that is no longer offered; keep accepting it.
-  const allowedCities = [...SHIPPER_LETTER_DESTINATIONS, (existing as { destination_city: string }).destination_city]
+  const allowedCities = [...SHIPPER_LETTER_DESTINATIONS, current.destination_city]
   if (!allowedCities.includes(values.destination_city)) {
     return { error: "Please choose a valid destination city." }
   }
 
+  // The invoice total includes the fixed-price charge exactly once: swap the previous
+  // fixed charge for the new one so a manually saved price/fee total is never altered otherwise.
+  const previousFixedCharge = fixedItemsCharge(getLetterFixedItems(current))
+  const newFixedCharge = parsedPackages.fixedCharge
+  let total: number | null = current.total === null ? null : Number(current.total)
+  if (previousFixedCharge !== newFixedCharge) {
+    total =
+      total !== null
+        ? Math.round((total - previousFixedCharge + newFixedCharge) * 100) / 100
+        : Math.round(((Number(current.price) || 0) + (Number(current.fees) || 0) + newFixedCharge) * 100) / 100
+    const { totalPaid } = summarizeLetterPayments(null, (received ?? []) as { amount_usd: number }[])
+    if (total < totalPaid) {
+      return {
+        error: `This change would make the invoice total ${total.toFixed(2)} USD, less than the ${totalPaid.toFixed(2)} USD already received.`,
+      }
+    }
+  }
+
   const specialInstructions = text(formData, "special_instructions", 1000)
 
-  // reference_number, status, payment and delivery fields are intentionally not touched here.
+  // reference_number, status, price/fee and delivery fields are intentionally not touched here.
   const { error } = await supabase
     .from("shipper_letters")
     .update({
       ...values,
       special_instructions: specialInstructions || null,
       ...parsedPackages.columns,
+      total,
       declared_value: Math.round(declaredValue * 100) / 100,
       updated_at: new Date().toISOString(),
     })
@@ -272,14 +377,17 @@ export async function updateShipperLetterPayment(
   if (price === null) return { error: "Please enter a valid price." }
   if (fees === null) return { error: "Please enter a valid assurance fee." }
 
-  // Total is always recomputed on the server; any client-sent total is ignored.
-  const total = Math.round((price + fees) * 100) / 100
-
   const supabase = getServiceClient()
-  const { data: received } = await supabase
-    .from("shipper_letter_payments")
-    .select("amount_usd")
-    .eq("shipper_letter_id", id)
+  const [{ data: letterRow }, { data: received }] = await Promise.all([
+    supabase.from("shipper_letters").select("fixed_items").eq("id", id).maybeSingle(),
+    supabase.from("shipper_letter_payments").select("amount_usd").eq("shipper_letter_id", id),
+  ])
+  if (!letterRow) return { error: "This Shipper Letter could not be found." }
+
+  // Total is always recomputed on the server; any client-sent total is ignored.
+  // Price covers per-pound parcels only; fixed-price items are added separately.
+  const fixedCharge = fixedItemsCharge(getLetterFixedItems(letterRow as { fixed_items: ShipperLetterFixedItem[] | null }))
+  const total = Math.round((price + fixedCharge + fees) * 100) / 100
   const { totalPaid } = summarizeLetterPayments(null, (received ?? []) as { amount_usd: number }[])
   if (total < totalPaid) {
     return { error: `The total can't be less than the ${totalPaid.toFixed(2)} USD already received.` }

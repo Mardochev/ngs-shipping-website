@@ -1,6 +1,6 @@
 "use client"
 
-import { useId, useState } from "react"
+import { useEffect, useId, useState } from "react"
 import { Plus, Trash2 } from "lucide-react"
 import { MAX_LETTER_PACKAGES, type ShipperLetterPackage } from "@/lib/shipper-letter-types"
 
@@ -8,8 +8,9 @@ type Row = { key: number; description: string; weight: string }
 
 let nextKey = 1
 
-function toRows(packages: ShipperLetterPackage[] | undefined): Row[] {
-  const source = packages && packages.length > 0 ? packages : [{ description: "", weight: 0 }]
+function toRows(packages: ShipperLetterPackage[] | undefined, allowEmpty: boolean): Row[] {
+  const source =
+    packages && (packages.length > 0 || allowEmpty) ? packages : [{ description: "", weight: 0 }]
   return source.map((p) => ({
     key: nextKey++,
     description: p.description,
@@ -20,18 +21,28 @@ function toRows(packages: ShipperLetterPackage[] | undefined): Row[] {
 export function PackageRowsField({
   inputClass,
   initialPackages,
+  allowEmpty = false,
+  onWeightsChange,
 }: {
   inputClass: string
   initialPackages?: ShipperLetterPackage[]
+  // Admin edit: a letter may hold only fixed-price items, so every row can be removed.
+  allowEmpty?: boolean
+  onWeightsChange?: (weights: number[]) => void
 }) {
   const baseId = useId()
-  const [rows, setRows] = useState<Row[]>(() => toRows(initialPackages))
+  const [rows, setRows] = useState<Row[]>(() => toRows(initialPackages, allowEmpty))
 
   const totalWeight =
     Math.round(rows.reduce((sum, r) => sum + (Number(r.weight) > 0 ? Number(r.weight) : 0), 0) * 100) / 100
   const serialized = JSON.stringify(
     rows.map((r) => ({ description: r.description.trim(), weight: Number(r.weight) })),
   )
+
+  const weightsKey = rows.map((r) => r.weight).join("|")
+  useEffect(() => {
+    onWeightsChange?.(weightsKey === "" ? [] : weightsKey.split("|").map((w) => (Number(w) > 0 ? Number(w) : 0)))
+  }, [weightsKey, onWeightsChange])
 
   function update(key: number, patch: Partial<Row>) {
     setRows((prev) => prev.map((r) => (r.key === key ? { ...r, ...patch } : r)))
@@ -41,6 +52,11 @@ export function PackageRowsField({
     <div className="flex flex-col gap-3 sm:col-span-2">
       <input type="hidden" name="packages" value={serialized} />
 
+      {rows.length === 0 ? (
+        <p className="rounded-lg border border-dashed border-border p-3 text-sm text-muted-foreground">
+          No per-pound packages. Add one if any fixed-price item is packed inside a box.
+        </p>
+      ) : null}
       <ol className="flex flex-col gap-3">
         {rows.map((row, index) => {
           const descId = `${baseId}-desc-${row.key}`
@@ -49,7 +65,7 @@ export function PackageRowsField({
             <li key={row.key} className="flex flex-col gap-2 rounded-lg border border-border p-3">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-xs font-bold uppercase tracking-wide text-primary">Package {index + 1}</span>
-                {rows.length > 1 ? (
+                {rows.length > 1 || allowEmpty ? (
                   <button
                     type="button"
                     onClick={() => setRows((prev) => prev.filter((r) => r.key !== row.key))}
