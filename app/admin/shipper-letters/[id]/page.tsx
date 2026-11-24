@@ -367,13 +367,16 @@ export default async function ShipperLetterDetailPage({ params }: { params: Prom
                   <dd className="font-mono text-slate-900">{usd.format(summary.totalPaid)}</dd>
                 </div>
                 <div className="mt-1 flex justify-between gap-4 border-t-2 border-[#0a1f44] pt-2">
-                  <dt className="font-bold uppercase text-[#0a1f44]">Balance Due</dt>
+                  <dt className="font-bold uppercase text-[#0a1f44]">
+                    Balance Due
+                    {!summary.balanceConfirmed ? (
+                      <span className="block text-[11px] font-semibold normal-case text-slate-600">
+                        Provisional, pending verification
+                      </span>
+                    ) : null}
+                  </dt>
                   <dd className="text-right font-mono text-lg font-extrabold text-[#0a1f44]">
-                    {!summary.balanceConfirmed
-                      ? PAYMENT_TO_VERIFY
-                      : summary.balanceDue === null
-                        ? "—"
-                        : usd.format(summary.balanceDue)}
+                    {summary.balanceDue === null ? "—" : usd.format(summary.balanceDue)}
                   </dd>
                 </div>
                 <div className="flex justify-between gap-4">
@@ -381,6 +384,12 @@ export default async function ShipperLetterDetailPage({ params }: { params: Prom
                   <dd className="font-bold text-slate-900">{summary.status}</dd>
                 </div>
               </dl>
+              {!summary.balanceConfirmed ? (
+                <p className="mt-3 ml-auto w-full max-w-xs border border-slate-400 p-2 text-xs leading-relaxed text-slate-700">
+                  <span className="font-bold uppercase">{PAYMENT_TO_VERIFY}:</span> this letter predates payment
+                  tracking. Payments made before tracking began may not be listed, so the balance is not yet confirmed.
+                </p>
+              ) : null}
             </section>
 
             <section className="sl-section border-t border-slate-200 pt-4">
