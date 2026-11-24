@@ -5,8 +5,17 @@ import { redirect } from "next/navigation"
 import { getServiceClient } from "@/lib/supabase/admin"
 import { getAdminSession } from "@/lib/session"
 import {
+  MAX_LETTER_PACKAGES,
+  PAYMENT_CURRENCIES,
+  PAYMENT_LOCATIONS,
+  PAYMENT_METHODS,
   SHIPPER_LETTER_DESTINATIONS,
   SHIPPER_LETTER_STATUSES,
+  sumPackageWeight,
+  summarizeLetterPayments,
+  type PaymentCurrency,
+  type PaymentLocation,
+  type ShipperLetterPackage,
   type ShipperLetterStatus,
 } from "@/lib/shipper-letter-types"
 
@@ -22,6 +31,42 @@ function text(formData: FormData, key: string, max = 200) {
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
+// Package rows are the source of truth; the combined count, weight and description
+// columns are derived from them so the Manifest and older screens keep working.
+function parsePackages(raw: FormDataEntryValue | null) {
+  let input: unknown
+  try {
+    input = JSON.parse(String(raw ?? "[]"))
+  } catch {
+    return { error: "Please check the package list and try again." }
+  }
+  if (!Array.isArray(input) || input.length === 0) return { error: "Add at least one package." }
+  if (input.length > MAX_LETTER_PACKAGES) return { error: `A Shipper Letter can list up to ${MAX_LETTER_PACKAGES} packages.` }
+
+  const packages: ShipperLetterPackage[] = []
+  for (const [index, row] of input.entries()) {
+    const description = String((row as { description?: unknown })?.description ?? "").trim().slice(0, 200)
+    const weight = Number((row as { weight?: unknown })?.weight)
+    if (!description) return { error: `Package ${index + 1}: description is required.` }
+    if (!Number.isFinite(weight) || weight <= 0 || weight > 100000) {
+      return { error: `Package ${index + 1}: please enter a valid weight in lbs.` }
+    }
+    packages.push({ description, weight: Math.round(weight * 100) / 100 })
+  }
+
+  return {
+    columns: {
+      packages,
+      number_of_packages: packages.length,
+      total_weight: sumPackageWeight(packages),
+      package_description: packages
+        .map((p) => p.description)
+        .join(", ")
+        .slice(0, 1000),
+    },
+  }
+}
+
 export async function submitShipperLetter(
   _prev: ShipperLetterFormState,
   formData: FormData,
@@ -36,7 +81,6 @@ export async function submitShipperLetter(
     recipient_full_name: text(formData, "recipient_full_name", 120),
     recipient_phone: text(formData, "recipient_phone", 40),
     destination_city: text(formData, "destination_city", 60),
-    package_description: text(formData, "package_description", 1000),
     signature: text(formData, "signature", 120),
     signed_date: text(formData, "signed_date", 10),
   }
@@ -47,7 +91,6 @@ export async function submitShipperLetter(
     ["recipient_full_name", "Recipient full name"],
     ["recipient_phone", "Recipient phone number"],
     ["destination_city", "City"],
-    ["package_description", "Package description"],
     ["signature", "Signature"],
     ["signed_date", "Date"],
   ]
@@ -65,16 +108,10 @@ export async function submitShipperLetter(
     return { error: "Please enter a valid date." }
   }
 
-  const numberOfPackages = Number(formData.get("number_of_packages"))
-  const totalWeight = Number(formData.get("total_weight"))
+  const parsedPackages = parsePackages(formData.get("packages"))
+  if ("error" in parsedPackages) return { error: parsedPackages.error }
   const declaredValue = Number(formData.get("declared_value"))
 
-  if (!Number.isInteger(numberOfPackages) || numberOfPackages < 1 || numberOfPackages > 10000) {
-    return { error: "Number of packages must be a whole number of at least 1." }
-  }
-  if (!Number.isFinite(totalWeight) || totalWeight <= 0 || totalWeight > 100000) {
-    return { error: "Please enter a valid total weight." }
-  }
   if (!Number.isFinite(declaredValue) || declaredValue < 0 || declaredValue > 10000000) {
     return { error: "Please enter a valid declared merchandise value." }
   }
@@ -97,8 +134,7 @@ export async function submitShipperLetter(
       shipper_zip: "",
       special_instructions: null,
       reference_number: referenceNumber,
-      number_of_packages: numberOfPackages,
-      total_weight: Math.round(totalWeight * 100) / 100,
+      ...parsedPackages.columns,
       declared_value: Math.round(declaredValue * 100) / 100,
       agreed_terms: true,
     })
@@ -137,7 +173,6 @@ export async function updateShipperLetter(
     recipient_full_name: text(formData, "recipient_full_name", 120),
     recipient_phone: text(formData, "recipient_phone", 40),
     destination_city: text(formData, "destination_city", 60),
-    package_description: text(formData, "package_description", 1000),
     signature: text(formData, "signature", 120),
     signed_date: text(formData, "signed_date", 10),
   }
@@ -148,7 +183,6 @@ export async function updateShipperLetter(
     ["recipient_full_name", "Recipient full name"],
     ["recipient_phone", "Recipient phone number"],
     ["destination_city", "City"],
-    ["package_description", "Package description"],
     ["signature", "Signature"],
     ["signed_date", "Date"],
   ]
@@ -163,16 +197,10 @@ export async function updateShipperLetter(
     return { error: "Please enter a valid date." }
   }
 
-  const numberOfPackages = Number(formData.get("number_of_packages"))
-  const totalWeight = Number(formData.get("total_weight"))
+  const parsedPackages = parsePackages(formData.get("packages"))
+  if ("error" in parsedPackages) return { error: parsedPackages.error }
   const declaredValue = Number(formData.get("declared_value"))
 
-  if (!Number.isInteger(numberOfPackages) || numberOfPackages < 1 || numberOfPackages > 10000) {
-    return { error: "Number of packages must be a whole number of at least 1." }
-  }
-  if (!Number.isFinite(totalWeight) || totalWeight <= 0 || totalWeight > 100000) {
-    return { error: "Please enter a valid total weight." }
-  }
   if (!Number.isFinite(declaredValue) || declaredValue < 0 || declaredValue > 10000000) {
     return { error: "Please enter a valid declared merchandise value." }
   }
@@ -199,8 +227,7 @@ export async function updateShipperLetter(
     .update({
       ...values,
       special_instructions: specialInstructions || null,
-      number_of_packages: numberOfPackages,
-      total_weight: Math.round(totalWeight * 100) / 100,
+      ...parsedPackages.columns,
       declared_value: Math.round(declaredValue * 100) / 100,
       updated_at: new Date().toISOString(),
     })
@@ -249,6 +276,15 @@ export async function updateShipperLetterPayment(
   const total = Math.round((price + fees) * 100) / 100
 
   const supabase = getServiceClient()
+  const { data: received } = await supabase
+    .from("shipper_letter_payments")
+    .select("amount_usd")
+    .eq("shipper_letter_id", id)
+  const { totalPaid } = summarizeLetterPayments(null, (received ?? []) as { amount_usd: number }[])
+  if (total < totalPaid) {
+    return { error: `The total can't be less than the ${totalPaid.toFixed(2)} USD already received.` }
+  }
+
   const { error } = await supabase
     .from("shipper_letters")
     .update({ price, fees, total, updated_at: new Date().toISOString() })
@@ -256,11 +292,129 @@ export async function updateShipperLetterPayment(
 
   if (error) {
     console.error("Saving shipper letter payment failed:", error)
-    return { error: "We couldn't save the payment. Please try again." }
+    return { error: "We couldn't save the invoice total. Please try again." }
   }
 
   revalidatePath(`/admin/shipper-letters/${id}`)
   return { savedAt: Date.now() }
+}
+
+export type RecordLetterPaymentState = {
+  error?: string
+  savedAt?: number
+}
+
+export async function recordShipperLetterPayment(
+  _prev: RecordLetterPaymentState,
+  formData: FormData,
+): Promise<RecordLetterPaymentState> {
+  const session = await getAdminSession()
+  if (!session) return { error: "Your session has expired. Please log in again." }
+
+  const id = String(formData.get("id") ?? "")
+  if (!id) return { error: "Missing Shipper Letter." }
+
+  const currency = String(formData.get("currency") ?? "") as PaymentCurrency
+  const location = String(formData.get("location") ?? "") as PaymentLocation
+  const method = String(formData.get("method") ?? "")
+  const paymentDate = String(formData.get("payment_date") ?? "").trim()
+  const amountRaw = Number(String(formData.get("amount") ?? "").trim())
+
+  if (!PAYMENT_CURRENCIES.includes(currency)) return { error: "Choose USD or HTG." }
+  if (!PAYMENT_LOCATIONS.includes(location)) return { error: "Choose where the payment was received." }
+  if (!(PAYMENT_METHODS as readonly string[]).includes(method)) return { error: "Choose a payment method." }
+  if (!DATE_RE.test(paymentDate) || Number.isNaN(Date.parse(paymentDate))) {
+    return { error: "Please enter a valid payment date." }
+  }
+  const maxAmount = currency === "HTG" ? MAX_AMOUNT * 1000 : MAX_AMOUNT
+  if (!Number.isFinite(amountRaw) || amountRaw <= 0 || amountRaw > maxAmount) {
+    return { error: "Please enter the amount received." }
+  }
+  const amount = Math.round(amountRaw * 100) / 100
+
+  let exchangeRate: number | null = null
+  let amountUsd = amount
+  if (currency === "HTG") {
+    const rate = Number(String(formData.get("exchange_rate") ?? "").trim())
+    if (!Number.isFinite(rate) || rate <= 0 || rate > 100000) {
+      return { error: "Enter the exchange rate used (HTG per 1 USD)." }
+    }
+    exchangeRate = Math.round(rate * 10000) / 10000
+    amountUsd = Math.round((amount / exchangeRate) * 100) / 100
+    if (amountUsd <= 0) return { error: "This HTG amount is too small at that exchange rate." }
+  }
+
+  const supabase = getServiceClient()
+  const [{ data: letter }, { data: received }] = await Promise.all([
+    supabase.from("shipper_letters").select("total").eq("id", id).maybeSingle(),
+    supabase.from("shipper_letter_payments").select("amount_usd").eq("shipper_letter_id", id),
+  ])
+  if (!letter) return { error: "This Shipper Letter could not be found." }
+
+  const { invoiceTotal, balanceDue } = summarizeLetterPayments(
+    (letter as { total: number | null }).total,
+    (received ?? []) as { amount_usd: number }[],
+  )
+  if (invoiceTotal === null || invoiceTotal <= 0) {
+    return { error: "Save the invoice total before recording payments." }
+  }
+  if (balanceDue === 0) return { error: "This Shipper Letter is already paid in full." }
+  if (balanceDue !== null && amountUsd > balanceDue + 0.01) {
+    return { error: `This payment (${amountUsd.toFixed(2)} USD) is more than the ${balanceDue.toFixed(2)} USD balance due.` }
+  }
+
+  const { error } = await supabase.from("shipper_letter_payments").insert({
+    shipper_letter_id: id,
+    amount,
+    currency,
+    location,
+    payment_date: paymentDate,
+    method,
+    exchange_rate: exchangeRate,
+    // A payment that settles the balance within rounding is recorded as the exact balance.
+    amount_usd: balanceDue !== null && amountUsd > balanceDue ? balanceDue : amountUsd,
+  })
+  if (error) {
+    console.error("Recording shipper letter payment failed:", error)
+    return { error: "We couldn't record the payment. Please try again." }
+  }
+
+  await supabase.from("shipper_letters").update({ updated_at: new Date().toISOString() }).eq("id", id)
+  revalidatePath(`/admin/shipper-letters/${id}`)
+  revalidatePath("/admin")
+  return { savedAt: Date.now() }
+}
+
+export async function deleteShipperLetterPayment(formData: FormData): Promise<void> {
+  const session = await getAdminSession()
+  if (!session) throw new Error("Unauthorized")
+
+  const id = String(formData.get("id") ?? "")
+  const paymentId = String(formData.get("payment_id") ?? "")
+  if (!id || !paymentId) return
+
+  const supabase = getServiceClient()
+  await supabase.from("shipper_letter_payments").delete().eq("id", paymentId).eq("shipper_letter_id", id)
+  revalidatePath(`/admin/shipper-letters/${id}`)
+  revalidatePath("/admin")
+}
+
+// Admin confirms that the recorded history for a legacy letter is complete,
+// after which the balance and Unpaid/Partially Paid/Paid status are shown as confirmed.
+export async function confirmShipperLetterPaymentHistory(formData: FormData): Promise<void> {
+  const session = await getAdminSession()
+  if (!session) throw new Error("Unauthorized")
+
+  const id = String(formData.get("id") ?? "")
+  if (!id) return
+
+  const supabase = getServiceClient()
+  await supabase
+    .from("shipper_letters")
+    .update({ payment_history_verified: true, updated_at: new Date().toISOString() })
+    .eq("id", id)
+  revalidatePath(`/admin/shipper-letters/${id}`)
+  revalidatePath("/admin")
 }
 
 export type ShipperLetterDeliveryState = {
