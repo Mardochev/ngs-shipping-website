@@ -1,8 +1,13 @@
 import { notFound, redirect } from "next/navigation"
 import { getAdminSession } from "@/lib/session"
-import { getShipperLetterById } from "@/lib/shipper-letter-queries"
+import { getShipperLetterById, listShipperLetterPayments } from "@/lib/shipper-letter-queries"
 import { getBarcodeSvg } from "@/lib/barcode"
-import { formatShipperAddressLines } from "@/lib/shipper-letter-types"
+import {
+  formatShipperAddressLines,
+  getLetterPackages,
+  sumPackageWeight,
+  summarizeLetterPayments,
+} from "@/lib/shipper-letter-types"
 import { ThermalReceiptActions } from "@/components/admin/thermal-receipt-actions"
 import { PrintAirplaneIcon } from "@/components/print/print-airplane-icon"
 
@@ -48,6 +53,7 @@ const thermalPrintCss = `
 `
 
 const usd = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" })
+const htg = new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
 function formatDate(value: string) {
   return new Date(`${value}T00:00:00`).toLocaleDateString("en-US", {
@@ -83,8 +89,11 @@ export default async function ShipperLetterReceiptPage({ params }: { params: Pro
   if (!session) redirect("/admin/login")
 
   const { id } = await params
-  const letter = await getShipperLetterById(id)
+  const [letter, payments] = await Promise.all([getShipperLetterById(id), listShipperLetterPayments(id)])
   if (!letter) notFound()
+
+  const packages = getLetterPackages(letter)
+  const summary = summarizeLetterPayments(letter.total === null ? null : Number(letter.total), payments)
 
   const barcodeSvg = getBarcodeSvg(letter.reference_number, { height: 60 })
   const printedDate = new Date().toLocaleDateString("en-US", {
@@ -155,9 +164,16 @@ export default async function ShipperLetterReceiptPage({ params }: { params: Pro
           <Divider />
 
           <Heading>Packages</Heading>
-          <p className="break-words font-bold">{letter.package_description}</p>
-          <Line label="Quantity" value={String(letter.number_of_packages)} />
-          <Line label="Price" value={formatMoney(letter.price)} />
+          {packages.map((p, i) => (
+            <div key={i} className="flex justify-between gap-3">
+              <span className="break-words">
+                {i + 1}. {p.description}
+              </span>
+              <span className="shrink-0 font-bold">{p.weight.toFixed(2)} lb</span>
+            </div>
+          ))}
+          <Line label="Packages" value={String(packages.length)} />
+          <Line label="Total weight" value={`${sumPackageWeight(packages).toFixed(2)} lb`} />
           {specialInstructions ? <p className="mt-0.5 break-words">Note: {specialInstructions}</p> : null}
 
           <Divider />
@@ -165,10 +181,35 @@ export default async function ShipperLetterReceiptPage({ params }: { params: Pro
           <Heading>Payment</Heading>
           <Line label="Price" value={formatMoney(letter.price)} />
           <Line label="Assurance fee" value={formatMoney(letter.fees)} />
-          <div className="mt-0.5 flex justify-between gap-3 text-[18px] font-black">
-            <span>TOTAL</span>
+          <div className="mt-0.5 flex justify-between gap-3 text-[16px] font-black">
+            <span>INVOICE TOTAL</span>
             <span>{formatMoney(letter.total)}</span>
           </div>
+
+          {payments.length > 0 ? (
+            <>
+              <Divider />
+              <Heading>Payments Received</Heading>
+              {payments.map((p) => (
+                <div key={p.id} className="mt-0.5">
+                  <Line label={`${formatDate(p.payment_date)} ${p.location}`} value={usd.format(p.amount_usd)} />
+                  <p className="text-[12px]">
+                    {p.method}
+                    {p.currency === "HTG" ? ` · ${htg.format(p.amount)} HTG @ ${p.exchange_rate}` : ""}
+                  </p>
+                </div>
+              ))}
+            </>
+          ) : null}
+
+          <Divider />
+
+          <Line label="Total paid" value={usd.format(summary.totalPaid)} />
+          <div className="mt-0.5 flex justify-between gap-3 text-[18px] font-black">
+            <span>BALANCE DUE</span>
+            <span>{summary.balanceDue === null ? "—" : usd.format(summary.balanceDue)}</span>
+          </div>
+          <p className="text-center text-[15px] font-black uppercase">{summary.status}</p>
 
           <Divider />
 

@@ -4,6 +4,7 @@ import { useActionState, useState, type ReactNode } from "react"
 import { CheckCircle2, Loader2, Send, AlertCircle } from "lucide-react"
 import { submitShipperLetter, type ShipperLetterFormState } from "@/lib/actions/shipper-letters"
 import { SHIPPER_LETTER_DESTINATIONS } from "@/lib/shipper-letter-types"
+import { PackageRowsField } from "@/components/package-rows-field"
 
 const inputClass =
   "w-full rounded-lg border border-input bg-navy-deep px-4 py-3 text-base text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-ring"
@@ -122,15 +123,7 @@ export function ShipperLetterForm() {
       </Section>
 
       <Section title="Package Information">
-        <Field id="package_description" label="Package Description" className="sm:col-span-2">
-          <textarea id="package_description" name="package_description" rows={3} required className={inputClass} />
-        </Field>
-        <Field id="number_of_packages" label="Number of Packages">
-          <input id="number_of_packages" name="number_of_packages" type="number" inputMode="numeric" min={1} step={1} required defaultValue={1} className={inputClass} />
-        </Field>
-        <Field id="total_weight" label="Total Weight (lbs)">
-          <input id="total_weight" name="total_weight" type="number" inputMode="decimal" min={0.01} step="0.01" required className={inputClass} />
-        </Field>
+        <PackageRowsField inputClass={inputClass} />
         <Field id="declared_value" label="Declared Merchandise Value (USD)" className="sm:col-span-2">
           <input id="declared_value" name="declared_value" type="number" inputMode="decimal" min={0} step="0.01" required className={inputClass} />
         </Field>

@@ -4,7 +4,8 @@ import Link from "next/link"
 import { useActionState } from "react"
 import { Loader2 } from "lucide-react"
 import { updateShipperLetter, type ShipperLetterEditState } from "@/lib/actions/shipper-letters"
-import { SHIPPER_LETTER_DESTINATIONS, type ShipperLetter } from "@/lib/shipper-letter-types"
+import { SHIPPER_LETTER_DESTINATIONS, getLetterPackages, type ShipperLetter } from "@/lib/shipper-letter-types"
+import { PackageRowsField } from "@/components/package-rows-field"
 
 const inputClass =
   "w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm text-foreground [color-scheme:dark] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
@@ -98,15 +99,7 @@ export function ShipperLetterEditForm({ letter }: { letter: ShipperLetter }) {
       </Section>
 
       <Section title="Package Information">
-        <Field id="package_description" label="Package Description" required className="sm:col-span-2">
-          <textarea id="package_description" name="package_description" required rows={3} maxLength={1000} defaultValue={letter.package_description} className={inputClass} />
-        </Field>
-        <Field id="number_of_packages" label="Number of Packages" required>
-          <input id="number_of_packages" name="number_of_packages" type="number" required min={1} step={1} defaultValue={letter.number_of_packages} className={inputClass} />
-        </Field>
-        <Field id="total_weight" label="Total Weight (lbs)" required>
-          <input id="total_weight" name="total_weight" type="number" required min="0.01" step="0.01" inputMode="decimal" defaultValue={Number(letter.total_weight)} className={inputClass} />
-        </Field>
+        <PackageRowsField inputClass={inputClass} initialPackages={getLetterPackages(letter)} />
         <Field id="declared_value" label="Declared Merchandise Value ($)" required className="sm:col-span-2">
           <input id="declared_value" name="declared_value" type="number" required min="0" step="0.01" inputMode="decimal" defaultValue={Number(letter.declared_value)} className={inputClass} />
         </Field>

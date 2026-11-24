@@ -2,9 +2,17 @@ import Link from "next/link"
 import { notFound, redirect } from "next/navigation"
 import { ArrowLeft, Pencil, Plane, Receipt, Tag } from "lucide-react"
 import { getAdminSession } from "@/lib/session"
-import { getShipperLetterById } from "@/lib/shipper-letter-queries"
+import { getShipperLetterById, listShipperLetterPayments } from "@/lib/shipper-letter-queries"
+import { getSettings } from "@/lib/queries"
 import { updateShipperLetterStatus } from "@/lib/actions/shipper-letters"
-import { SHIPPER_LETTER_STATUSES, formatShipperAddressLines } from "@/lib/shipper-letter-types"
+import {
+  SHIPPER_LETTER_STATUSES,
+  formatShipperAddressLines,
+  getLetterPackages,
+  sumPackageWeight,
+  summarizeLetterPayments,
+} from "@/lib/shipper-letter-types"
+import { ShipperLetterPaymentsPanel, formatPaymentAmount } from "@/components/admin/shipper-letter-payments-panel"
 import { ShipperLetterPrintButton } from "@/components/admin/shipper-letter-print-button"
 import { ShipperLetterPaymentForm } from "@/components/admin/shipper-letter-payment-form"
 import { ShipperLetterDeliveryForm } from "@/components/admin/shipper-letter-delivery-form"
@@ -64,8 +72,16 @@ export default async function ShipperLetterDetailPage({ params }: { params: Prom
   if (!session) redirect("/admin/login")
 
   const { id } = await params
-  const letter = await getShipperLetterById(id)
+  const [letter, payments, settings] = await Promise.all([
+    getShipperLetterById(id),
+    listShipperLetterPayments(id),
+    getSettings(),
+  ])
   if (!letter) notFound()
+
+  const packages = getLetterPackages(letter)
+  const totalWeight = sumPackageWeight(packages)
+  const summary = summarizeLetterPayments(letter.total === null ? null : Number(letter.total), payments)
 
   return (
     <div className="sl-page min-h-screen bg-navy-deep px-4 py-8">
@@ -131,6 +147,13 @@ export default async function ShipperLetterDetailPage({ params }: { params: Prom
 
         <ShipperLetterPaymentForm id={letter.id} price={letter.price} fees={letter.fees} />
 
+        <ShipperLetterPaymentsPanel
+          id={letter.id}
+          total={letter.total === null ? null : Number(letter.total)}
+          payments={payments}
+          defaultHtgRate={settings.htg_rate === null ? null : Number(settings.htg_rate)}
+        />
+
         <article className="sl-paper rounded-xl border border-slate-200 bg-white p-6 text-slate-900 shadow-xl sm:p-10">
           <header className="flex flex-wrap items-start justify-between gap-4 border-b-4 border-[#f5a623] pb-5">
             <div className="flex items-center gap-3">
@@ -181,10 +204,33 @@ export default async function ShipperLetterDetailPage({ params }: { params: Prom
 
             <Block title="Package Information">
               <div className="col-span-2">
-                <Row label="Package Description" value={letter.package_description} />
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-300 text-left text-[11px] uppercase tracking-wide text-slate-500">
+                      <th scope="col" className="w-10 py-1.5 font-semibold">#</th>
+                      <th scope="col" className="py-1.5 font-semibold">Description</th>
+                      <th scope="col" className="py-1.5 text-right font-semibold">Actual Weight</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {packages.map((p, i) => (
+                      <tr key={i} className="border-b border-slate-100">
+                        <td className="py-1.5 text-slate-500">{i + 1}</td>
+                        <td className="py-1.5 text-slate-900">{p.description}</td>
+                        <td className="py-1.5 text-right font-mono text-slate-900">{p.weight.toFixed(2)} lbs</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot>
+                    <tr className="font-bold text-[#0a1f44]">
+                      <td className="pt-2" colSpan={2}>
+                        {packages.length} {packages.length === 1 ? "package" : "packages"}
+                      </td>
+                      <td className="pt-2 text-right font-mono">{totalWeight.toFixed(2)} lbs</td>
+                    </tr>
+                  </tfoot>
+                </table>
               </div>
-              <Row label="Number of Packages" value={String(letter.number_of_packages)} />
-              <Row label="Total Weight" value={`${Number(letter.total_weight).toFixed(2)} lbs`} />
               <Row label="Declared Merchandise Value" value={usd.format(Number(letter.declared_value))} />
               <div className="col-span-2">
                 <Row label="Special Instructions" value={letter.special_instructions ?? ""} />
@@ -207,10 +253,60 @@ export default async function ShipperLetterDetailPage({ params }: { params: Prom
                   </dd>
                 </div>
                 <div className="mt-1 flex justify-between gap-4 border-t-2 border-[#0a1f44] pt-2">
-                  <dt className="font-bold uppercase text-[#0a1f44]">Total</dt>
+                  <dt className="font-bold uppercase text-[#0a1f44]">Invoice Total</dt>
                   <dd className="font-mono text-lg font-extrabold text-[#0a1f44]">
                     {letter.total === null ? "—" : usd.format(Number(letter.total))}
                   </dd>
+                </div>
+              </dl>
+
+              <h3 className="mt-5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Payment History</h3>
+              {payments.length > 0 ? (
+                <table className="mt-2 w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-300 text-left text-[11px] uppercase tracking-wide text-slate-500">
+                      <th scope="col" className="py-1.5 font-semibold">Date</th>
+                      <th scope="col" className="py-1.5 font-semibold">Received In</th>
+                      <th scope="col" className="py-1.5 font-semibold">Method</th>
+                      <th scope="col" className="py-1.5 text-right font-semibold">Amount</th>
+                      <th scope="col" className="py-1.5 text-right font-semibold">USD</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {payments.map((p) => (
+                      <tr key={p.id} className="border-b border-slate-100 align-top">
+                        <td className="py-1.5 text-slate-900">{formatSignedDate(p.payment_date)}</td>
+                        <td className="py-1.5 text-slate-900">{p.location}</td>
+                        <td className="py-1.5 text-slate-900">{p.method}</td>
+                        <td className="py-1.5 text-right font-mono text-slate-900">
+                          {formatPaymentAmount(p)}
+                          {p.exchange_rate ? (
+                            <span className="block text-[11px] text-slate-500">@ {p.exchange_rate} HTG/USD</span>
+                          ) : null}
+                        </td>
+                        <td className="py-1.5 text-right font-mono text-slate-900">{usd.format(p.amount_usd)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <p className="mt-2 text-sm text-slate-500">No payments received.</p>
+              )}
+
+              <dl className="mt-3 ml-auto flex w-full max-w-xs flex-col gap-1.5 text-sm">
+                <div className="flex justify-between gap-4">
+                  <dt className="text-slate-600">Total Paid</dt>
+                  <dd className="font-mono text-slate-900">{usd.format(summary.totalPaid)}</dd>
+                </div>
+                <div className="mt-1 flex justify-between gap-4 border-t-2 border-[#0a1f44] pt-2">
+                  <dt className="font-bold uppercase text-[#0a1f44]">Balance Due</dt>
+                  <dd className="font-mono text-lg font-extrabold text-[#0a1f44]">
+                    {summary.balanceDue === null ? "—" : usd.format(summary.balanceDue)}
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-slate-600">Payment Status</dt>
+                  <dd className="font-bold text-slate-900">{summary.status}</dd>
                 </div>
               </dl>
             </section>

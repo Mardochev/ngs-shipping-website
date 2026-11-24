@@ -41,6 +41,66 @@ export type ShipperLetter = {
   fees: number | null
   total: number | null
   estimated_delivery_date: string | null
+  packages: ShipperLetterPackage[] | null
   created_at: string
   updated_at: string
+}
+
+export type ShipperLetterPackage = {
+  description: string
+  weight: number
+}
+
+export const MAX_LETTER_PACKAGES = 100
+
+// Letters saved before package rows existed only have the combined columns.
+export function getLetterPackages(letter: {
+  packages: ShipperLetterPackage[] | null
+  package_description: string
+  total_weight: number
+}): ShipperLetterPackage[] {
+  if (Array.isArray(letter.packages) && letter.packages.length > 0) {
+    return letter.packages.map((p) => ({ description: String(p.description ?? ""), weight: Number(p.weight) || 0 }))
+  }
+  return [{ description: letter.package_description, weight: Number(letter.total_weight) || 0 }]
+}
+
+export function sumPackageWeight(packages: ShipperLetterPackage[]) {
+  return Math.round(packages.reduce((sum, p) => sum + (Number(p.weight) || 0), 0) * 100) / 100
+}
+
+export const PAYMENT_CURRENCIES = ["USD", "HTG"] as const
+export type PaymentCurrency = (typeof PAYMENT_CURRENCIES)[number]
+
+export const PAYMENT_LOCATIONS = ["USA", "Haiti"] as const
+export type PaymentLocation = (typeof PAYMENT_LOCATIONS)[number]
+
+export const PAYMENT_METHODS = ["Cash", "Zelle", "Cash App", "Card", "MonCash", "NatCash", "Bank transfer", "Other"] as const
+
+export type ShipperLetterPayment = {
+  id: string
+  shipper_letter_id: string
+  amount: number
+  currency: PaymentCurrency
+  location: PaymentLocation
+  payment_date: string
+  method: string
+  exchange_rate: number | null
+  amount_usd: number
+  created_at: string
+}
+
+export type LetterPaymentStatus = "Unpaid" | "Partially Paid" | "Paid"
+
+const cents = (n: number) => Math.round(n * 100) / 100
+
+// The invoice total is what is owed; only recorded payments count as paid.
+export function summarizeLetterPayments(total: number | null, payments: Pick<ShipperLetterPayment, "amount_usd">[]) {
+  const totalPaid = cents(payments.reduce((sum, p) => sum + Number(p.amount_usd), 0))
+  const invoiceTotal = total === null || total === undefined ? null : cents(Number(total))
+  const balanceDue = invoiceTotal === null ? null : Math.max(0, cents(invoiceTotal - totalPaid))
+  let status: LetterPaymentStatus = "Unpaid"
+  if (invoiceTotal !== null && invoiceTotal > 0 && balanceDue === 0) status = "Paid"
+  else if (totalPaid > 0) status = "Partially Paid"
+  return { invoiceTotal, totalPaid, balanceDue, status }
 }
