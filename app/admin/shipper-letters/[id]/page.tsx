@@ -8,8 +8,10 @@ import { updateShipperLetterStatus } from "@/lib/actions/shipper-letters"
 import {
   SHIPPER_LETTER_STATUSES,
   formatShipperAddressLines,
+  computeLetterLoad,
+  fixedItemCharge,
+  getLetterFixedItems,
   getLetterPackages,
-  sumPackageWeight,
   summarizeLetterPayments,
   PAYMENT_TO_VERIFY,
 } from "@/lib/shipper-letter-types"
@@ -81,7 +83,8 @@ export default async function ShipperLetterDetailPage({ params }: { params: Prom
   if (!letter) notFound()
 
   const packages = getLetterPackages(letter)
-  const totalWeight = sumPackageWeight(packages)
+  const fixedItems = getLetterFixedItems(letter)
+  const load = computeLetterLoad(packages, fixedItems)
   const summary = summarizeLetterPayments(
     letter.total === null ? null : Number(letter.total),
     payments,
@@ -150,7 +153,13 @@ export default async function ShipperLetterDetailPage({ params }: { params: Prom
 
         <ShipperLetterDeliveryForm id={letter.id} date={letter.estimated_delivery_date} />
 
-        <ShipperLetterPaymentForm id={letter.id} price={letter.price} fees={letter.fees} />
+        <ShipperLetterPaymentForm
+          id={letter.id}
+          price={letter.price}
+          fees={letter.fees}
+          fixedCharge={load.fixedCharge}
+          perLbWeight={load.perLbWeight}
+        />
 
         <ShipperLetterPaymentsPanel
           id={letter.id}
@@ -209,33 +218,77 @@ export default async function ShipperLetterDetailPage({ params }: { params: Prom
             </Block>
 
             <Block title="Package Information">
-              <div className="col-span-2">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-slate-300 text-left text-[11px] uppercase tracking-wide text-slate-500">
-                      <th scope="col" className="w-10 py-1.5 font-semibold">#</th>
-                      <th scope="col" className="py-1.5 font-semibold">Description</th>
-                      <th scope="col" className="py-1.5 text-right font-semibold">Actual Weight</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {packages.map((p, i) => (
-                      <tr key={i} className="border-b border-slate-100">
-                        <td className="py-1.5 text-slate-500">{i + 1}</td>
-                        <td className="py-1.5 text-slate-900">{p.description}</td>
-                        <td className="py-1.5 text-right font-mono text-slate-900">{p.weight.toFixed(2)} lbs</td>
+              {packages.length > 0 ? (
+                <div className="col-span-2">
+                  <h3 className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                    Packages (per pound)
+                  </h3>
+                  <table className="mt-1 w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-slate-300 text-left text-[11px] uppercase tracking-wide text-slate-500">
+                        <th scope="col" className="w-10 py-1.5 font-semibold">#</th>
+                        <th scope="col" className="py-1.5 font-semibold">Description</th>
+                        <th scope="col" className="py-1.5 text-right font-semibold">Actual Weight</th>
                       </tr>
-                    ))}
-                  </tbody>
-                  <tfoot>
-                    <tr className="font-bold text-[#0a1f44]">
-                      <td className="pt-2" colSpan={2}>
-                        {packages.length} {packages.length === 1 ? "package" : "packages"}
-                      </td>
-                      <td className="pt-2 text-right font-mono">{totalWeight.toFixed(2)} lbs</td>
-                    </tr>
-                  </tfoot>
-                </table>
+                    </thead>
+                    <tbody>
+                      {packages.map((p, i) => (
+                        <tr key={i} className="border-b border-slate-100">
+                          <td className="py-1.5 text-slate-500">{i + 1}</td>
+                          <td className="py-1.5 text-slate-900">{p.description}</td>
+                          <td className="py-1.5 text-right font-mono text-slate-900">{p.weight.toFixed(2)} lbs</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : null}
+
+              {fixedItems.length > 0 ? (
+                <div className="col-span-2">
+                  <h3 className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                    Fixed-price items (not billed by the pound)
+                  </h3>
+                  <table className="mt-1 w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-slate-300 text-left text-[11px] uppercase tracking-wide text-slate-500">
+                        <th scope="col" className="py-1.5 font-semibold">Description</th>
+                        <th scope="col" className="py-1.5 text-right font-semibold">Qty</th>
+                        <th scope="col" className="py-1.5 text-right font-semibold">Price / Item</th>
+                        <th scope="col" className="py-1.5 text-right font-semibold">Weight</th>
+                        <th scope="col" className="py-1.5 text-right font-semibold">Charge</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {fixedItems.map((item, i) => (
+                        <tr key={i} className="border-b border-slate-100 align-top">
+                          <td className="py-1.5 text-slate-900">
+                            {item.description}
+                            <span className="block text-[11px] text-slate-500">
+                              {item.in_existing_box ? "Packed inside a package above" : "Own box"}
+                            </span>
+                          </td>
+                          <td className="py-1.5 text-right font-mono text-slate-900">{item.quantity}</td>
+                          <td className="py-1.5 text-right font-mono text-slate-900">{usd.format(item.unit_price)}</td>
+                          <td className="py-1.5 text-right font-mono text-slate-900">{item.weight.toFixed(2)} lbs</td>
+                          <td className="py-1.5 text-right font-mono text-slate-900">
+                            {usd.format(fixedItemCharge(item))}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : null}
+
+              <div className="col-span-2 flex flex-wrap justify-between gap-x-6 gap-y-1 border-t-2 border-[#0a1f44] pt-2 text-sm font-bold text-[#0a1f44]">
+                <span>
+                  {load.packageCount} {load.packageCount === 1 ? "package" : "packages"}
+                </span>
+                <span className="font-mono">Total weight {load.totalWeight.toFixed(2)} lbs</span>
+                {fixedItems.length > 0 ? (
+                  <span className="font-mono">Per-pound weight {load.perLbWeight.toFixed(2)} lbs</span>
+                ) : null}
               </div>
               <Row label="Declared Merchandise Value" value={usd.format(Number(letter.declared_value))} />
               <div className="col-span-2">
@@ -247,11 +300,17 @@ export default async function ShipperLetterDetailPage({ params }: { params: Prom
               <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-[#0a1f44]">Payment</h2>
               <dl className="mt-3 ml-auto flex w-full max-w-xs flex-col gap-1.5 text-sm">
                 <div className="flex justify-between gap-4">
-                  <dt className="text-slate-600">Price</dt>
+                  <dt className="text-slate-600">{fixedItems.length > 0 ? "Per-pound packages" : "Price"}</dt>
                   <dd className="font-mono text-slate-900">
                     {letter.price === null ? "—" : usd.format(Number(letter.price))}
                   </dd>
                 </div>
+                {fixedItems.length > 0 ? (
+                  <div className="flex justify-between gap-4">
+                    <dt className="text-slate-600">Fixed-price items</dt>
+                    <dd className="font-mono text-slate-900">{usd.format(load.fixedCharge)}</dd>
+                  </div>
+                ) : null}
                 <div className="flex justify-between gap-4">
                   <dt className="text-slate-600">Assurance fee</dt>
                   <dd className="font-mono text-slate-900">

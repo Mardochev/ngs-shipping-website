@@ -4,8 +4,10 @@ import { getShipperLetterById, listShipperLetterPayments } from "@/lib/shipper-l
 import { getBarcodeSvg } from "@/lib/barcode"
 import {
   formatShipperAddressLines,
+  computeLetterLoad,
+  fixedItemCharge,
+  getLetterFixedItems,
   getLetterPackages,
-  sumPackageWeight,
   summarizeLetterPayments,
 } from "@/lib/shipper-letter-types"
 import { ThermalReceiptActions } from "@/components/admin/thermal-receipt-actions"
@@ -93,6 +95,8 @@ export default async function ShipperLetterReceiptPage({ params }: { params: Pro
   if (!letter) notFound()
 
   const packages = getLetterPackages(letter)
+  const fixedItems = getLetterFixedItems(letter)
+  const load = computeLetterLoad(packages, fixedItems)
   const summary = summarizeLetterPayments(
     letter.total === null ? null : Number(letter.total),
     payments,
@@ -176,14 +180,35 @@ export default async function ShipperLetterReceiptPage({ params }: { params: Pro
               <span className="shrink-0 font-bold">{p.weight.toFixed(2)} lb</span>
             </div>
           ))}
-          <Line label="Packages" value={String(packages.length)} />
-          <Line label="Total weight" value={`${sumPackageWeight(packages).toFixed(2)} lb`} />
+          {fixedItems.length > 0 ? (
+            <>
+              <p className="mt-1 font-black uppercase">Fixed-price items</p>
+              {fixedItems.map((item, i) => (
+                <div key={i} className="mt-0.5">
+                  <div className="flex justify-between gap-3">
+                    <span className="break-words">
+                      {item.quantity} × {item.description}
+                    </span>
+                    <span className="shrink-0 font-bold">{usd.format(fixedItemCharge(item))}</span>
+                  </div>
+                  <p className="text-[12px]">
+                    {usd.format(item.unit_price)} each · {item.weight.toFixed(2)} lb
+                    {item.in_existing_box ? " · in box above" : " · own box"}
+                  </p>
+                </div>
+              ))}
+            </>
+          ) : null}
+          <Line label="Packages" value={String(load.packageCount)} />
+          <Line label="Total weight" value={`${load.totalWeight.toFixed(2)} lb`} />
+          {fixedItems.length > 0 ? <Line label="Per-lb weight" value={`${load.perLbWeight.toFixed(2)} lb`} /> : null}
           {specialInstructions ? <p className="mt-0.5 break-words">Note: {specialInstructions}</p> : null}
 
           <Divider />
 
           <Heading>Payment</Heading>
-          <Line label="Price" value={formatMoney(letter.price)} />
+          <Line label={fixedItems.length > 0 ? "Per-lb packages" : "Price"} value={formatMoney(letter.price)} />
+          {fixedItems.length > 0 ? <Line label="Fixed-price items" value={usd.format(load.fixedCharge)} /> : null}
           <Line label="Assurance fee" value={formatMoney(letter.fees)} />
           <div className="mt-0.5 flex justify-between gap-3 text-[16px] font-black">
             <span>INVOICE TOTAL</span>

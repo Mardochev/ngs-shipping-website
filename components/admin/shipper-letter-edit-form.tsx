@@ -1,11 +1,17 @@
 "use client"
 
 import Link from "next/link"
-import { useActionState } from "react"
+import { useActionState, useState } from "react"
 import { Loader2 } from "lucide-react"
 import { updateShipperLetter, type ShipperLetterEditState } from "@/lib/actions/shipper-letters"
-import { SHIPPER_LETTER_DESTINATIONS, getLetterPackages, type ShipperLetter } from "@/lib/shipper-letter-types"
+import {
+  SHIPPER_LETTER_DESTINATIONS,
+  getLetterFixedItems,
+  getLetterPackages,
+  type ShipperLetter,
+} from "@/lib/shipper-letter-types"
 import { PackageRowsField } from "@/components/package-rows-field"
+import { FixedItemsField } from "@/components/admin/fixed-items-field"
 
 const inputClass =
   "w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm text-foreground [color-scheme:dark] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
@@ -45,6 +51,8 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export function ShipperLetterEditForm({ letter }: { letter: ShipperLetter }) {
   const [state, formAction, pending] = useActionState<ShipperLetterEditState, FormData>(updateShipperLetter, {})
+  const [initialPackages] = useState(() => getLetterPackages(letter))
+  const [parcelWeights, setParcelWeights] = useState<number[]>(() => initialPackages.map((p) => p.weight))
 
   const cities = (SHIPPER_LETTER_DESTINATIONS as readonly string[]).includes(letter.destination_city)
     ? [...SHIPPER_LETTER_DESTINATIONS]
@@ -99,7 +107,21 @@ export function ShipperLetterEditForm({ letter }: { letter: ShipperLetter }) {
       </Section>
 
       <Section title="Package Information">
-        <PackageRowsField inputClass={inputClass} initialPackages={getLetterPackages(letter)} />
+        <div className="sm:col-span-2">
+          <h3 className="text-sm font-semibold text-foreground">Packages (per pound)</h3>
+          <p className="text-sm text-muted-foreground">Each physical box with its actual scale weight.</p>
+        </div>
+        <PackageRowsField
+          inputClass={inputClass}
+          initialPackages={initialPackages}
+          allowEmpty
+          onWeightsChange={setParcelWeights}
+        />
+        <FixedItemsField
+          inputClass={inputClass}
+          initialItems={getLetterFixedItems(letter)}
+          parcelWeights={parcelWeights}
+        />
         <Field id="declared_value" label="Declared Merchandise Value ($)" required className="sm:col-span-2">
           <input id="declared_value" name="declared_value" type="number" required min="0" step="0.01" inputMode="decimal" defaultValue={Number(letter.declared_value)} className={inputClass} />
         </Field>

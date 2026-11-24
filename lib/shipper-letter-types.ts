@@ -42,6 +42,7 @@ export type ShipperLetter = {
   total: number | null
   estimated_delivery_date: string | null
   packages: ShipperLetterPackage[] | null
+  fixed_items: ShipperLetterFixedItem[] | null
   payment_history_verified: boolean
   created_at: string
   updated_at: string
@@ -55,12 +56,13 @@ export type ShipperLetterPackage = {
 export const MAX_LETTER_PACKAGES = 100
 
 // Letters saved before package rows existed only have the combined columns.
+// An empty array is valid: a letter may contain only fixed-price items.
 export function getLetterPackages(letter: {
   packages: ShipperLetterPackage[] | null
   package_description: string
   total_weight: number
 }): ShipperLetterPackage[] {
-  if (Array.isArray(letter.packages) && letter.packages.length > 0) {
+  if (Array.isArray(letter.packages)) {
     return letter.packages.map((p) => ({ description: String(p.description ?? ""), weight: Number(p.weight) || 0 }))
   }
   return [{ description: letter.package_description, weight: Number(letter.total_weight) || 0 }]
@@ -68,6 +70,58 @@ export function getLetterPackages(letter: {
 
 export function sumPackageWeight(packages: ShipperLetterPackage[]) {
   return Math.round(packages.reduce((sum, p) => sum + (Number(p.weight) || 0), 0) * 100) / 100
+}
+
+// Fixed-price items (e.g. TVs, phones) are billed per item, never by the pound.
+// `weight` is the actual weight of the whole line (all units), kept for the manifest.
+// When `in_existing_box` is true the item sits inside one of the package rows, so its
+// weight is already in that box's scale weight and it adds no physical package.
+export type ShipperLetterFixedItem = {
+  description: string
+  quantity: number
+  unit_price: number
+  weight: number
+  in_existing_box: boolean
+}
+
+export const MAX_LETTER_FIXED_ITEMS = 50
+
+const round2 = (n: number) => Math.round(n * 100) / 100
+
+export function getLetterFixedItems(letter: { fixed_items: ShipperLetterFixedItem[] | null }): ShipperLetterFixedItem[] {
+  if (!Array.isArray(letter.fixed_items)) return []
+  return letter.fixed_items.map((i) => ({
+    description: String(i.description ?? ""),
+    quantity: Number(i.quantity) || 0,
+    unit_price: Number(i.unit_price) || 0,
+    weight: Number(i.weight) || 0,
+    in_existing_box: i.in_existing_box === true,
+  }))
+}
+
+export function fixedItemCharge(item: Pick<ShipperLetterFixedItem, "quantity" | "unit_price">) {
+  return round2(item.quantity * item.unit_price)
+}
+
+export function fixedItemsCharge(items: Pick<ShipperLetterFixedItem, "quantity" | "unit_price">[]) {
+  return round2(items.reduce((sum, i) => sum + fixedItemCharge(i), 0))
+}
+
+// Single source for counts and weights so the form, letter, receipt and manifest agree.
+export function computeLetterLoad(
+  packages: Pick<ShipperLetterPackage, "weight">[],
+  fixedItems: Pick<ShipperLetterFixedItem, "quantity" | "unit_price" | "weight" | "in_existing_box">[],
+) {
+  const parcelWeight = round2(packages.reduce((sum, p) => sum + (Number(p.weight) || 0), 0))
+  const inBoxWeight = round2(fixedItems.reduce((sum, i) => sum + (i.in_existing_box ? i.weight : 0), 0))
+  const ownBoxWeight = round2(fixedItems.reduce((sum, i) => sum + (i.in_existing_box ? 0 : i.weight), 0))
+  const ownBoxCount = fixedItems.reduce((sum, i) => sum + (i.in_existing_box ? 0 : i.quantity), 0)
+  return {
+    packageCount: packages.length + ownBoxCount,
+    totalWeight: round2(parcelWeight + ownBoxWeight),
+    perLbWeight: Math.max(0, round2(parcelWeight - inBoxWeight)),
+    fixedCharge: fixedItemsCharge(fixedItems),
+  }
 }
 
 export const PAYMENT_CURRENCIES = ["USD", "HTG"] as const

@@ -19,10 +19,14 @@ export function ShipperLetterPaymentForm({
   id,
   price,
   fees,
+  fixedCharge = 0,
+  perLbWeight,
 }: {
   id: string
   price: number | null
   fees: number | null
+  fixedCharge?: number
+  perLbWeight?: number
 }) {
   const [priceValue, setPriceValue] = useState(initialValue(price))
   const [feesValue, setFeesValue] = useState(initialValue(fees))
@@ -31,7 +35,7 @@ export function ShipperLetterPaymentForm({
     {},
   )
 
-  const total = Math.round((toNumber(priceValue) + toNumber(feesValue)) * 100) / 100
+  const total = Math.round((toNumber(priceValue) + fixedCharge + toNumber(feesValue)) * 100) / 100
 
   const inputClass =
     "w-full rounded-lg border border-input bg-background py-2.5 pl-7 pr-3 text-right font-mono text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
@@ -51,7 +55,12 @@ export function ShipperLetterPaymentForm({
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div className="flex flex-col gap-1.5">
             <label htmlFor="payment-price" className="text-sm font-medium text-foreground">
-              Price
+              Price (per-pound packages)
+              {perLbWeight !== undefined ? (
+                <span className="block text-xs font-normal text-muted-foreground">
+                  {perLbWeight.toFixed(2)} lbs billable
+                </span>
+              ) : null}
             </label>
             <div className="relative">
               <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
@@ -108,6 +117,14 @@ export function ShipperLetterPaymentForm({
             </output>
           </div>
         </div>
+
+        {fixedCharge > 0 ? (
+          <p className="text-sm text-muted-foreground">
+            Includes fixed-price items:{" "}
+            <span className="font-mono font-bold text-foreground">{usd.format(fixedCharge)}</span> (edit them in Edit
+            Shipper Letter).
+          </p>
+        ) : null}
 
         <div className="flex flex-wrap items-center gap-3">
           <button
