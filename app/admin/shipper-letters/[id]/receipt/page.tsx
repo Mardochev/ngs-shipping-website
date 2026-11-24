@@ -93,7 +93,11 @@ export default async function ShipperLetterReceiptPage({ params }: { params: Pro
   if (!letter) notFound()
 
   const packages = getLetterPackages(letter)
-  const summary = summarizeLetterPayments(letter.total === null ? null : Number(letter.total), payments)
+  const summary = summarizeLetterPayments(
+    letter.total === null ? null : Number(letter.total),
+    payments,
+    letter.payment_history_verified !== false,
+  )
 
   const barcodeSvg = getBarcodeSvg(letter.reference_number, { height: 60 })
   const printedDate = new Date().toLocaleDateString("en-US", {
@@ -205,10 +209,12 @@ export default async function ShipperLetterReceiptPage({ params }: { params: Pro
           <Divider />
 
           <Line label="Total paid" value={usd.format(summary.totalPaid)} />
-          <div className="mt-0.5 flex justify-between gap-3 text-[18px] font-black">
-            <span>BALANCE DUE</span>
-            <span>{summary.balanceDue === null ? "—" : usd.format(summary.balanceDue)}</span>
-          </div>
+          {summary.balanceConfirmed ? (
+            <div className="mt-0.5 flex justify-between gap-3 text-[18px] font-black">
+              <span>BALANCE DUE</span>
+              <span>{summary.balanceDue === null ? "—" : usd.format(summary.balanceDue)}</span>
+            </div>
+          ) : null}
           <p className="text-center text-[15px] font-black uppercase">{summary.status}</p>
 
           <Divider />

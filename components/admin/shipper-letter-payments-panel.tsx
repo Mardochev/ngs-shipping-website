@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react"
 import { CheckCircle2, Loader2, Trash2 } from "lucide-react"
 import {
+  confirmShipperLetterPaymentHistory,
   deleteShipperLetterPayment,
   recordShipperLetterPayment,
   type RecordLetterPaymentState,
@@ -35,11 +36,13 @@ export function ShipperLetterPaymentsPanel({
   id,
   total,
   payments,
+  historyVerified,
   defaultHtgRate,
 }: {
   id: string
   total: number | null
   payments: ShipperLetterPayment[]
+  historyVerified: boolean
   defaultHtgRate: number | null
 }) {
   const [state, formAction, pending] = useActionState<RecordLetterPaymentState, FormData>(
@@ -58,8 +61,9 @@ export function ShipperLetterPaymentsPanel({
     setFormKey((k) => k + 1)
   }
 
-  const summary = summarizeLetterPayments(total, payments)
+  const summary = summarizeLetterPayments(total, payments, historyVerified)
   const balance = summary.balanceDue ?? 0
+  const fullyRecorded = summary.invoiceTotal !== null && summary.invoiceTotal > 0 && balance === 0
   const rateNumber = Number(rate)
   const amountNumber = Number(amount)
   const usdPreview =
@@ -72,7 +76,7 @@ export function ShipperLetterPaymentsPanel({
     )
   }
 
-  const canRecord = summary.invoiceTotal !== null && summary.invoiceTotal > 0 && summary.status !== "Paid"
+  const canRecord = summary.invoiceTotal !== null && summary.invoiceTotal > 0 && !fullyRecorded
 
   return (
     <section aria-labelledby="payments-heading" className="no-print mb-6 rounded-xl border border-border bg-card p-5">
@@ -99,10 +103,34 @@ export function ShipperLetterPaymentsPanel({
         <div className="flex flex-col gap-1 rounded-lg border border-primary/40 bg-primary/10 p-3">
           <dt className="text-muted-foreground">Balance due</dt>
           <dd className="font-mono font-bold text-foreground">
-            {summary.balanceDue === null ? "—" : usd.format(summary.balanceDue)}
+            {!summary.balanceConfirmed ? "To verify" : summary.balanceDue === null ? "—" : usd.format(summary.balanceDue)}
           </dd>
         </div>
       </dl>
+
+      {!historyVerified ? (
+        <div className="mt-4 flex flex-col gap-3 rounded-lg border border-primary/40 bg-primary/10 p-4 text-sm">
+          <p className="leading-relaxed text-foreground">
+            This letter was created before payment history was tracked, so earlier payments may not be recorded here.
+            Record any payments already received, then confirm the history is complete to show the confirmed balance
+            and status.
+          </p>
+          <form
+            action={confirmShipperLetterPaymentHistory}
+            onSubmit={(e) => {
+              if (!window.confirm("Confirm that every payment received for this letter is recorded?")) e.preventDefault()
+            }}
+          >
+            <input type="hidden" name="id" value={id} />
+            <button
+              type="submit"
+              className="rounded-lg border border-primary px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
+            >
+              Confirm payment history is complete
+            </button>
+          </form>
+        </div>
+      ) : null}
 
       {payments.length > 0 ? (
         <ul className="mt-4 flex flex-col divide-y divide-border rounded-lg border border-border">

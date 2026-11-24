@@ -11,6 +11,7 @@ import {
   getLetterPackages,
   sumPackageWeight,
   summarizeLetterPayments,
+  PAYMENT_TO_VERIFY,
 } from "@/lib/shipper-letter-types"
 import { ShipperLetterPaymentsPanel, formatPaymentAmount } from "@/components/admin/shipper-letter-payments-panel"
 import { ShipperLetterPrintButton } from "@/components/admin/shipper-letter-print-button"
@@ -81,7 +82,11 @@ export default async function ShipperLetterDetailPage({ params }: { params: Prom
 
   const packages = getLetterPackages(letter)
   const totalWeight = sumPackageWeight(packages)
-  const summary = summarizeLetterPayments(letter.total === null ? null : Number(letter.total), payments)
+  const summary = summarizeLetterPayments(
+    letter.total === null ? null : Number(letter.total),
+    payments,
+    letter.payment_history_verified !== false,
+  )
 
   return (
     <div className="sl-page min-h-screen bg-navy-deep px-4 py-8">
@@ -151,6 +156,7 @@ export default async function ShipperLetterDetailPage({ params }: { params: Prom
           id={letter.id}
           total={letter.total === null ? null : Number(letter.total)}
           payments={payments}
+          historyVerified={letter.payment_history_verified !== false}
           defaultHtgRate={settings.htg_rate === null ? null : Number(settings.htg_rate)}
         />
 
@@ -290,7 +296,9 @@ export default async function ShipperLetterDetailPage({ params }: { params: Prom
                   </tbody>
                 </table>
               ) : (
-                <p className="mt-2 text-sm text-slate-500">No payments received.</p>
+                <p className="mt-2 text-sm text-slate-500">
+                  {summary.balanceConfirmed ? "No payments received." : "No payments recorded in the system."}
+                </p>
               )}
 
               <dl className="mt-3 ml-auto flex w-full max-w-xs flex-col gap-1.5 text-sm">
@@ -300,8 +308,12 @@ export default async function ShipperLetterDetailPage({ params }: { params: Prom
                 </div>
                 <div className="mt-1 flex justify-between gap-4 border-t-2 border-[#0a1f44] pt-2">
                   <dt className="font-bold uppercase text-[#0a1f44]">Balance Due</dt>
-                  <dd className="font-mono text-lg font-extrabold text-[#0a1f44]">
-                    {summary.balanceDue === null ? "—" : usd.format(summary.balanceDue)}
+                  <dd className="text-right font-mono text-lg font-extrabold text-[#0a1f44]">
+                    {!summary.balanceConfirmed
+                      ? PAYMENT_TO_VERIFY
+                      : summary.balanceDue === null
+                        ? "—"
+                        : usd.format(summary.balanceDue)}
                   </dd>
                 </div>
                 <div className="flex justify-between gap-4">

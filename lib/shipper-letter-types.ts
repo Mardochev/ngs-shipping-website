@@ -42,6 +42,7 @@ export type ShipperLetter = {
   total: number | null
   estimated_delivery_date: string | null
   packages: ShipperLetterPackage[] | null
+  payment_history_verified: boolean
   created_at: string
   updated_at: string
 }
@@ -90,17 +91,26 @@ export type ShipperLetterPayment = {
   created_at: string
 }
 
-export type LetterPaymentStatus = "Unpaid" | "Partially Paid" | "Paid"
+export type LetterPaymentStatus = "Unpaid" | "Partially Paid" | "Paid" | "Payment to verify"
+
+export const PAYMENT_TO_VERIFY = "Payment to verify"
 
 const cents = (n: number) => Math.round(n * 100) / 100
 
 // The invoice total is what is owed; only recorded payments count as paid.
-export function summarizeLetterPayments(total: number | null, payments: Pick<ShipperLetterPayment, "amount_usd">[]) {
+// Letters created before payment history existed may have been paid outside the app,
+// so until an admin confirms their history the balance is not presented as confirmed.
+export function summarizeLetterPayments(
+  total: number | null,
+  payments: Pick<ShipperLetterPayment, "amount_usd">[],
+  historyVerified = true,
+) {
   const totalPaid = cents(payments.reduce((sum, p) => sum + Number(p.amount_usd), 0))
   const invoiceTotal = total === null || total === undefined ? null : cents(Number(total))
   const balanceDue = invoiceTotal === null ? null : Math.max(0, cents(invoiceTotal - totalPaid))
   let status: LetterPaymentStatus = "Unpaid"
-  if (invoiceTotal !== null && invoiceTotal > 0 && balanceDue === 0) status = "Paid"
+  if (!historyVerified) status = PAYMENT_TO_VERIFY
+  else if (invoiceTotal !== null && invoiceTotal > 0 && balanceDue === 0) status = "Paid"
   else if (totalPaid > 0) status = "Partially Paid"
-  return { invoiceTotal, totalPaid, balanceDue, status }
+  return { invoiceTotal, totalPaid, balanceDue, status, balanceConfirmed: historyVerified }
 }

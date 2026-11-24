@@ -399,6 +399,24 @@ export async function deleteShipperLetterPayment(formData: FormData): Promise<vo
   revalidatePath("/admin")
 }
 
+// Admin confirms that the recorded history for a legacy letter is complete,
+// after which the balance and Unpaid/Partially Paid/Paid status are shown as confirmed.
+export async function confirmShipperLetterPaymentHistory(formData: FormData): Promise<void> {
+  const session = await getAdminSession()
+  if (!session) throw new Error("Unauthorized")
+
+  const id = String(formData.get("id") ?? "")
+  if (!id) return
+
+  const supabase = getServiceClient()
+  await supabase
+    .from("shipper_letters")
+    .update({ payment_history_verified: true, updated_at: new Date().toISOString() })
+    .eq("id", id)
+  revalidatePath(`/admin/shipper-letters/${id}`)
+  revalidatePath("/admin")
+}
+
 export type ShipperLetterDeliveryState = {
   error?: string
   savedAt?: number
