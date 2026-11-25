@@ -191,17 +191,20 @@ export default async function ShipperLetterReceiptPage({ params }: { params: Pro
                     </span>
                     <span className="shrink-0 font-bold">{usd.format(fixedItemCharge(item))}</span>
                   </div>
-                  <p className="text-[12px]">
-                    {usd.format(item.unit_price)} each · {item.weight.toFixed(2)} lb
-                    {item.in_existing_box ? " · in box above" : " · own box"}
-                  </p>
+                  <p className="text-[12px]">{usd.format(item.unit_price)} each</p>
                 </div>
               ))}
             </>
           ) : null}
           <Line label="Packages" value={String(load.packageCount)} />
-          <Line label="Total weight" value={`${load.totalWeight.toFixed(2)} lb`} />
-          {fixedItems.length > 0 ? <Line label="Per-lb weight" value={`${load.perLbWeight.toFixed(2)} lb`} /> : null}
+          {packages.length > 0 ? (
+            <>
+              <Line label="Total weight" value={`${load.totalWeight.toFixed(2)} lb`} />
+              {fixedItems.length > 0 ? (
+                <Line label="Per-lb weight" value={`${load.perLbWeight.toFixed(2)} lb`} />
+              ) : null}
+            </>
+          ) : null}
           {specialInstructions ? <p className="mt-0.5 break-words">Note: {specialInstructions}</p> : null}
 
           <Divider />

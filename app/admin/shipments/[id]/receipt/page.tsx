@@ -83,6 +83,7 @@ export default async function ShipmentReceiptPage({ params }: { params: Promise<
     day: "numeric",
   })
   const sender = shipment.customers
+  const hasPerLbLines = isLegacy || lines.some((line) => line.mode !== "flat")
 
   return (
     <div className="receipt-page min-h-screen bg-navy-deep px-4 py-8">
@@ -143,7 +144,7 @@ export default async function ShipmentReceiptPage({ params }: { params: Promise<
           <Divider />
 
           <Heading>Packages</Heading>
-          <Line label="Weight" value={`${shipment.weight_lb} lb`} />
+          {hasPerLbLines ? <Line label="Weight" value={`${shipment.weight_lb} lb`} /> : null}
           {lines.map((line, index) => (
             <div key={index} className="mt-1">
               <p className="break-words font-bold">{line.description}</p>

@@ -255,23 +255,16 @@ export default async function ShipperLetterDetailPage({ params }: { params: Prom
                       <tr className="border-b border-slate-300 text-left text-[11px] uppercase tracking-wide text-slate-500">
                         <th scope="col" className="py-1.5 font-semibold">Description</th>
                         <th scope="col" className="py-1.5 text-right font-semibold">Qty</th>
-                        <th scope="col" className="py-1.5 text-right font-semibold">Price / Item</th>
-                        <th scope="col" className="py-1.5 text-right font-semibold">Weight</th>
-                        <th scope="col" className="py-1.5 text-right font-semibold">Charge</th>
+                        <th scope="col" className="py-1.5 text-right font-semibold">Unit Price</th>
+                        <th scope="col" className="py-1.5 text-right font-semibold">Total</th>
                       </tr>
                     </thead>
                     <tbody>
                       {fixedItems.map((item, i) => (
                         <tr key={i} className="border-b border-slate-100 align-top">
-                          <td className="py-1.5 text-slate-900">
-                            {item.description}
-                            <span className="block text-[11px] text-slate-500">
-                              {item.in_existing_box ? "Packed inside a package above" : "Own box"}
-                            </span>
-                          </td>
+                          <td className="py-1.5 text-slate-900">{item.description}</td>
                           <td className="py-1.5 text-right font-mono text-slate-900">{item.quantity}</td>
                           <td className="py-1.5 text-right font-mono text-slate-900">{usd.format(item.unit_price)}</td>
-                          <td className="py-1.5 text-right font-mono text-slate-900">{item.weight.toFixed(2)} lbs</td>
                           <td className="py-1.5 text-right font-mono text-slate-900">
                             {usd.format(fixedItemCharge(item))}
                           </td>
@@ -286,9 +279,13 @@ export default async function ShipperLetterDetailPage({ params }: { params: Prom
                 <span>
                   {load.packageCount} {load.packageCount === 1 ? "package" : "packages"}
                 </span>
-                <span className="font-mono">Total weight {load.totalWeight.toFixed(2)} lbs</span>
-                {fixedItems.length > 0 ? (
-                  <span className="font-mono">Per-pound weight {load.perLbWeight.toFixed(2)} lbs</span>
+                {packages.length > 0 ? (
+                  <>
+                    <span className="font-mono">Total weight {load.totalWeight.toFixed(2)} lbs</span>
+                    {fixedItems.length > 0 ? (
+                      <span className="font-mono">Per-pound weight {load.perLbWeight.toFixed(2)} lbs</span>
+                    ) : null}
+                  </>
                 ) : null}
               </div>
               <Row label="Declared Merchandise Value" value={usd.format(Number(letter.declared_value))} />
