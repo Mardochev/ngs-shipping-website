@@ -3,8 +3,9 @@
 import { useMemo, useState } from "react"
 import Link from "next/link"
 import { Search, ExternalLink } from "lucide-react"
-import { updateShipperLetterStatus } from "@/lib/actions/shipper-letters"
+import { updateShipperLetterStatus, updateShipperLetterTrackingStatus } from "@/lib/actions/shipper-letters"
 import { ShareFormButton } from "@/components/admin/share-form-button"
+import { TrackingStatusSelect } from "@/components/admin/tracking-status-select"
 import { SHIPPER_LETTER_STATUSES, type ShipperLetter, type ShipperLetterStatus } from "@/lib/shipper-letter-types"
 
 export const shipperLetterStatusStyles: Record<ShipperLetterStatus, string> = {
@@ -80,6 +81,7 @@ export function ShipperLettersPanel({ letters }: { letters: ShipperLetter[] }) {
               <th className="pb-3 pr-4 font-semibold">Description</th>
               <th className="pb-3 pr-4 font-semibold">Submitted</th>
               <th className="pb-3 pr-4 font-semibold">Status</th>
+              <th className="pb-3 pr-4 font-semibold">Tracking</th>
               <th className="pb-3 font-semibold">
                 <span className="sr-only">Actions</span>
               </th>
@@ -119,6 +121,14 @@ export function ShipperLettersPanel({ letters }: { letters: ShipperLetter[] }) {
                     </select>
                   </form>
                 </td>
+                <td className="py-3 pr-4">
+                  <TrackingStatusSelect
+                    action={updateShipperLetterTrackingStatus}
+                    id={l.id}
+                    value={l.tracking_status ?? null}
+                    label={`Tracking status for ${l.reference_number}`}
+                  />
+                </td>
                 <td className="py-3">
                   <Link
                     href={`/admin/shipper-letters/${l.id}`}
@@ -131,7 +141,7 @@ export function ShipperLettersPanel({ letters }: { letters: ShipperLetter[] }) {
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={10} className="py-10 text-center text-muted-foreground">
+                <td colSpan={11} className="py-10 text-center text-muted-foreground">
                   {letters.length === 0 ? "No Shipper Letters submitted yet." : "No Shipper Letters match your search."}
                 </td>
               </tr>

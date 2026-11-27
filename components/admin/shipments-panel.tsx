@@ -5,13 +5,13 @@ import Link from "next/link"
 import { Plus, Pencil, Trash2, FileText, Search, Tag } from "lucide-react"
 import { deleteShipment, updateShipmentStatus } from "@/lib/actions/admin"
 import {
-  SHIPMENT_STATUSES,
   type Customer,
   type DestinationRate,
   type Shipment,
   type ShipmentWithCustomer,
 } from "@/lib/types"
 import { Modal } from "./modal"
+import { TrackingStatusSelect } from "./tracking-status-select"
 import { ShipmentForm } from "./shipment-form"
 
 export function ShipmentsPanel({
@@ -91,22 +91,12 @@ export function ShipmentsPanel({
                   <td className="px-4 py-3 text-muted-foreground">${(Number(s.declared_value) || 0).toFixed(2)}</td>
                   <td className="px-4 py-3 text-muted-foreground">${Number(s.cost).toFixed(2)}</td>
                   <td className="px-4 py-3">
-                    <form action={updateShipmentStatus} className="flex items-center gap-2">
-                      <input type="hidden" name="id" value={s.id} />
-                      <select
-                        name="status"
-                        defaultValue={s.status}
-                        onChange={(e) => e.currentTarget.form?.requestSubmit()}
-                        className="rounded-md border border-input bg-navy-deep px-2 py-1 text-xs text-foreground focus:border-primary focus:outline-none"
-                        aria-label={`Update status for ${s.tracking_number}`}
-                      >
-                        {SHIPMENT_STATUSES.map((st) => (
-                          <option key={st} value={st}>
-                            {st}
-                          </option>
-                        ))}
-                      </select>
-                    </form>
+                    <TrackingStatusSelect
+                      action={updateShipmentStatus}
+                      id={s.id}
+                      value={s.status}
+                      label={`Update status for ${s.tracking_number}`}
+                    />
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-1">

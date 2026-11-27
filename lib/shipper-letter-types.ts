@@ -1,3 +1,5 @@
+import type { ShipmentStatus } from "@/lib/types"
+
 export const SHIPPER_LETTER_STATUSES = ["New", "Processing", "Completed", "Cancelled"] as const
 export type ShipperLetterStatus = (typeof SHIPPER_LETTER_STATUSES)[number]
 
@@ -37,6 +39,7 @@ export type ShipperLetter = {
   signature: string
   signed_date: string
   status: ShipperLetterStatus
+  tracking_status: ShipmentStatus | null
   price: number | null
   fees: number | null
   total: number | null
