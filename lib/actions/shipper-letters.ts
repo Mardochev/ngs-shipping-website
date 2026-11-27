@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { getServiceClient } from "@/lib/supabase/admin"
 import { getAdminSession } from "@/lib/session"
+import { SHIPMENT_STATUSES, type ShipmentStatus } from "@/lib/types"
 import {
   MAX_LETTER_FIXED_ITEMS,
   MAX_LETTER_PACKAGES,
@@ -573,6 +574,41 @@ export async function updateShipperLetterStatus(formData: FormData): Promise<voi
     .from("shipper_letters")
     .update({ status, updated_at: new Date().toISOString() })
     .eq("id", id)
+
+  revalidatePath("/admin")
+  revalidatePath(`/admin/shipper-letters/${id}`)
+}
+
+// Tracking status is separate from the letter workflow status: it only touches
+// tracking_status and the letter's tracking history, never status, updated_at, or payments.
+export async function updateShipperLetterTrackingStatus(formData: FormData): Promise<void> {
+  const session = await getAdminSession()
+  if (!session) throw new Error("Unauthorized")
+
+  const id = String(formData.get("id") ?? "")
+  const status = String(formData.get("status") ?? "") as ShipmentStatus
+  const location = String(formData.get("location") ?? "").trim()
+  if (!id || !SHIPMENT_STATUSES.includes(status)) return
+
+  const supabase = getServiceClient()
+  const { data: letter } = await supabase
+    .from("shipper_letters")
+    .select("id, tracking_status")
+    .eq("id", id)
+    .maybeSingle()
+  if (!letter || letter.tracking_status === status) return
+
+  const { error } = await supabase.from("shipper_letters").update({ tracking_status: status }).eq("id", id)
+  if (error) {
+    console.error("Updating shipper letter tracking status failed:", error.message)
+    return
+  }
+  await supabase.from("tracking_events").insert({
+    shipper_letter_id: id,
+    status,
+    location: location || null,
+    note: `Status updated to ${status}`,
+  })
 
   revalidatePath("/admin")
   revalidatePath(`/admin/shipper-letters/${id}`)

@@ -1,7 +1,7 @@
 "use server"
 
 import { getShipmentByTracking } from "@/lib/queries"
-import { getShipperLetterByReference } from "@/lib/shipper-letter-queries"
+import { getShipperLetterByReference, getShipperLetterTrackingEvents } from "@/lib/shipper-letter-queries"
 
 export type TrackingResult = {
   found: boolean
@@ -48,21 +48,38 @@ export async function lookupTracking(
 
   const letter = await getShipperLetterByReference(tracking)
   if (letter) {
-    const status = SHIPPER_LETTER_PUBLIC_STATUS[letter.status] ?? letter.status
-    return {
+    const received = {
+      status: "Received",
+      location: "NGS Office, USA",
+      note: "Shipper Letter received by NGS NEXTLANE GLOBAL SHIPPING.",
+      date: letter.created_at,
+    }
+    const base = {
       found: true,
       tracking: letter.reference_number,
-      status,
       origin: "USA",
       destination: letter.destination_city ? `${letter.destination_city}, Haiti` : "Haiti",
       estimatedDelivery: letter.estimated_delivery_date,
+    }
+
+    if (letter.tracking_status) {
+      const trackingEvents = await getShipperLetterTrackingEvents(letter.id)
+      return {
+        ...base,
+        status: letter.tracking_status,
+        events: [
+          received,
+          ...trackingEvents.map((e) => ({ status: e.status, location: e.location, note: e.note, date: e.created_at })),
+        ],
+      }
+    }
+
+    const status = SHIPPER_LETTER_PUBLIC_STATUS[letter.status] ?? letter.status
+    return {
+      ...base,
+      status,
       events: [
-        {
-          status: "Received",
-          location: "NGS Office, USA",
-          note: "Shipper Letter received by NGS NEXTLANE GLOBAL SHIPPING.",
-          date: letter.created_at,
-        },
+        received,
         ...(status !== "Received" && letter.updated_at !== letter.created_at
           ? [{ status, location: null, note: null, date: letter.updated_at }]
           : []),

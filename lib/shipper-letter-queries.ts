@@ -49,6 +49,22 @@ export async function getShipperLetterByReference(reference: string): Promise<Sh
   return (data as ShipperLetter | null) ?? null
 }
 
+export async function getShipperLetterTrackingEvents(
+  letterId: string,
+): Promise<{ status: string; location: string | null; note: string | null; created_at: string }[]> {
+  const supabase = getServiceClient()
+  const { data, error } = await supabase
+    .from("tracking_events")
+    .select("status, location, note, created_at")
+    .eq("shipper_letter_id", letterId)
+    .order("created_at", { ascending: true })
+  if (error) {
+    console.error("Failed to load shipper letter tracking events:", error.message)
+    return []
+  }
+  return data ?? []
+}
+
 export async function getShipperLetterById(id: string): Promise<ShipperLetter | null> {
   const supabase = getServiceClient()
   const { data } = await supabase.from("shipper_letters").select("*").eq("id", id).maybeSingle()
