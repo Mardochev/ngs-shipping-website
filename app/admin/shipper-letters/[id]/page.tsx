@@ -18,6 +18,8 @@ import {
 } from "@/lib/shipper-letter-types"
 import { ShipperLetterPaymentsPanel } from "@/components/admin/shipper-letter-payments-panel"
 import { ShipperLetterPrintButton } from "@/components/admin/shipper-letter-print-button"
+import { WhatsAppButton } from "@/components/admin/whatsapp-button"
+import { letterWhatsAppInfo } from "@/lib/whatsapp"
 import { ShipperLetterPaymentForm } from "@/components/admin/shipper-letter-payment-form"
 import { ShipperLetterDeliveryForm } from "@/components/admin/shipper-letter-delivery-form"
 
@@ -148,6 +150,11 @@ export default async function ShipperLetterDetailPage({ params }: { params: Prom
             >
               <Tag className="h-4 w-4" aria-hidden="true" /> PRINT SHIPPING LABEL
             </Link>
+            <WhatsAppButton
+              info={letterWhatsAppInfo(letter)}
+              shipper={{ name: letter.shipper_full_name, phone: letter.shipper_phone }}
+              recipient={{ name: letter.recipient_full_name, phone: letter.recipient_phone }}
+            />
             <ShipperLetterPrintButton />
           </div>
         </div>

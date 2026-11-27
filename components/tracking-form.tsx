@@ -2,7 +2,7 @@
 
 import { useActionState } from "react"
 import { Search, Truck, CheckCircle2, MapPin, Clock } from "lucide-react"
-import { lookupTracking } from "@/lib/actions/tracking"
+import { lookupTracking, type TrackingResult } from "@/lib/actions/tracking"
 import { StatusBadge } from "@/components/status-badge"
 import { SubmitButton } from "@/components/admin/submit-button"
 
@@ -21,8 +21,14 @@ function formatDay(value: string | null | undefined) {
   return new Date(value).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
 }
 
-export function TrackingForm() {
-  const [result, formAction] = useActionState(lookupTracking, null)
+export function TrackingForm({
+  initialNumber = "",
+  initialResult = null,
+}: {
+  initialNumber?: string
+  initialResult?: TrackingResult | null
+} = {}) {
+  const [result, formAction] = useActionState(lookupTracking, initialResult)
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -39,6 +45,7 @@ export function TrackingForm() {
             id="tracking"
             name="tracking"
             type="text"
+            defaultValue={initialNumber}
             placeholder="Enter tracking number (e.g. NGS-2026-0042)"
             className="w-full bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none"
           />

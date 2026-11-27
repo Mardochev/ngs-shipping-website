@@ -12,6 +12,8 @@ import {
 } from "@/lib/types"
 import { Modal } from "./modal"
 import { TrackingStatusSelect } from "./tracking-status-select"
+import { WhatsAppButton } from "./whatsapp-button"
+import { shipmentWhatsAppInfo } from "@/lib/whatsapp"
 import { ShipmentForm } from "./shipment-form"
 
 export function ShipmentsPanel({
@@ -117,6 +119,12 @@ export function ShipmentsPanel({
                       >
                         <Tag className="h-4 w-4" />
                       </Link>
+                      <WhatsAppButton
+                        compact
+                        info={shipmentWhatsAppInfo(s)}
+                        shipper={{ name: s.customers?.full_name, phone: s.customers?.phone }}
+                        recipient={{ name: s.recipient_name, phone: s.recipient_phone }}
+                      />
                       <button
                         type="button"
                         onClick={() => setEditing(s)}

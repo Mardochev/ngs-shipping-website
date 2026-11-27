@@ -3,6 +3,7 @@ import { Phone } from "lucide-react"
 import { PageHeader } from "@/components/page-header"
 import { TrackingForm } from "@/components/tracking-form"
 import { site } from "@/lib/site"
+import { lookupTracking } from "@/lib/actions/tracking"
 
 export const metadata: Metadata = {
   title: "Track Your Shipment",
@@ -10,7 +11,20 @@ export const metadata: Metadata = {
     "Track your NGS shipment from the USA to Haiti in real time. Enter your tracking number to see the latest status.",
 }
 
-export default function TrackingPage() {
+export default async function TrackingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ number?: string | string[] }>
+}) {
+  const raw = (await searchParams).number
+  const initialNumber = (Array.isArray(raw) ? raw[0] : raw)?.trim().slice(0, 64) ?? ""
+  let initialResult = null
+  if (initialNumber) {
+    const fd = new FormData()
+    fd.set("tracking", initialNumber)
+    initialResult = await lookupTracking(null, fd)
+  }
+
   return (
     <>
       <PageHeader
@@ -20,7 +34,7 @@ export default function TrackingPage() {
       />
 
       <section className="px-4 py-20 sm:px-6 lg:px-8">
-        <TrackingForm />
+        <TrackingForm initialNumber={initialNumber} initialResult={initialResult} />
 
         <div className="mx-auto mt-12 max-w-3xl rounded-2xl border border-border bg-navy-deep p-6 text-center sm:p-8">
           <h2 className="font-display text-xl font-semibold text-foreground">

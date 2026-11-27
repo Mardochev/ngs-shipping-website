@@ -6,6 +6,8 @@ import { Search, ExternalLink } from "lucide-react"
 import { updateShipperLetterStatus, updateShipperLetterTrackingStatus } from "@/lib/actions/shipper-letters"
 import { ShareFormButton } from "@/components/admin/share-form-button"
 import { TrackingStatusSelect } from "@/components/admin/tracking-status-select"
+import { WhatsAppButton } from "@/components/admin/whatsapp-button"
+import { letterWhatsAppInfo } from "@/lib/whatsapp"
 import { SHIPPER_LETTER_STATUSES, type ShipperLetter, type ShipperLetterStatus } from "@/lib/shipper-letter-types"
 
 export const shipperLetterStatusStyles: Record<ShipperLetterStatus, string> = {
@@ -130,12 +132,20 @@ export function ShipperLettersPanel({ letters }: { letters: ShipperLetter[] }) {
                   />
                 </td>
                 <td className="py-3">
-                  <Link
-                    href={`/admin/shipper-letters/${l.id}`}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-foreground transition-colors hover:border-primary hover:text-primary"
-                  >
-                    Open <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
-                  </Link>
+                  <div className="flex items-center gap-1">
+                    <WhatsAppButton
+                      compact
+                      info={letterWhatsAppInfo(l)}
+                      shipper={{ name: l.shipper_full_name, phone: l.shipper_phone }}
+                      recipient={{ name: l.recipient_full_name, phone: l.recipient_phone }}
+                    />
+                    <Link
+                      href={`/admin/shipper-letters/${l.id}`}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-foreground transition-colors hover:border-primary hover:text-primary"
+                    >
+                      Open <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                    </Link>
+                  </div>
                 </td>
               </tr>
             ))}
