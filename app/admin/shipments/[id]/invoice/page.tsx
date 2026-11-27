@@ -4,6 +4,8 @@ import { getAdminSession } from "@/lib/session"
 import { getShipmentForPrint } from "@/lib/queries"
 import { getCachedQrDataUrl } from "@/lib/qr-cache"
 import { InvoiceActions } from "@/components/admin/invoice-actions"
+import { WhatsAppButton } from "@/components/admin/whatsapp-button"
+import { shipmentWhatsAppInfo } from "@/lib/whatsapp"
 import { computeInvoice } from "@/lib/invoice-lines"
 
 // Invoice-specific company details (provided by NGS)
@@ -108,8 +110,15 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
     <div className="invoice-page min-h-screen bg-slate-100 px-4 py-8 print:bg-white print:p-0">
       <style dangerouslySetInnerHTML={{ __html: invoicePrintCss }} />
       <div className="mx-auto max-w-3xl">
-        <div className="no-print mb-6">
+        <div className="no-print mb-6 flex flex-col gap-3">
           <InvoiceActions shipmentId={shipment.id} paymentStatus={paymentStatus} />
+          <div className="flex justify-end">
+            <WhatsAppButton
+              info={shipmentWhatsAppInfo(shipment)}
+              shipper={{ name: customer?.full_name, phone: customer?.phone }}
+              recipient={{ name: shipment.recipient_name, phone: shipment.recipient_phone }}
+            />
+          </div>
         </div>
 
         <article className="invoice-article mx-auto overflow-hidden rounded-2xl bg-white text-slate-900 shadow-2xl print:rounded-none print:shadow-none">
